@@ -38,9 +38,21 @@ export const createOrder = asyncHandler(async (req, res) => {
 
   // Build WhatsApp message
   const lines = orderItems.map(
-    (i) => `• ${i.name} x${i.quantity} — $${(i.price * i.quantity).toLocaleString('es-AR')}`
+    (item, index) => `${index + 1}. ${item.name}\n   Cantidad: ${item.quantity}\n   Subtotal: $${(item.price * item.quantity).toLocaleString('es-AR')}`
   );
-  const whatsappMessage = `¡Hola! Me gustaría hacer el siguiente pedido:\n\n${lines.join('\n')}\n\n*Total: $${total.toLocaleString('es-AR')}*`;
+  const storeName = process.env.STORE_NAME || 'Playa y Sol';
+  const whatsappMessage = [
+    '¡Hola! 👋',
+    `🏪 *${storeName}*`,
+    'Quiero realizar este pedido:',
+    '',
+    '🛒 *Detalle*',
+    lines.join('\n\n'),
+    '',
+    `💰 *Total: $${total.toLocaleString('es-AR')}*`,
+    '',
+    'Gracias 🙌',
+  ].join('\n');
 
   const order = await Order.create({
     items: orderItems,

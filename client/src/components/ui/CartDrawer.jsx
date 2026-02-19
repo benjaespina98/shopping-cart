@@ -11,16 +11,25 @@ export default function CartDrawer() {
 
   const handleWhatsApp = async () => {
     if (items.length === 0) return;
+
+    const popup = window.open('', '_blank');
     setSending(true);
     try {
       const { data } = await ordersAPI.create({
         items: items.map(({ productId, quantity }) => ({ productId, quantity })),
       });
+
+      if (popup && !popup.closed) {
+        popup.location.href = data.whatsappUrl;
+      } else {
+        window.location.href = data.whatsappUrl;
+      }
+
       clearCart();
       toggleCart();
-      window.open(data.whatsappUrl, '_blank');
       toast.success('¡Pedido enviado a WhatsApp!');
     } catch (err) {
+      if (popup && !popup.closed) popup.close();
       toast.error(err.response?.data?.message || 'Error al procesar el pedido');
     } finally {
       setSending(false);

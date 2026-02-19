@@ -19,6 +19,7 @@
     "react-router-dom": "^6.24.0",
     "react-toastify": "^10.0.5",
     "recharts": "^2.12.7",
+    "shopping-cart-mern": "file:..",
     "tailwindcss": "^3.4.6",
     "vite": "^5.3.4"
   },

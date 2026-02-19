@@ -65,7 +65,8 @@ JWT_SECRET=una_clave_muy_secreta_larga
 CLOUDINARY_CLOUD_NAME=...
 CLOUDINARY_API_KEY=...
 CLOUDINARY_API_SECRET=...
-WHATSAPP_NUMBER=5491112345678   # Tu número con código de país, sin + ni espacios
+STORE_NAME="Playa y Sol"
+WHATSAPP_NUMBER=5493534224607   # Tu número con código de país, sin + ni espacios
 ADMIN_EMAIL=admin@mitienda.com
 ADMIN_PASSWORD=TuPassword123!
 ```

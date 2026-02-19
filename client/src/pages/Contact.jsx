@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { FiMail, FiPhone, FiMessageCircle, FiInstagram, FiFacebook, FiSend } from 'react-icons/fi';
 
-const WHATSAPP_NUMBER = '5491112345678'; // Change in .env and here
+const WHATSAPP_NUMBER = '5493534224607';
+const PHONE_DISPLAY = '3534224607';
+const PHONE_LINK = 'tel:+543534224607';
+const CONTACT_EMAIL = 'benjaespina98@gmail.com';
 
 export default function Contact() {
   const [form, setForm] = useState({ name: '', email: '', message: '' });
@@ -10,7 +13,15 @@ export default function Contact() {
   const handleWhatsApp = (e) => {
     e.preventDefault();
     const text = `Hola! Soy ${form.name}${form.email ? ` (${form.email})` : ''}.\n\n${form.message}`;
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`, '_blank');
+    const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+    const popup = window.open('', '_blank');
+
+    if (popup && !popup.closed) {
+      popup.location.href = whatsappUrl;
+    } else {
+      window.location.href = whatsappUrl;
+    }
+
     setSent(true);
     setTimeout(() => setSent(false), 4000);
     setForm({ name: '', email: '', message: '' });
@@ -43,31 +54,31 @@ export default function Contact() {
               <div>
                 <p className="text-xs text-slate-400 font-medium">WhatsApp</p>
                 <p className="text-sm font-semibold text-slate-700 group-hover:text-green-600 transition-colors">
-                  +54 9 11 1234-5678
+                  {PHONE_DISPLAY}
                 </p>
               </div>
             </a>
 
-            <a href="tel:+5491112345678" className="flex items-center gap-4 group">
+            <a href={PHONE_LINK} className="flex items-center gap-4 group">
               <div className="w-11 h-11 rounded-xl bg-brand-light flex items-center justify-center group-hover:bg-brand transition-colors">
                 <FiPhone size={19} className="text-brand group-hover:text-white" />
               </div>
               <div>
                 <p className="text-xs text-slate-400 font-medium">Teléfono</p>
                 <p className="text-sm font-semibold text-slate-700 group-hover:text-brand transition-colors">
-                  +54 9 11 1234-5678
+                  {PHONE_DISPLAY}
                 </p>
               </div>
             </a>
 
-            <a href="mailto:info@mitienda.com" className="flex items-center gap-4 group">
+            <a href={`mailto:${CONTACT_EMAIL}`} className="flex items-center gap-4 group">
               <div className="w-11 h-11 rounded-xl bg-brand-light flex items-center justify-center group-hover:bg-brand transition-colors">
                 <FiMail size={19} className="text-brand group-hover:text-white" />
               </div>
               <div>
                 <p className="text-xs text-slate-400 font-medium">Email</p>
                 <p className="text-sm font-semibold text-slate-700 group-hover:text-brand transition-colors">
-                  info@mitienda.com
+                  {CONTACT_EMAIL}
                 </p>
               </div>
             </a>
