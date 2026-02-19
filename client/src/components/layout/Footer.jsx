@@ -49,11 +49,11 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-2">
                 <FiPhone size={15} className="text-brand shrink-0" />
-                <a href="tel:+5491112345678" className="hover:text-brand">+54 9 11 1234-5678</a>
+                <a href="tel:+543534224607" className="hover:text-brand">3534224607</a>
               </li>
               <li className="flex items-center gap-2">
                 <FiMail size={15} className="text-brand shrink-0" />
-                <a href="mailto:info@mitienda.com" className="hover:text-brand">info@mitienda.com</a>
+                <a href="mailto:benjaespina98@gmail.com" className="hover:text-brand">benjaespina98@gmail.com</a>
               </li>
             </ul>
           </div>
