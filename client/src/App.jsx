@@ -1,18 +1,27 @@
+import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import PublicLayout from './components/layout/PublicLayout';
-import AdminLayout from './components/layout/AdminLayout';
 import Landing from './pages/Landing';
 import Shop from './pages/Shop';
 import Contact from './pages/Contact';
 import Location from './pages/Location';
-import AdminLogin from './pages/admin/AdminLogin';
-import AdminDashboard from './pages/admin/AdminDashboard';
-import AdminProducts from './pages/admin/AdminProducts';
-import AdminOrders from './pages/admin/AdminOrders';
-import AdminMetrics from './pages/admin/AdminMetrics';
-import AdminProfile from './pages/admin/AdminProfile';
-import AdminGallery from './pages/admin/AdminGallery';
+
+// Admin — carga solo cuando el usuario navega al panel
+const AdminLayout    = lazy(() => import('./components/layout/AdminLayout'));
+const AdminLogin     = lazy(() => import('./pages/admin/AdminLogin'));
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
+const AdminProducts  = lazy(() => import('./pages/admin/AdminProducts'));
+const AdminOrders    = lazy(() => import('./pages/admin/AdminOrders'));
+const AdminMetrics   = lazy(() => import('./pages/admin/AdminMetrics'));
+const AdminProfile   = lazy(() => import('./pages/admin/AdminProfile'));
+const AdminGallery   = lazy(() => import('./pages/admin/AdminGallery'));
+
+const AdminFallback = () => (
+  <div className="flex items-center justify-center h-screen bg-slate-100">
+    <div className="w-8 h-8 border-4 border-brand border-t-transparent rounded-full animate-spin" />
+  </div>
+);
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -32,14 +41,16 @@ export default function App() {
       </Route>
 
       {/* Admin login (no layout) */}
-      <Route path="/admin/login" element={<AdminLogin />} />
+      <Route path="/admin/login" element={<Suspense fallback={<AdminFallback />}><AdminLogin /></Suspense>} />
 
       {/* Admin protected routes */}
       <Route
         path="/admin"
         element={
           <ProtectedRoute>
-            <AdminLayout />
+            <Suspense fallback={<AdminFallback />}>
+              <AdminLayout />
+            </Suspense>
           </ProtectedRoute>
         }
       >
