@@ -8,6 +8,12 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+const fileFilter = (req, file, cb) => {
+  const allowed = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+  if (allowed.includes(file.mimetype)) return cb(null, true);
+  cb(new Error('Solo se permiten imágenes JPG, PNG y WEBP'));
+};
+
 const storage = new CloudinaryStorage({
   cloudinary,
   params: {
@@ -17,13 +23,15 @@ const storage = new CloudinaryStorage({
   },
 });
 
-export const upload = multer({
-  storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB max per file
-  fileFilter: (req, file, cb) => {
-    const allowed = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-    if (allowed.includes(file.mimetype)) return cb(null, true);
-    cb(new Error('Solo se permiten imágenes JPG, PNG y WEBP'));
+const galleryStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'shopping-cart/gallery',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+    transformation: [{ width: 1400, crop: 'limit', quality: 'auto' }],
   },
 });
+
+export const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 }, fileFilter });
+export const uploadGallery = multer({ storage: galleryStorage, limits: { fileSize: 8 * 1024 * 1024 }, fileFilter });
 export { cloudinary };

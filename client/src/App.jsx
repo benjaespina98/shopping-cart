@@ -11,6 +11,8 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminProducts from './pages/admin/AdminProducts';
 import AdminOrders from './pages/admin/AdminOrders';
 import AdminMetrics from './pages/admin/AdminMetrics';
+import AdminProfile from './pages/admin/AdminProfile';
+import AdminGallery from './pages/admin/AdminGallery';
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -46,6 +48,8 @@ export default function App() {
         <Route path="productos" element={<AdminProducts />} />
         <Route path="pedidos" element={<AdminOrders />} />
         <Route path="metricas" element={<AdminMetrics />} />
+        <Route path="galeria" element={<AdminGallery />} />
+        <Route path="perfil" element={<AdminProfile />} />
       </Route>
 
       {/* Catch-all */}
