@@ -1,6 +1,6 @@
 {
   "installCommand": "npm install",
-  "buildCommand": "npm --prefix client install --include=dev && npm --prefix client run build",
+  "buildCommand": "npm run build:vercel",
   "outputDirectory": "client/dist",
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
