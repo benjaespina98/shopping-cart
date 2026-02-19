@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { FiX, FiChevronLeft, FiChevronRight, FiMaximize2 } from 'react-icons/fi';
+import { galleryAPI } from '../../services/api';
 
 // Reemplazá estas URLs con fotos reales de tu local / las piscinas que instalaste
 export const GALLERY_IMAGES = [
@@ -34,6 +35,10 @@ export const GALLERY_IMAGES = [
     alt: 'Piscina con desnivel y cascada',
   },
 ];
+
+const toThumb = (url) => url.includes('cloudinary.com')
+  ? url.replace('/upload/', '/upload/w_500,q_70/')
+  : url;
 
 // ─── Lightbox ──────────────────────────────────────────────
 function Lightbox({ images, index, onClose }) {
@@ -126,9 +131,20 @@ function Lightbox({ images, index, onClose }) {
 }
 
 // ─── Gallery Section ───────────────────────────────────────
-export default function ImageGallery({ images = GALLERY_IMAGES }) {
+export default function ImageGallery() {
+  const [images, setImages] = useState(GALLERY_IMAGES);
   const [active, setActive] = useState(0);
   const [lightbox, setLightbox] = useState(null);
+
+  useEffect(() => {
+    galleryAPI.getAll()
+      .then(({ data }) => {
+        if (data && data.length > 0) {
+          setImages(data.map((img) => ({ ...img, thumb: toThumb(img.url) })));
+        }
+      })
+      .catch(() => {}); // silently fall back to hardcoded images
+  }, []);
 
   // Auto-advance
   useEffect(() => {

@@ -62,4 +62,14 @@ export const metricsAPI = {
   getCategoryStats: () => api.get('/metrics/categories'),
 };
 
+// ─── Gallery ─────────────────────────────────────────────
+export const galleryAPI = {
+  getAll: () => api.get('/gallery'),
+  add: (formData) =>
+    api.post('/gallery', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  update: (id, data) => api.put(`/gallery/${id}`, data),
+  reorder: (items) => api.put('/gallery/reorder', { items }),
+  delete: (id) => api.delete(`/gallery/${id}`),
+};
+
 export default api;
