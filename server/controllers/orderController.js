@@ -42,16 +42,16 @@ export const createOrder = asyncHandler(async (req, res) => {
   );
   const storeName = process.env.STORE_NAME || 'Playa y Sol';
   const whatsappMessage = [
-    '¡Hola! 👋',
-    `🏪 *${storeName}*`,
+    '\u{1F44B} \u00A1Hola!',
+    `\u{1F3EA} *${storeName}*`,
     'Quiero realizar este pedido:',
     '',
-    '🛒 *Detalle*',
+    '\u{1F6D2} *Detalle del pedido*',
     lines.join('\n\n'),
     '',
-    `💰 *Total: $${total.toLocaleString('es-AR')}*`,
+    `\u{1F4B0} *Total: $${total.toLocaleString('es-AR')}*`,
     '',
-    'Gracias 🙌',
+    'Gracias \u{1F64C}',
   ].join('\n');
 
   const order = await Order.create({
