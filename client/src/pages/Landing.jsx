@@ -59,7 +59,7 @@ export default function Landing() {
             </div>
 
             {/* Stat badges */}
-            <div className="hidden md:grid grid-cols-2 gap-3 max-w-xs ml-auto">
+            <div className="grid grid-cols-2 gap-3 max-w-xs mx-auto md:ml-auto">
               {[
                 { n: '+500', l: 'Piscinas instaladas' },
                 { n: '+10',  l: 'Años de experiencia' },
@@ -99,7 +99,8 @@ export default function Landing() {
       <section className="py-16 bg-gradient-to-b from-slate-50 to-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
-            <h2 className="text-2xl md:text-3xl font-bold text-slate-900">Nuestros trabajos</h2>
+            <span className="section-eyebrow">Galería</span>
+            <h2 className="section-title">Nuestros trabajos</h2>
             <p className="text-slate-500 mt-2 max-w-xl mx-auto">
               Cada piscina es única. Mirá algunas de las instalaciones que realizamos para nuestros clientes.
             </p>
@@ -112,13 +113,14 @@ export default function Landing() {
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
-            <h2 className="text-2xl md:text-3xl font-bold text-slate-900">¿Qué hacemos?</h2>
-            <p className="text-slate-500 mt-2">Todo en un solo lugar</p>
+            <span className="section-eyebrow">Servicios</span>
+            <h2 className="section-title">¿Qué hacemos?</h2>
+            <p className="text-slate-500 mt-2">Todo en un solo lugar para tu piscina</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {services.map(({ title, desc, emoji }) => (
-              <div key={title} className="card p-6 hover:border-brand transition-colors group">
-                <div className="text-3xl mb-4">{emoji}</div>
+              <div key={title} className="card p-6 hover:border-brand transition-colors group cursor-default">
+                <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-200 origin-left">{emoji}</div>
                 <h3 className="font-semibold text-slate-800 mb-2 group-hover:text-brand transition-colors">{title}</h3>
                 <p className="text-sm text-slate-500 leading-relaxed">{desc}</p>
               </div>
@@ -133,7 +135,8 @@ export default function Landing() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-end justify-between mb-8">
               <div>
-                <h2 className="text-2xl md:text-3xl font-bold text-slate-900">Productos Destacados</h2>
+                <span className="section-eyebrow">Top picks</span>
+                <h2 className="section-title">Productos Destacados</h2>
                 <p className="text-slate-500 mt-1">Los más elegidos de nuestra tienda</p>
               </div>
               <Link to="/tienda" className="btn-ghost flex items-center gap-1 text-brand font-semibold">
