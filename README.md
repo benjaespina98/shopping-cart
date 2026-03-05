@@ -88,6 +88,44 @@ npm run dev
 
 ---
 
+## Comandos diarios (guía rápida)
+
+Desde la raíz del proyecto:
+
+```bash
+npm run dev
+```
+Levanta backend + frontend en desarrollo.
+
+```bash
+npm run dev:open
+```
+Levanta solo frontend y abre el navegador automáticamente.
+
+```bash
+npm run dev:full:open
+```
+Levanta backend + frontend y abre el navegador automáticamente.
+
+```bash
+npm run build
+```
+Compila el frontend para producción local.
+
+```bash
+npm --prefix client run preview
+```
+Sirve el build compilado del frontend para previsualización local.
+
+```bash
+npm run build:vercel
+```
+Build completo pensado para deploy en Vercel.
+
+Nota: si cerrás el proceso con `Ctrl + C`, es normal ver `exit code 1` en `concurrently`; no implica error de la app.
+
+---
+
 ## Rutas públicas
 
 | Ruta | Descripción |

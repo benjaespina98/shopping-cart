@@ -4,20 +4,36 @@ import { cloudinary } from '../config/cloudinary.js';
 
 // GET /api/products — público
 export const getProducts = asyncHandler(async (req, res) => {
-  const { category, search, featured, page = 1, limit = 20 } = req.query;
+  const { category, search, featured, sort, page = 1, limit = 20 } = req.query;
   const filter = { active: true };
+
+  const pageNumber = Math.max(1, Number(page) || 1);
+  const limitNumber = Math.min(50, Math.max(1, Number(limit) || 20));
 
   if (category) filter.category = category;
   if (featured === 'true') filter.featured = true;
   if (search) filter.$text = { $search: search };
 
+  const sortMap = {
+    price_asc: { price: 1, name: 1 },
+    price_desc: { price: -1, name: 1 },
+    name_asc: { name: 1 },
+  };
+
+  const sortQuery = sortMap[sort] || (featured === 'true' ? { featured: -1, createdAt: -1 } : { createdAt: -1 });
+
   const total = await Product.countDocuments(filter);
   const products = await Product.find(filter)
-    .sort(featured === 'true' ? { featured: -1 } : { createdAt: -1 })
-    .limit(Number(limit))
-    .skip((Number(page) - 1) * Number(limit));
+    .sort(sortQuery)
+    .limit(limitNumber)
+    .skip((pageNumber - 1) * limitNumber);
 
-  res.json({ products, total, page: Number(page), pages: Math.ceil(total / limit) });
+  res.json({
+    products,
+    total,
+    page: pageNumber,
+    pages: Math.max(1, Math.ceil(total / limitNumber)),
+  });
 });
 
 // GET /api/products/categories — público

@@ -3,7 +3,7 @@ import { FiInstagram, FiFacebook, FiMapPin, FiPhone, FiMail } from 'react-icons/
 
 export default function Footer() {
   return (
-    <footer className="bg-slate-900 text-slate-300">
+    <footer className="bg-slate-900 text-slate-300 border-t border-slate-800/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Brand */}
@@ -12,7 +12,7 @@ export default function Footer() {
               <span className="text-2xl font-extrabold text-brand">Playa</span>
               <span className="text-2xl font-extrabold text-white">y Sol</span>
             </div>
-            <p className="text-sm text-slate-400 leading-relaxed">
+            <p className="text-sm text-slate-400 leading-relaxed max-w-sm">
               Especialistas en piscinas, tratamiento de agua y accesorios. Tu pileta, nuestra pasión.
             </p>
             <div className="flex gap-3 mt-4">
@@ -33,7 +33,7 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               {[['/', 'Inicio'], ['/tienda', 'Tienda'], ['/contacto', 'Contacto'], ['/ubicacion', 'Ubicación']].map(([to, label]) => (
                 <li key={to}>
-                  <Link to={to} className="hover:text-brand transition-colors">{label}</Link>
+                  <Link to={to} className="hover:text-brand transition-colors inline-flex py-0.5">{label}</Link>
                 </li>
               ))}
             </ul>
