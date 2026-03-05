@@ -14,6 +14,7 @@ export default function Shop() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [sort, setSort] = useState('');
@@ -30,6 +31,7 @@ export default function Shop() {
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
+    setError('');
     try {
       const params = { page, limit: 12 };
       if (selectedCategory) params.category = selectedCategory;
@@ -41,6 +43,7 @@ export default function Shop() {
       setTotalProducts(data.total ?? data.products.length);
     } catch {
       setProducts([]);
+      setError('No pudimos cargar los productos. Verificá tu conexión e intentá nuevamente.');
     } finally {
       setLoading(false);
     }
@@ -51,7 +54,13 @@ export default function Shop() {
   }, [fetchProducts]);
 
   useEffect(() => {
-    productsAPI.getCategories().then(({ data }) => setCategories(data)).catch(() => {});
+    productsAPI
+      .getCategories()
+      .then(({ data }) => {
+        const sorted = [...data].sort((a, b) => a.localeCompare(b, 'es'));
+        setCategories(sorted);
+      })
+      .catch(() => {});
   }, []);
 
   const handleCategoryChange = (cat) => {
@@ -78,7 +87,8 @@ export default function Shop() {
       </div>
 
       {/* Search + Sort */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-5">
+      <div className="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 mb-5 shadow-sm">
+      <div className="flex flex-col sm:flex-row gap-3">
         {/* Search */}
         <div className="relative flex-1 max-w-md">
           <FiSearch size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -113,6 +123,7 @@ export default function Shop() {
             <FiX size={14} /> Limpiar filtros
           </button>
         )}
+      </div>
       </div>
 
       {/* Categories */}
@@ -170,8 +181,15 @@ export default function Shop() {
             </div>
           ))}
         </div>
+      ) : error ? (
+        <div className="text-center py-16 bg-white rounded-2xl border border-slate-100 shadow-sm">
+          <FiX size={40} className="mx-auto text-rose-300 mb-4" />
+          <p className="text-slate-700 font-semibold text-lg">Hubo un problema al cargar la tienda</p>
+          <p className="text-slate-400 text-sm mt-1 mb-5">{error}</p>
+          <button onClick={fetchProducts} className="btn-primary">Reintentar</button>
+        </div>
       ) : products.length === 0 ? (
-        <div className="text-center py-24 bg-white rounded-2xl border border-slate-100">
+        <div className="text-center py-24 bg-white rounded-2xl border border-slate-100 shadow-sm">
           <FiFilter size={48} className="mx-auto text-slate-200 mb-4" />
           <p className="text-slate-700 font-semibold text-lg">No se encontraron productos</p>
           <p className="text-slate-400 text-sm mt-1 mb-5">Probá ajustando los filtros o la búsqueda</p>
@@ -187,7 +205,9 @@ export default function Shop() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex justify-center items-center gap-2 mt-12">
+            <div className="flex flex-col items-center gap-3 mt-12">
+              <p className="text-xs text-slate-400">Página {page} de {totalPages}</p>
+              <div className="flex justify-center items-center gap-2">
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
@@ -230,6 +250,7 @@ export default function Shop() {
               >
                 Siguiente <FiChevronRight size={16} />
               </button>
+              </div>
             </div>
           )}
         </>

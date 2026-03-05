@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FiX, FiTrash2, FiPlus, FiMinus, FiMessageCircle, FiShoppingCart } from 'react-icons/fi';
 import { useCart } from '../../context/CartContext';
 import { ordersAPI } from '../../services/api';
@@ -8,6 +8,24 @@ export default function CartDrawer() {
   const { items, removeItem, updateQty, clearCart, totalItems, totalPrice, isOpen, toggleCart } =
     useCart();
   const [sending, setSending] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') toggleCart();
+    };
+
+    window.addEventListener('keydown', handleEscape);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', handleEscape);
+    };
+  }, [isOpen, toggleCart]);
 
   const handleWhatsApp = async () => {
     if (items.length === 0) return;
@@ -95,7 +113,7 @@ export default function CartDrawer() {
                 {/* Image */}
                 <div className="w-16 h-16 rounded-xl overflow-hidden bg-slate-100 shrink-0">
                   {item.image ? (
-                    <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                    <img src={item.image} alt={item.name} loading="lazy" className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-slate-300 text-xs">
                       N/A

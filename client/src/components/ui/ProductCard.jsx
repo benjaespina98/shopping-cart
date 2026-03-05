@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FiShoppingCart, FiPlus, FiMinus, FiCheck, FiAlertTriangle } from 'react-icons/fi';
 import { useCart } from '../../context/CartContext';
 import { toast } from 'react-toastify';
@@ -7,21 +7,32 @@ export default function ProductCard({ product }) {
   const { addItem, items } = useCart();
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
+  const addedTimeoutRef = useRef(null);
 
   const inCart = items.find((i) => i.productId === product._id);
   const isOutOfStock = product.stock === 0;
   const isLowStock = !isOutOfStock && product.stock <= 5;
+
+  useEffect(() => {
+    return () => {
+      if (addedTimeoutRef.current) {
+        clearTimeout(addedTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleAdd = () => {
     if (isOutOfStock) return;
     addItem(product, qty);
     setAdded(true);
     toast.success(`"${product.name}" agregado al carrito`);
-    setTimeout(() => setAdded(false), 2000);
+    if (addedTimeoutRef.current) clearTimeout(addedTimeoutRef.current);
+    addedTimeoutRef.current = setTimeout(() => setAdded(false), 2000);
     setQty(1);
   };
 
   const currentImg = product.images?.[0]?.url;
+  const safePrice = Number(product.price) || 0;
 
   return (
     <div className="card flex flex-col group overflow-hidden">
@@ -31,6 +42,7 @@ export default function ProductCard({ product }) {
           <img
             src={currentImg}
             alt={product.name}
+            loading="lazy"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
         ) : (
@@ -75,7 +87,7 @@ export default function ProductCard({ product }) {
           <div className="flex items-baseline gap-1">
             <span className="text-xs text-slate-400 font-medium">$</span>
             <span className="text-2xl font-extrabold text-slate-900 leading-none">
-              {product.price.toLocaleString('es-AR')}
+              {safePrice.toLocaleString('es-AR')}
             </span>
           </div>
 

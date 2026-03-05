@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { FiShoppingCart, FiMenu, FiX } from 'react-icons/fi';
 import { useCart } from '../../context/CartContext';
 
@@ -13,9 +14,14 @@ const navLinks = [
 export default function Navbar() {
   const { totalItems, toggleCart } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname]);
 
   return (
-    <header className="bg-sky-950 border-b border-white/10 sticky top-0 z-40 backdrop-blur-sm">
+    <header className="bg-sky-950/95 supports-[backdrop-filter]:bg-sky-950/85 border-b border-white/10 sticky top-0 z-40 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -34,7 +40,7 @@ export default function Navbar() {
                 className={({ isActive }) =>
                   `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     isActive
-                      ? 'bg-white/10 text-brand font-semibold'
+                      ? 'bg-white/10 text-sol font-semibold'
                       : 'text-slate-300 hover:text-white hover:bg-white/10'
                   }`
                 }
@@ -72,22 +78,23 @@ export default function Navbar() {
 
         {/* Mobile nav */}
         {menuOpen && (
-          <nav className="md:hidden pb-4 flex flex-col gap-1">
+          <nav className="md:hidden pb-4">
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-2 flex flex-col gap-1">
             {navLinks.map(({ to, label }) => (
               <NavLink
                 key={to}
                 to={to}
                 end
-                onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
                   `px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-                    isActive ? 'bg-white/10 text-brand' : 'text-slate-300 hover:text-white hover:bg-white/10'
+                    isActive ? 'bg-white/10 text-sol' : 'text-slate-300 hover:text-white hover:bg-white/10'
                   }`
                 }
               >
                 {label}
               </NavLink>
             ))}
+            </div>
           </nav>
         )}
       </div>

@@ -14,7 +14,8 @@ export default function Location() {
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
       <div className="text-center mb-12">
-        <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Nuestra Ubicación</h1>
+        <span className="section-eyebrow">Ubicación</span>
+        <h1 className="section-title mb-3">Nuestra Ubicación</h1>
         <p className="text-slate-500 max-w-lg mx-auto">
           Visitanos en nuestro local. Estamos listos para atenderte.
         </p>
@@ -82,7 +83,7 @@ export default function Location() {
             href={LOCATION.mapsUrl}
             target="_blank"
             rel="noreferrer"
-            className="flex items-center justify-center gap-2 w-full bg-brand text-white font-semibold py-3 rounded-xl hover:bg-brand-dark transition-colors active:scale-95"
+            className="flex items-center justify-center gap-2 w-full bg-brand text-white font-semibold py-3 rounded-xl hover:bg-brand-dark transition-colors active:scale-95 shadow-sm"
           >
             <FiNavigation size={17} />
             Cómo llegar

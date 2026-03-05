@@ -5,9 +5,17 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    text-rendering: optimizeLegibility;
   }
   body {
     @apply bg-slate-50 text-slate-800 font-sans;
+  }
+  a,
+  button,
+  input,
+  select,
+  textarea {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2;
   }
 }
 
