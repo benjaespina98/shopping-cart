@@ -1,6 +1,7 @@
 {
   "name": "shopping-cart-mern",
   "version": "1.0.0",
+  "type": "module",
   "description": "MERN Stack Shopping Cart App",
   "scripts": {
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
