@@ -19,15 +19,43 @@ dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 const app = express();
 
-const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
+const normalizeOrigin = (origin) => origin.trim().replace(/\/+$/, '');
+
+const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173,http://127.0.0.1:5173')
   .split(',')
-  .map((origin) => origin.trim())
+  .map((origin) => normalizeOrigin(origin))
   .filter(Boolean);
+
+const originPatternRegexList = allowedOrigins
+  .filter((origin) => origin.includes('*'))
+  .map((pattern) => {
+    const escaped = pattern.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*');
+    return new RegExp(`^${escaped}$`, 'i');
+  });
+
+const exactOrigins = allowedOrigins.filter((origin) => !origin.includes('*'));
+
+const localDevOriginPattern = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i;
+
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true;
+
+  const normalizedOrigin = normalizeOrigin(origin);
+  if (exactOrigins.includes(normalizedOrigin)) return true;
+  if (originPatternRegexList.some((regex) => regex.test(normalizedOrigin))) return true;
+
+  // Allow any localhost/127.0.0.1 port in development to avoid Vite port drift issues.
+  if (process.env.NODE_ENV !== 'production' && localDevOriginPattern.test(normalizedOrigin)) {
+    return true;
+  }
+
+  return false;
+};
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (isAllowedOrigin(origin)) {
         callback(null, true);
         return;
       }
