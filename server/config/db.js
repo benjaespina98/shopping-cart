@@ -7,6 +7,10 @@ export const connectDB = async () => {
   if (cachedConnection) return cachedConnection;
   if (connectingPromise) return connectingPromise;
 
+  if (!process.env.MONGODB_URI) {
+    throw new Error('MONGODB_URI no está configurado en las variables de entorno');
+  }
+
   connectingPromise = mongoose
     .connect(process.env.MONGODB_URI)
     .then((conn) => {

@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { connectDB } from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import productRoutes from './routes/productRoutes.js';
@@ -9,7 +11,11 @@ import orderRoutes from './routes/orderRoutes.js';
 import metricsRoutes from './routes/metricsRoutes.js';
 import galleryRoutes from './routes/galleryRoutes.js';
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load env variables from server/.env regardless of current working directory.
+dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 const app = express();
 
@@ -62,7 +68,8 @@ app.use((req, res) => {
 });
 
 app.use((err, req, res, next) => {
-  const statusCode = err.statusCode || 500;
+  // Preserve statuses set by controllers/middleware (401/403/404/etc.).
+  const statusCode = err.statusCode || (res.statusCode >= 400 ? res.statusCode : 500);
   res.status(statusCode).json({
     message: err.message || 'Internal Server Error',
     stack: process.env.NODE_ENV === 'production' ? null : err.stack,
