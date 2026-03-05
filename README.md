@@ -173,15 +173,34 @@ GET    /api/metrics/categories
 
 ## Deploy (producción)
 
-### Backend — Railway / Render / VPS
-```bash
-cd server && npm start
+### Full stack en Vercel (frontend + API serverless)
+
+Este repo ya incluye configuración para desplegar todo junto en Vercel:
+
+- Frontend estático desde `client/dist`
+- API Express como función serverless en `/api/*`
+
+#### Variables de entorno en Vercel
+
+Configurá estas variables (Project Settings → Environment Variables):
+
+```env
+MONGODB_URI=...
+JWT_SECRET=...
+CLOUDINARY_CLOUD_NAME=...
+CLOUDINARY_API_KEY=...
+CLOUDINARY_API_SECRET=...
+ADMIN_EMAIL=...
+ADMIN_PASSWORD=...
+STORE_NAME=...
+WHATSAPP_NUMBER=...
+CLIENT_URL=https://tu-proyecto.vercel.app,http://localhost:5173
 ```
 
-### Frontend — Vercel / Netlify
-```bash
-cd client && npm run build
-```
-Apuntá el build output a `client/dist/`.
+Notas:
+- `CLIENT_URL` acepta múltiples orígenes separados por coma.
+- `VITE_API_URL` no es obligatorio en producción si frontend y API están en el mismo dominio (usa `/api` por defecto).
 
-> Para producción, configurá `CLIENT_URL` en el backend y la variable de entorno `VITE_API_URL` si no usás proxy.
+### Opción alternativa
+
+Si preferís mantener backend separado, podés seguir usando Render/Railway y definir `VITE_API_URL` apuntando a esa API externa.
