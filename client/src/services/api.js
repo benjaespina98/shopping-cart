@@ -1,7 +1,11 @@
 import axios from 'axios';
 
+const isProduction = import.meta.env.PROD;
+const configuredApiUrl = (import.meta.env.VITE_API_URL || '').trim();
+const initialBaseUrl = isProduction ? '/api' : configuredApiUrl || '/api';
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL: initialBaseUrl,
   headers: { 'Content-Type': 'application/json' },
 });
 
@@ -15,7 +19,23 @@ api.interceptors.request.use((config) => {
 // Auto-logout on 401
 api.interceptors.response.use(
   (res) => res,
-  (err) => {
+  async (err) => {
+    const originalConfig = err.config || {};
+
+    // If an external API URL is configured but unavailable (e.g. paused Render), retry once on same-origin /api.
+    const shouldFallbackToLocalApi =
+      !isProduction &&
+      configuredApiUrl &&
+      configuredApiUrl !== '/api' &&
+      !originalConfig._localApiRetried &&
+      (err.code === 'ERR_NETWORK' || !err.response);
+
+    if (shouldFallbackToLocalApi) {
+      originalConfig._localApiRetried = true;
+      originalConfig.baseURL = '/api';
+      return api.request(originalConfig);
+    }
+
     if (err.response?.status === 401) {
       localStorage.removeItem('admin_token');
       localStorage.removeItem('admin_user');

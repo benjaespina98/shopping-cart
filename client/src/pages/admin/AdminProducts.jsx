@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { FiPlus, FiEdit2, FiTrash2, FiX, FiUpload, FiCheck, FiAlertCircle } from 'react-icons/fi';
+import { FiPlus, FiEdit2, FiTrash2, FiX, FiUpload, FiCheck, FiAlertCircle, FiSave } from 'react-icons/fi';
 import { productsAPI } from '../../services/api';
 import { toast } from 'react-toastify';
 
@@ -184,6 +184,9 @@ export default function AdminProducts() {
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState(null); // null | 'create' | product
   const [deleting, setDeleting] = useState(null);
+  const [editingStockId, setEditingStockId] = useState(null);
+  const [draftStocks, setDraftStocks] = useState({});
+  const [savingStockId, setSavingStockId] = useState(null);
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -213,14 +216,38 @@ export default function AdminProducts() {
     }
   };
 
-  const handleStockChange = async (product, newStock) => {
-    const val = Number(newStock);
-    if (isNaN(val) || val < 0) return;
+  const beginStockEdit = (product) => {
+    setEditingStockId(product._id);
+    setDraftStocks((prev) => ({ ...prev, [product._id]: String(product.stock) }));
+  };
+
+  const cancelStockEdit = () => {
+    setEditingStockId(null);
+  };
+
+  const saveStock = async (product) => {
+    const raw = draftStocks[product._id];
+    const val = Number(raw);
+    if (!Number.isFinite(val) || val < 0) {
+      toast.error('Ingresá un stock válido (0 o mayor)');
+      return;
+    }
+
+    if (val === product.stock) {
+      setEditingStockId(null);
+      return;
+    }
+
     try {
+      setSavingStockId(product._id);
       await productsAPI.updateStock(product._id, val);
       setProducts((ps) => ps.map((p) => p._id === product._id ? { ...p, stock: val } : p));
+      toast.success('Stock actualizado');
+      setEditingStockId(null);
     } catch {
       toast.error('Error al actualizar stock');
+    } finally {
+      setSavingStockId(null);
     }
   };
 
@@ -283,13 +310,47 @@ export default function AdminProducts() {
                     <td className="px-4 py-3 text-slate-500">{p.category}</td>
                     <td className="px-4 py-3 text-right font-semibold text-slate-800">${p.price.toLocaleString('es-AR')}</td>
                     <td className="px-4 py-3 text-center">
-                      <input
-                        type="number"
-                        min="0"
-                        value={p.stock}
-                        onChange={(e) => handleStockChange(p, e.target.value)}
-                        className="w-16 text-center border border-slate-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
-                      />
+                      {editingStockId === p._id ? (
+                        <div className="flex items-center justify-center gap-2">
+                          <input
+                            type="number"
+                            min="0"
+                            value={draftStocks[p._id] ?? ''}
+                            onChange={(e) =>
+                              setDraftStocks((prev) => ({ ...prev, [p._id]: e.target.value }))
+                            }
+                            className="w-20 text-center border border-slate-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
+                          />
+                          <button
+                            onClick={() => saveStock(p)}
+                            disabled={savingStockId === p._id}
+                            className="p-2 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition-colors disabled:opacity-50"
+                            title="Guardar stock"
+                          >
+                            <FiSave size={14} />
+                          </button>
+                          <button
+                            onClick={cancelStockEdit}
+                            className="p-2 rounded-lg bg-slate-100 text-slate-500 hover:bg-slate-200 transition-colors"
+                            title="Cancelar edición"
+                          >
+                            <FiX size={14} />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-center gap-2">
+                          <span className="inline-flex min-w-10 justify-center rounded-lg border border-slate-200 px-2 py-1 text-sm font-medium text-slate-700">
+                            {p.stock}
+                          </span>
+                          <button
+                            onClick={() => beginStockEdit(p)}
+                            className="p-2 rounded-lg bg-slate-100 text-slate-500 hover:bg-slate-200 transition-colors"
+                            title="Editar stock"
+                          >
+                            <FiEdit2 size={14} />
+                          </button>
+                        </div>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-center">
                       <span className={`badge ${p.active ? 'bg-green-50 text-green-700' : 'bg-slate-100 text-slate-500'}`}>

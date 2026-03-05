@@ -80,9 +80,9 @@ export default function AdminMetrics() {
       {summary && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           {[
-            { label: 'Revenue total', value: `$${(summary.totalRevenue || 0).toLocaleString('es-AR')}`, color: 'text-green-600' },
-            { label: 'Pedidos totales', value: summary.totalOrders, color: 'text-brand' },
-            { label: 'Productos activos', value: summary.activeProducts, color: 'text-blue-600' },
+            { label: 'Ventas confirmadas', value: `$${(summary.totalRevenue || 0).toLocaleString('es-AR')}`, color: 'text-green-600' },
+            { label: 'Pedidos confirmados', value: summary.confirmedOrders || 0, color: 'text-brand' },
+            { label: 'Ticket promedio', value: `$${Math.round(summary.averageOrderValue || 0).toLocaleString('es-AR')}`, color: 'text-blue-600' },
             { label: 'Sin stock', value: summary.outOfStock, color: summary.outOfStock > 0 ? 'text-red-500' : 'text-slate-500' },
           ].map(({ label, value, color }) => (
             <div key={label} className="card p-5 text-center">
@@ -96,7 +96,7 @@ export default function AdminMetrics() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Orders over time */}
         <div className="card p-6">
-          <h2 className="font-semibold text-slate-800 mb-4 text-sm">Pedidos en el tiempo</h2>
+          <h2 className="font-semibold text-slate-800 mb-4 text-sm">Pedidos por día (totales y confirmados)</h2>
           {ordersTime.length === 0 ? (
             <div className="h-48 flex items-center justify-center text-slate-400 text-sm">Sin datos para el período</div>
           ) : (
@@ -105,8 +105,9 @@ export default function AdminMetrics() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                 <XAxis dataKey="_id" tick={{ fontSize: 10 }} tickFormatter={(v) => v.slice(5)} />
                 <YAxis tick={{ fontSize: 10 }} />
-                <Tooltip formatter={(v, n) => [v, n === 'count' ? 'Pedidos' : 'Revenue']} labelFormatter={(l) => `Fecha: ${l}`} />
-                <Line type="monotone" dataKey="count" stroke="#0369a1" strokeWidth={2} dot={false} name="count" />
+                <Tooltip formatter={(v, n) => [v, n === 'count' ? 'Pedidos totales' : 'Pedidos confirmados']} labelFormatter={(l) => `Fecha: ${l}`} />
+                <Line type="monotone" dataKey="count" stroke="#94a3b8" strokeWidth={2} dot={false} name="count" />
+                <Line type="monotone" dataKey="confirmedOrders" stroke="#0369a1" strokeWidth={2} dot={false} name="confirmedOrders" />
               </LineChart>
             </ResponsiveContainer>
           )}
@@ -114,7 +115,7 @@ export default function AdminMetrics() {
 
         {/* Revenue over time */}
         <div className="card p-6">
-          <h2 className="font-semibold text-slate-800 mb-4 text-sm">Revenue en el tiempo</h2>
+          <h2 className="font-semibold text-slate-800 mb-4 text-sm">Ventas confirmadas por día</h2>
           {ordersTime.length === 0 ? (
             <div className="h-48 flex items-center justify-center text-slate-400 text-sm">Sin datos para el período</div>
           ) : (
@@ -123,7 +124,7 @@ export default function AdminMetrics() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                 <XAxis dataKey="_id" tick={{ fontSize: 10 }} tickFormatter={(v) => v.slice(5)} />
                 <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
-                <Tooltip formatter={(v) => [`$${v.toLocaleString('es-AR')}`, 'Revenue']} />
+                <Tooltip formatter={(v) => [`$${v.toLocaleString('es-AR')}`, 'Ventas confirmadas']} />
                 <Bar dataKey="revenue" fill="#0369a1" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -132,7 +133,7 @@ export default function AdminMetrics() {
 
         {/* Top products */}
         <div className="card p-6">
-          <h2 className="font-semibold text-slate-800 mb-4 text-sm">Top 10 productos más vendidos</h2>
+          <h2 className="font-semibold text-slate-800 mb-4 text-sm">Top 10 productos (pedidos confirmados)</h2>
           {topProducts.length === 0 ? (
             <div className="h-48 flex items-center justify-center text-slate-400 text-sm">Sin datos</div>
           ) : (

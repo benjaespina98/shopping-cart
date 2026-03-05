@@ -11,24 +11,42 @@ export const createOrder = asyncHandler(async (req, res) => {
     throw new Error('No hay productos en el carrito');
   }
 
-  // Verify products and build items with current prices
+  // Merge duplicated lines from the cart to avoid discounting stock twice for same product row.
+  const quantityByProduct = new Map();
+  for (const item of items) {
+    const productId = String(item.productId || '');
+    const quantity = Number(item.quantity || 0);
+    if (!productId || quantity <= 0) continue;
+    quantityByProduct.set(productId, (quantityByProduct.get(productId) || 0) + quantity);
+  }
+
+  const productIds = Array.from(quantityByProduct.keys());
+  const products = await Product.find({ _id: { $in: productIds }, active: true });
+  const productById = new Map(products.map((product) => [String(product._id), product]));
+
+  // Verify products, stock, and build items with current prices.
   const orderItems = [];
   let total = 0;
 
-  for (const item of items) {
-    const product = await Product.findById(item.productId);
-    if (!product || !product.active) continue;
+  for (const [productId, quantity] of quantityByProduct.entries()) {
+    const product = productById.get(productId);
+    if (!product) continue;
+
+    if (product.stock < quantity) {
+      res.status(400);
+      throw new Error(`Stock insuficiente para "${product.name}". Disponible: ${product.stock}`);
+    }
 
     const orderItem = {
       product: product._id,
       name: product.name,
       price: product.price,
-      quantity: item.quantity,
+      quantity,
       image: product.images?.[0]?.url || '',
     };
 
     orderItems.push(orderItem);
-    total += product.price * item.quantity;
+    total += product.price * quantity;
   }
 
   if (orderItems.length === 0) {
@@ -54,13 +72,50 @@ export const createOrder = asyncHandler(async (req, res) => {
     'Gracias \u{1F64C}',
   ].join('\n');
 
-  const order = await Order.create({
-    items: orderItems,
-    total,
-    customerName: customerName || '',
-    customerPhone: customerPhone || '',
-    whatsappMessage,
-  });
+  // Atomic per-product stock decrement with conditional check.
+  const discounted = [];
+  for (const item of orderItems) {
+    const updated = await Product.findOneAndUpdate(
+      {
+        _id: item.product,
+        active: true,
+        stock: { $gte: item.quantity },
+      },
+      { $inc: { stock: -item.quantity } },
+      { new: true }
+    );
+
+    if (!updated) {
+      // Roll back previous decrements if any product no longer has stock due to concurrent purchase.
+      await Promise.all(
+        discounted.map((entry) =>
+          Product.findByIdAndUpdate(entry.productId, { $inc: { stock: entry.quantity } })
+        )
+      );
+      res.status(409);
+      throw new Error(`No se pudo reservar stock para "${item.name}". Probá nuevamente.`);
+    }
+
+    discounted.push({ productId: item.product, quantity: item.quantity });
+  }
+
+  let order;
+  try {
+    order = await Order.create({
+      items: orderItems,
+      total,
+      customerName: customerName || '',
+      customerPhone: customerPhone || '',
+      whatsappMessage,
+    });
+  } catch (error) {
+    await Promise.all(
+      discounted.map((entry) =>
+        Product.findByIdAndUpdate(entry.productId, { $inc: { stock: entry.quantity } })
+      )
+    );
+    throw error;
+  }
 
   res.status(201).json({
     order,
