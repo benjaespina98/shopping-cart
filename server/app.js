@@ -11,8 +11,6 @@ import galleryRoutes from './routes/galleryRoutes.js';
 
 dotenv.config();
 
-await connectDB();
-
 const app = express();
 
 const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
@@ -35,15 +33,29 @@ app.use(
 app.use(express.json());
 app.use(morgan('dev'));
 
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'OK', message: 'Server running' });
+});
+
+app.use('/api', async (req, res, next) => {
+  if (req.path === '/health') {
+    next();
+    return;
+  }
+
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/metrics', metricsRoutes);
 app.use('/api/gallery', galleryRoutes);
-
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Server running' });
-});
 
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
