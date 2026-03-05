@@ -53,8 +53,8 @@ export default function AdminDashboard() {
     },
     {
       icon: FiShoppingBag,
-      label: 'Pedidos totales',
-      value: summary?.totalOrders,
+      label: 'Pedidos confirmados',
+      value: summary?.confirmedOrders,
       color: 'bg-blue-500',
       to: '/admin/pedidos',
     },
@@ -67,7 +67,7 @@ export default function AdminDashboard() {
     },
     {
       icon: FiDollarSign,
-      label: 'Revenue total',
+      label: 'Ventas confirmadas',
       value: `$${(summary?.totalRevenue || 0).toLocaleString('es-AR')}`,
       color: 'bg-green-500',
       to: '/admin/metricas',
@@ -92,17 +92,17 @@ export default function AdminDashboard() {
           <h2 className="font-semibold text-slate-800 mb-4">Resumen del mes</h2>
           <div className="space-y-3">
             <div className="flex justify-between items-center py-2 border-b border-slate-100 text-sm">
-              <span className="text-slate-600">Pedidos (últimos 30 días)</span>
+              <span className="text-slate-600">Pedidos creados (30 días)</span>
               <span className="font-semibold text-slate-900">{summary?.recentOrders ?? 0}</span>
             </div>
             <div className="flex justify-between items-center py-2 border-b border-slate-100 text-sm">
-              <span className="text-slate-600">Total productos</span>
-              <span className="font-semibold text-slate-900">{summary?.totalProducts ?? 0}</span>
+              <span className="text-slate-600">Ventas confirmadas (30 días)</span>
+              <span className="font-semibold text-slate-900">${(summary?.recentRevenue || 0).toLocaleString('es-AR')}</span>
             </div>
             <div className="flex justify-between items-center py-2 text-sm">
-              <span className="text-slate-600">Productos sin stock</span>
-              <span className={`font-semibold ${summary?.outOfStock > 0 ? 'text-red-500' : 'text-green-600'}`}>
-                {summary?.outOfStock ?? 0}
+              <span className="text-slate-600">Ticket promedio</span>
+              <span className="font-semibold text-slate-900">
+                ${Math.round(summary?.averageOrderValue || 0).toLocaleString('es-AR')}
               </span>
             </div>
           </div>

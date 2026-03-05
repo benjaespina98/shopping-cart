@@ -237,8 +237,5 @@ CLIENT_URL=https://tu-proyecto.vercel.app,http://localhost:5173
 
 Notas:
 - `CLIENT_URL` acepta múltiples orígenes separados por coma.
-- `VITE_API_URL` no es obligatorio en producción si frontend y API están en el mismo dominio (usa `/api` por defecto).
-
-### Opción alternativa
-
-Si preferís mantener backend separado, podés seguir usando Render/Railway y definir `VITE_API_URL` apuntando a esa API externa.
+- En este proyecto, producción está pensada para Vercel full stack: frontend y API en el mismo dominio (`/api`).
+- `VITE_API_URL` solo se recomienda para pruebas locales o entornos de desarrollo específicos.
