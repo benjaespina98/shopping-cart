@@ -1,18 +1,49 @@
 import { useEffect, useRef, useState } from 'react';
-import { FiMail, FiPhone, FiMessageCircle, FiInstagram, FiFacebook } from 'react-icons/fi';
+import { FiMail, FiPhone, FiInstagram, FiFacebook } from 'react-icons/fi';
+import { FaWhatsapp } from 'react-icons/fa';
 import { toast } from 'react-toastify';
+import { settingsAPI } from '../services/api';
 
-const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '5493534224607';
-const PHONE_DISPLAY = '3534224607';
-const PHONE_LINK = 'tel:+543534224607';
-const CONTACT_EMAIL = 'benjaespina98@gmail.com';
+const defaultContactSettings = {
+  whatsappNumber: import.meta.env.VITE_WHATSAPP_NUMBER || '5493534224607',
+  phoneNumberDisplay: '3534224607',
+  phoneNumberLink: 'tel:+543534224607',
+  contactEmail: 'benjaespina98@gmail.com',
+  businessHours: [
+    { day: 'Lunes a Viernes', hours: '9:00 - 18:00' },
+    { day: 'Sabados', hours: '9:00 - 13:00' },
+    { day: 'Domingos', hours: 'Cerrado' },
+  ],
+};
 
 export default function Contact() {
   const [form, setForm] = useState({ name: '', email: '', message: '' });
   const [sendingChannel, setSendingChannel] = useState('');
+  const [contactSettings, setContactSettings] = useState(defaultContactSettings);
   const sentTimeoutRef = useRef(null);
 
+  const WHATSAPP_NUMBER = contactSettings.whatsappNumber;
+  const PHONE_DISPLAY = contactSettings.phoneNumberDisplay;
+  const PHONE_LINK = contactSettings.phoneNumberLink;
+  const CONTACT_EMAIL = contactSettings.contactEmail;
+
   useEffect(() => {
+    settingsAPI.getPublic()
+      .then(({ data }) => {
+        setContactSettings({
+          whatsappNumber: data?.whatsappNumber || defaultContactSettings.whatsappNumber,
+          phoneNumberDisplay: data?.phoneNumberDisplay || defaultContactSettings.phoneNumberDisplay,
+          phoneNumberLink: data?.phoneNumberLink || defaultContactSettings.phoneNumberLink,
+          contactEmail: data?.contactEmail || defaultContactSettings.contactEmail,
+          businessHours: Array.isArray(data?.businessHours) && data.businessHours.length > 0
+            ? data.businessHours
+            : defaultContactSettings.businessHours,
+        });
+      })
+      .catch(() => {
+        // Keep fallback defaults if settings are unavailable.
+      });
+
     return () => {
       if (sentTimeoutRef.current) {
         clearTimeout(sentTimeoutRef.current);
@@ -87,8 +118,8 @@ export default function Contact() {
               rel="noreferrer"
               className="flex items-center gap-4 group"
             >
-              <div className="w-11 h-11 rounded-xl bg-green-50 flex items-center justify-center group-hover:bg-green-500 transition-colors">
-                <FiMessageCircle size={20} className="text-green-500 group-hover:text-white" />
+              <div className="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center group-hover:bg-green-500 transition-colors">
+                <FaWhatsapp size={22} className="text-green-500 group-hover:text-white" />
               </div>
               <div>
                 <p className="text-xs text-slate-400 font-medium">WhatsApp</p>
@@ -99,8 +130,8 @@ export default function Contact() {
             </a>
 
             <a href={PHONE_LINK} className="flex items-center gap-4 group">
-              <div className="w-11 h-11 rounded-xl bg-brand-light flex items-center justify-center group-hover:bg-brand transition-colors">
-                <FiPhone size={19} className="text-brand group-hover:text-white" />
+              <div className="w-12 h-12 rounded-xl bg-brand-light flex items-center justify-center group-hover:bg-brand transition-colors">
+                <FiPhone size={20} className="text-brand group-hover:text-white" />
               </div>
               <div>
                 <p className="text-xs text-slate-400 font-medium">Teléfono</p>
@@ -111,8 +142,8 @@ export default function Contact() {
             </a>
 
             <a href={`mailto:${CONTACT_EMAIL}`} className="flex items-center gap-4 group">
-              <div className="w-11 h-11 rounded-xl bg-brand-light flex items-center justify-center group-hover:bg-brand transition-colors">
-                <FiMail size={19} className="text-brand group-hover:text-white" />
+              <div className="w-12 h-12 rounded-xl bg-brand-light flex items-center justify-center group-hover:bg-brand transition-colors">
+                <FiMail size={20} className="text-brand group-hover:text-white" />
               </div>
               <div>
                 <p className="text-xs text-slate-400 font-medium">Email</p>
@@ -127,14 +158,10 @@ export default function Contact() {
           <div className="card p-6">
             <h2 className="font-semibold text-slate-800 text-lg mb-4">Horarios de atención</h2>
             <div className="space-y-2 text-sm">
-              {[
-                ['Lunes a Viernes', '9:00 – 18:00'],
-                ['Sábados', '9:00 – 13:00'],
-                ['Domingos', 'Cerrado'],
-              ].map(([day, hours]) => (
-                <div key={day} className="flex justify-between text-slate-600">
+              {contactSettings.businessHours.map(({ day, hours }) => (
+                <div key={`${day}-${hours}`} className="flex justify-between text-slate-600">
                   <span className="font-medium">{day}</span>
-                  <span className={hours === 'Cerrado' ? 'text-slate-400' : 'text-brand font-semibold'}>{hours}</span>
+                  <span className={hours.toLowerCase() === 'cerrado' ? 'text-slate-400' : 'text-brand font-semibold'}>{hours}</span>
                 </div>
               ))}
             </div>
@@ -164,21 +191,21 @@ export default function Contact() {
               Elegí el canal que prefieras. Preparamos el mensaje automáticamente con tus datos.
             </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-5">
             <button
               type="button"
               onClick={handleWhatsApp}
-              className="w-full flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-3 rounded-xl transition-colors active:scale-95"
+              className="w-full flex items-center justify-center gap-2.5 bg-green-500 hover:bg-green-600 text-white font-semibold text-sm sm:text-base whitespace-nowrap py-3 rounded-xl transition-colors active:scale-95"
             >
-              <FiMessageCircle size={16} />
+              <FaWhatsapp size={18} />
               {sendingChannel === 'whatsapp' ? '¡Listo! Abriendo WhatsApp...' : 'Enviar por WhatsApp'}
             </button>
             <button
               type="button"
               onClick={handleEmail}
-              className="w-full flex items-center justify-center gap-2 bg-brand text-white font-semibold py-3 rounded-xl hover:bg-brand-dark transition-colors active:scale-95"
+              className="w-full flex items-center justify-center gap-2.5 bg-brand text-white font-semibold text-sm sm:text-base whitespace-nowrap py-3 rounded-xl hover:bg-brand-dark transition-colors active:scale-95"
             >
-              <FiMail size={16} />
+              <FiMail size={18} />
               {sendingChannel === 'email' ? '¡Listo! Abriendo email...' : 'Enviar por Email'}
             </button>
           </div>

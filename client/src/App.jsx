@@ -16,6 +16,8 @@ const AdminOrders    = lazy(() => import('./pages/admin/AdminOrders'));
 const AdminMetrics   = lazy(() => import('./pages/admin/AdminMetrics'));
 const AdminProfile   = lazy(() => import('./pages/admin/AdminProfile'));
 const AdminGallery   = lazy(() => import('./pages/admin/AdminGallery'));
+const AdminSettings  = lazy(() => import('./pages/admin/AdminSettings'));
+const AdminLogs      = lazy(() => import('./pages/admin/AdminLogs'));
 
 const AdminFallback = () => (
   <div className="flex items-center justify-center h-screen bg-slate-100">
@@ -59,7 +61,9 @@ export default function App() {
         <Route path="productos" element={<AdminProducts />} />
         <Route path="pedidos" element={<AdminOrders />} />
         <Route path="metricas" element={<AdminMetrics />} />
+        <Route path="logs" element={<AdminLogs />} />
         <Route path="galeria" element={<AdminGallery />} />
+        <Route path="configuracion" element={<AdminSettings />} />
         <Route path="perfil" element={<AdminProfile />} />
       </Route>
 

@@ -60,7 +60,9 @@ cp .env.example .env
 Editá `server/.env` con tus credenciales:
 
 ```env
-MONGODB_URI=mongodb+srv://<user>:<pass>@cluster.mongodb.net/shopping_cart
+MONGODB_URI_DEVELOPMENT=mongodb+srv://<user>:<pass>@cluster.mongodb.net/shopping_cart_dev
+MONGODB_URI_PREVIEW=mongodb+srv://<user>:<pass>@cluster.mongodb.net/shopping_cart_test
+MONGODB_URI_PRODUCTION=mongodb+srv://<user>:<pass>@cluster.mongodb.net/shopping_cart_prod
 JWT_SECRET=una_clave_muy_secreta_larga
 CLOUDINARY_CLOUD_NAME=...
 CLOUDINARY_API_KEY=...
@@ -69,12 +71,20 @@ STORE_NAME="Playa y Sol"
 WHATSAPP_NUMBER=5493534224607   # Tu número con código de país, sin + ni espacios
 ADMIN_EMAIL=admin@mitienda.com
 ADMIN_PASSWORD=TuPassword123!
+APP_ENV=development
 ```
 
 ### 3. Crear usuario admin y productos de ejemplo
 
 ```bash
 npm run seed
+```
+
+Opcional para elegir entorno de seed:
+
+```bash
+cd server
+$env:SEED_ENV="preview"; npm run seed
 ```
 
 ### 4. Iniciar en desarrollo
@@ -144,6 +154,7 @@ Nota: si cerrás el proceso con `Ctrl + C`, es normal ver `exit code 1` en `conc
 | `/admin/productos` | CRUD productos + upload de imágenes |
 | `/admin/pedidos` | Lista de pedidos con estados |
 | `/admin/metricas` | Gráficos de revenue, pedidos, categorías |
+| `/admin/logs` | Auditoría de acciones (usuarios, productos, pedidos, configuración) |
 
 ---
 
@@ -195,6 +206,8 @@ GET    /api/metrics/summary
 GET    /api/metrics/orders-over-time
 GET    /api/metrics/top-products
 GET    /api/metrics/categories
+
+GET    /api/logs               # Auditoría de acciones (filtros + paginación)
 ```
 
 ---
@@ -223,7 +236,8 @@ Este repo ya incluye configuración para desplegar todo junto en Vercel:
 Configurá estas variables (Project Settings → Environment Variables):
 
 ```env
-MONGODB_URI=...
+MONGODB_URI_PRODUCTION=...
+MONGODB_URI_PREVIEW=...
 JWT_SECRET=...
 CLOUDINARY_CLOUD_NAME=...
 CLOUDINARY_API_KEY=...
@@ -239,3 +253,8 @@ Notas:
 - `CLIENT_URL` acepta múltiples orígenes separados por coma.
 - En este proyecto, producción está pensada para Vercel full stack: frontend y API en el mismo dominio (`/api`).
 - `VITE_API_URL` solo se recomienda para pruebas locales o entornos de desarrollo específicos.
+- La API bloquea conexiones en `preview/testing` si no existe `MONGODB_URI_PREVIEW` (o `MONGODB_URI_TEST`) para evitar que Preview toque la base de producción.
+- Definí variables por entorno en Vercel:
+    - `Production`: `MONGODB_URI_PRODUCTION`
+    - `Preview`: `MONGODB_URI_PREVIEW`
+    - `Development`: la que uses local (`MONGODB_URI_DEVELOPMENT`)

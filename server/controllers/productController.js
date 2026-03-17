@@ -1,6 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import Product from '../models/Product.js';
 import { cloudinary } from '../config/cloudinary.js';
+import { writeAuditLog } from '../utils/auditLogger.js';
 
 // GET /api/products — público
 export const getProducts = asyncHandler(async (req, res) => {
@@ -71,6 +72,20 @@ export const createProduct = asyncHandler(async (req, res) => {
     images,
   });
 
+  await writeAuditLog({
+    req,
+    action: 'PRODUCT_CREATED',
+    entity: 'product',
+    entityId: product._id,
+    message: `Producto creado: ${product.name}`,
+    meta: {
+      name: product.name,
+      category: product.category,
+      price: product.price,
+      stock: product.stock,
+    },
+  });
+
   res.status(201).json(product);
 });
 
@@ -110,6 +125,22 @@ export const updateProduct = asyncHandler(async (req, res) => {
   if (tags !== undefined) product.tags = JSON.parse(tags);
 
   const updated = await product.save();
+
+  await writeAuditLog({
+    req,
+    action: 'PRODUCT_UPDATED',
+    entity: 'product',
+    entityId: updated._id,
+    message: `Producto actualizado: ${updated.name}`,
+    meta: {
+      name: updated.name,
+      category: updated.category,
+      price: updated.price,
+      stock: updated.stock,
+      active: updated.active,
+    },
+  });
+
   res.json(updated);
 });
 
@@ -125,6 +156,16 @@ export const updateStock = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error('Producto no encontrado');
   }
+
+  await writeAuditLog({
+    req,
+    action: 'PRODUCT_STOCK_UPDATED',
+    entity: 'product',
+    entityId: product._id,
+    message: `Stock actualizado para ${product.name}`,
+    meta: { stock: product.stock },
+  });
+
   res.json(product);
 });
 
@@ -141,7 +182,19 @@ export const deleteProduct = asyncHandler(async (req, res) => {
     if (img.publicId) await cloudinary.uploader.destroy(img.publicId);
   }
 
+  const productName = product.name;
+  const productId = product._id;
+
   await product.deleteOne();
+
+  await writeAuditLog({
+    req,
+    action: 'PRODUCT_DELETED',
+    entity: 'product',
+    entityId: productId,
+    message: `Producto eliminado: ${productName}`,
+  });
+
   res.json({ message: 'Producto eliminado' });
 });
 

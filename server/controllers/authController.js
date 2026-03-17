@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import asyncHandler from 'express-async-handler';
 import User from '../models/User.js';
+import { writeAuditLog } from '../utils/auditLogger.js';
 
 const generateToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '7d' });
@@ -19,6 +20,20 @@ export const login = asyncHandler(async (req, res) => {
     res.status(401);
     throw new Error('Credenciales inválidas');
   }
+
+  req.user = {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+  };
+  await writeAuditLog({
+    req,
+    action: 'LOGIN_SUCCESS',
+    entity: 'auth',
+    entityId: user._id,
+    message: 'Inicio de sesion exitoso',
+  });
 
   res.json({
     _id: user._id,
@@ -47,5 +62,12 @@ export const changePassword = asyncHandler(async (req, res) => {
 
   user.password = newPassword;
   await user.save();
+  await writeAuditLog({
+    req,
+    action: 'PASSWORD_CHANGED',
+    entity: 'user',
+    entityId: user._id,
+    message: 'Contrasena actualizada por el usuario',
+  });
   res.json({ message: 'Contraseña actualizada correctamente' });
 });
