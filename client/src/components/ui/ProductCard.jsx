@@ -10,8 +10,16 @@ export default function ProductCard({ product }) {
   const addedTimeoutRef = useRef(null);
 
   const inCart = items.find((i) => i.productId === product._id);
+  const alreadyInCartQty = inCart?.quantity || 0;
   const isOutOfStock = product.stock === 0;
   const isLowStock = !isOutOfStock && product.stock <= 5;
+  const remainingStock = Math.max(0, product.stock - alreadyInCartQty);
+  const maxSelectableQty = Math.max(1, remainingStock);
+  const hasReachedCartStockLimit = !isOutOfStock && remainingStock === 0;
+
+  useEffect(() => {
+    setQty((currentQty) => Math.min(currentQty, maxSelectableQty));
+  }, [maxSelectableQty]);
 
   useEffect(() => {
     return () => {
@@ -22,7 +30,7 @@ export default function ProductCard({ product }) {
   }, []);
 
   const handleAdd = () => {
-    if (isOutOfStock) return;
+    if (isOutOfStock || hasReachedCartStockLimit) return;
     addItem(product, qty);
     setAdded(true);
     toast.success(`"${product.name}" agregado al carrito`);
@@ -33,6 +41,7 @@ export default function ProductCard({ product }) {
 
   const currentImg = product.images?.[0]?.url;
   const safePrice = Number(product.price) || 0;
+  const selectedTotalPrice = safePrice * qty;
 
   return (
     <div className="card flex flex-col group overflow-hidden">
@@ -84,11 +93,20 @@ export default function ProductCard({ product }) {
 
         <div className="border-t border-slate-100 pt-3 space-y-3">
           {/* Price */}
-          <div className="flex items-baseline gap-1">
-            <span className="text-xs text-slate-400 font-medium">$</span>
-            <span className="text-2xl font-extrabold text-slate-900 leading-none">
-              {safePrice.toLocaleString('es-AR')}
-            </span>
+          <div className="space-y-1">
+            <div className="flex items-baseline gap-1">
+              <span className="text-xs text-slate-400 font-medium">$</span>
+              <span className="text-2xl font-extrabold text-slate-900 leading-none">
+                {safePrice.toLocaleString('es-AR')}
+              </span>
+              <span className="text-xs text-slate-400">c/u</span>
+            </div>
+            <p className="text-xs text-slate-500">
+              Total seleccionado:{' '}
+              <span className="font-semibold text-slate-700">
+                ${selectedTotalPrice.toLocaleString('es-AR')}
+              </span>
+            </p>
           </div>
 
           {/* Low stock warning */}
@@ -105,13 +123,15 @@ export default function ProductCard({ product }) {
               <div className="flex items-center border border-slate-200 rounded-xl overflow-hidden bg-slate-50">
                 <button
                   onClick={() => setQty((q) => Math.max(1, q - 1))}
+                  disabled={qty <= 1}
                   className="px-2.5 py-2 hover:bg-slate-200 transition-colors text-slate-600 active:scale-90"
                 >
                   <FiMinus size={12} />
                 </button>
                 <span className="px-3 text-sm font-bold min-w-[2.5rem] text-center text-slate-800">{qty}</span>
                 <button
-                  onClick={() => setQty((q) => Math.min(product.stock, q + 1))}
+                  onClick={() => setQty((q) => Math.min(maxSelectableQty, q + 1))}
+                  disabled={qty >= maxSelectableQty}
                   className="px-2.5 py-2 hover:bg-slate-200 transition-colors text-slate-600 active:scale-90"
                 >
                   <FiPlus size={12} />
@@ -121,17 +141,26 @@ export default function ProductCard({ product }) {
               {/* Add to cart */}
               <button
                 onClick={handleAdd}
-                disabled={added}
+                disabled={added || hasReachedCartStockLimit}
                 className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200
                   ${added
                     ? 'bg-green-500 text-white scale-95'
-                    : 'bg-brand text-white hover:bg-brand-dark active:scale-95 shadow-sm hover:shadow-md'
+                    : hasReachedCartStockLimit
+                      ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                      : 'bg-brand text-white hover:bg-brand-dark active:scale-95 shadow-sm hover:shadow-md'
                   }`}
               >
                 {added ? <FiCheck size={15} /> : <FiShoppingCart size={15} />}
-                {added ? 'Agregado' : 'Agregar'}
+                {added ? 'Agregado' : hasReachedCartStockLimit ? 'Stock en carrito' : 'Agregar'}
               </button>
             </div>
+          )}
+          {!isOutOfStock && (
+            <p className="text-[11px] text-slate-400">
+              {hasReachedCartStockLimit
+                ? 'Ya agregaste todo el stock disponible de este producto.'
+                : `Disponibles para sumar: ${remainingStock}`}
+            </p>
           )}
         </div>
       </div>

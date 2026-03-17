@@ -1,21 +1,17 @@
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
-import dotenv from 'dotenv';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import { connectDB } from './config/db.js';
+import { loadServerEnv } from './config/env.js';
 import authRoutes from './routes/authRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import metricsRoutes from './routes/metricsRoutes.js';
 import galleryRoutes from './routes/galleryRoutes.js';
+import settingsRoutes from './routes/settingsRoutes.js';
+import logRoutes from './routes/logRoutes.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Load env variables from server/.env regardless of current working directory.
-dotenv.config({ path: path.resolve(__dirname, '.env') });
+loadServerEnv();
 
 const app = express();
 
@@ -90,6 +86,8 @@ app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/metrics', metricsRoutes);
 app.use('/api/gallery', galleryRoutes);
+app.use('/api/settings', settingsRoutes);
+app.use('/api/logs', logRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });

@@ -128,19 +128,22 @@ export default function CartDrawer() {
                     ${(item.price * item.quantity).toLocaleString('es-AR')}
                   </p>
                   <p className="text-xs text-slate-400">${item.price.toLocaleString('es-AR')} c/u</p>
+                  <p className="text-[11px] text-slate-400">Stock disponible: {item.stock}</p>
 
                   <div className="flex items-center gap-2 mt-2">
                     <div className="flex items-center border border-slate-200 rounded-lg overflow-hidden text-sm">
                       <button
                         onClick={() => updateQty(item.productId, item.quantity - 1)}
-                        className="px-2 py-1 hover:bg-slate-100 transition-colors text-slate-600"
+                        disabled={item.quantity <= 1}
+                        className="px-2 py-1 hover:bg-slate-100 transition-colors text-slate-600 disabled:opacity-40 disabled:cursor-not-allowed"
                       >
                         <FiMinus size={11} />
                       </button>
                       <span className="px-2 min-w-[1.8rem] text-center font-medium">{item.quantity}</span>
                       <button
                         onClick={() => updateQty(item.productId, item.quantity + 1)}
-                        className="px-2 py-1 hover:bg-slate-100 transition-colors text-slate-600"
+                        disabled={item.quantity >= item.stock}
+                        className="px-2 py-1 hover:bg-slate-100 transition-colors text-slate-600 disabled:opacity-40 disabled:cursor-not-allowed"
                       >
                         <FiPlus size={11} />
                       </button>

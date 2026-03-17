@@ -92,4 +92,19 @@ export const galleryAPI = {
   delete: (id) => api.delete(`/gallery/${id}`),
 };
 
+// ─── Settings ────────────────────────────────────────────
+export const settingsAPI = {
+  getPublic: () => api.get('/settings/public'),
+  getAdmin: () => api.get('/settings/admin'),
+  updateAdmin: (data) => api.put('/settings/admin', data),
+  getUsers: () => api.get('/settings/users'),
+  createUser: (data) => api.post('/settings/users', data),
+  deleteUser: (id) => api.delete(`/settings/users/${id}`),
+};
+
+// ─── Logs ───────────────────────────────────────────────
+export const logsAPI = {
+  getAll: (params) => api.get('/logs', { params }),
+};
+
 export default api;

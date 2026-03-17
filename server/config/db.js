@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { resolveMongoConnection } from './env.js';
 
 let cachedConnection = null;
 let connectingPromise = null;
@@ -7,15 +8,13 @@ export const connectDB = async () => {
   if (cachedConnection) return cachedConnection;
   if (connectingPromise) return connectingPromise;
 
-  if (!process.env.MONGODB_URI) {
-    throw new Error('MONGODB_URI no está configurado en las variables de entorno');
-  }
+  const { uri, label } = resolveMongoConnection();
 
   connectingPromise = mongoose
-    .connect(process.env.MONGODB_URI)
+    .connect(uri)
     .then((conn) => {
       cachedConnection = conn;
-      console.log(`MongoDB connected: ${conn.connection.host}`);
+      console.log(`MongoDB connected (${label}): ${conn.connection.host}`);
       return conn;
     })
     .catch((error) => {

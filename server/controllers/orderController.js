@@ -1,6 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import Order from '../models/Order.js';
 import Product from '../models/Product.js';
+import { writeAuditLog } from '../utils/auditLogger.js';
 
 // POST /api/orders — público (se llama cuando el usuario hace click en WhatsApp)
 export const createOrder = asyncHandler(async (req, res) => {
@@ -117,6 +118,20 @@ export const createOrder = asyncHandler(async (req, res) => {
     throw error;
   }
 
+  await writeAuditLog({
+    req,
+    action: 'ORDER_CREATED',
+    entity: 'order',
+    entityId: order._id,
+    message: 'Pedido creado y enviado a WhatsApp',
+    meta: {
+      total,
+      itemsCount: orderItems.length,
+      customerName: customerName || '',
+      customerPhone: customerPhone || '',
+    },
+  });
+
   res.status(201).json({
     order,
     whatsappUrl: `https://wa.me/${process.env.WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`,
@@ -146,5 +161,15 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error('Orden no encontrada');
   }
+
+  await writeAuditLog({
+    req,
+    action: 'ORDER_STATUS_UPDATED',
+    entity: 'order',
+    entityId: order._id,
+    message: `Estado actualizado a ${status}`,
+    meta: { status },
+  });
+
   res.json(order);
 });

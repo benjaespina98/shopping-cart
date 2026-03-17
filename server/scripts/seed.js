@@ -1,13 +1,19 @@
 import mongoose from 'mongoose';
-import dotenv from 'dotenv';
 import User from '../models/User.js';
 import Product from '../models/Product.js';
+import { loadServerEnv, resolveMongoConnection } from '../config/env.js';
 
-dotenv.config();
+loadServerEnv();
 
 const seed = async () => {
-  await mongoose.connect(process.env.MONGODB_URI);
-  console.log('MongoDB connected for seeding...');
+  // Optional: SEED_ENV=production | preview | testing | development
+  if (process.env.SEED_ENV) {
+    process.env.APP_ENV = process.env.SEED_ENV;
+  }
+
+  const { uri, label } = resolveMongoConnection();
+  await mongoose.connect(uri);
+  console.log(`MongoDB connected for seeding (${label})...`);
 
   // Create admin user
   const existingAdmin = await User.findOne({ email: process.env.ADMIN_EMAIL });
