@@ -94,6 +94,8 @@ app.use((req, res) => {
 });
 
 app.use((err, req, res, next) => {
+  // Mostrar el error en consola para debugging
+  console.error('Express error:', err);
   // Preserve statuses set by controllers/middleware (401/403/404/etc.).
   const statusCode = err.statusCode || (res.statusCode >= 400 ? res.statusCode : 500);
   res.status(statusCode).json({

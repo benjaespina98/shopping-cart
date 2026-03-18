@@ -55,38 +55,44 @@ export const getProductById = asyncHandler(async (req, res) => {
 
 // POST /api/products — admin
 export const createProduct = asyncHandler(async (req, res) => {
-  const { name, description, price, stock, category, featured, tags } = req.body;
+  try {
+    const { name, description, price, stock, category, featured, tags } = req.body;
 
-  const images = req.files
-    ? req.files.map((f) => ({ url: f.path, publicId: f.filename }))
-    : [];
+    let images = [];
+    if (req.files && req.files.length > 0) {
+      images = req.files.map((f) => ({ url: f.path, publicId: f.filename }));
+    }
 
-  const product = await Product.create({
-    name,
-    description,
-    price: Number(price),
-    stock: Number(stock),
-    category,
-    featured: featured === 'true',
-    tags: tags ? JSON.parse(tags) : [],
-    images,
-  });
+    const product = await Product.create({
+      name,
+      description,
+      price: Number(price),
+      stock: Number(stock),
+      category,
+      featured: featured === 'true',
+      tags: tags ? JSON.parse(tags) : [],
+      images,
+    });
 
-  await writeAuditLog({
-    req,
-    action: 'PRODUCT_CREATED',
-    entity: 'product',
-    entityId: product._id,
-    message: `Producto creado: ${product.name}`,
-    meta: {
-      name: product.name,
-      category: product.category,
-      price: product.price,
-      stock: product.stock,
-    },
-  });
+    await writeAuditLog({
+      req,
+      action: 'PRODUCT_CREATED',
+      entity: 'product',
+      entityId: product._id,
+      message: `Producto creado: ${product.name}`,
+      meta: {
+        name: product.name,
+        category: product.category,
+        price: product.price,
+        stock: product.stock,
+      },
+    });
 
-  res.status(201).json(product);
+    res.status(201).json(product);
+  } catch (error) {
+    console.error('Error al crear producto:', error);
+    throw error;
+  }
 });
 
 // PUT /api/products/:id — admin
