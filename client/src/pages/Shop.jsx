@@ -1,16 +1,18 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { FiSearch, FiFilter, FiX, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { productsAPI } from '../services/api';
 import ProductCard from '../components/ui/ProductCard';
+import { useCart } from '../context/CartContext';
 
 const SORT_OPTIONS = [
   { value: '',          label: 'Relevancia' },
   { value: 'price_asc', label: 'Precio: menor a mayor' },
-  { value: 'price_desc','label': 'Precio: mayor a menor' },
+  { value: 'price_desc', label: 'Precio: mayor a menor' },
   { value: 'name_asc',  label: 'Nombre: A → Z' },
 ];
 
 export default function Shop() {
+  const { items } = useCart();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,6 +24,14 @@ export default function Shop() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalProducts, setTotalProducts] = useState(0);
   const [debouncedSearch, setDebouncedSearch] = useState('');
+
+  const inCartByProductId = useMemo(() => {
+    const map = new Map();
+    items.forEach((item) => {
+      map.set(item.productId, item.quantity);
+    });
+    return map;
+  }, [items]);
 
   // Debounce search
   useEffect(() => {
@@ -200,7 +210,13 @@ export default function Shop() {
       ) : (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {products.map((p) => <ProductCard key={p._id} product={p} />)}
+            {products.map((p) => (
+              <ProductCard
+                key={p._id}
+                product={p}
+                inCartQuantity={inCartByProductId.get(p._id) || 0}
+              />
+            ))}
           </div>
 
           {/* Pagination */}

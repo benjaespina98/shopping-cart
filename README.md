@@ -1,239 +1,238 @@
-# 🛒 MiTienda — MERN Shopping Cart
+# Shopping Cart MERN
 
-Aplicación web completa para un local comercial con carrito de compras, integración con WhatsApp y panel de administración.
+E-commerce liviano para un local comercial, construido con React, Node, Express y MongoDB. Incluye catálogo público, carrito persistente, checkout por WhatsApp y un panel de administración con productos, pedidos, métricas, logs y configuración.
 
-## Stack
+## Resumen
 
-| Capa | Tecnología |
-|------|-----------|
-| Frontend | React 18 + Vite + Tailwind CSS |
-| Backend | Node.js + Express |
-| Base de datos | MongoDB Atlas |
-| Imágenes | Cloudinary |
-| Auth | JWT |
+Este proyecto fue pensado para un caso real de negocio:
 
----
+- navegación rápida y responsive para clientes
+- carga y gestión de productos con imágenes
+- flujo de compra simple que termina en WhatsApp
+- panel admin para operar el negocio desde cualquier dispositivo
+- despliegue full stack en Vercel
 
-## Estructura del proyecto
+## Tecnologías
 
-```
+### Frontend
+
+- React 18
+- Vite
+- React Router DOM
+- Tailwind CSS
+- Axios
+- React Toastify
+- Recharts
+
+### Backend
+
+- Node.js
+- Express
+- MongoDB Atlas
+- Mongoose
+- Cloudinary
+- JWT para autenticación
+- Multer para uploads
+
+### Infraestructura
+
+- Vercel para frontend y backend
+- MongoDB Atlas para persistencia
+- Cloudinary para almacenamiento de imágenes
+
+## Funcionalidades principales
+
+### Cliente
+
+- landing page con productos destacados
+- listado de productos con búsqueda y filtros
+- detalle de producto con galería de imágenes
+- carrito persistente en `localStorage`
+- envío del pedido a WhatsApp con el detalle armado automáticamente
+- sección de contacto y ubicación
+
+### Administrador
+
+- login protegido con JWT
+- dashboard con resumen general
+- métricas y gráficos de ventas/pedidos
+- CRUD de productos con subida y borrado de imágenes
+- gestión de pedidos y estados
+- logs de auditoría
+- configuración general del sitio
+
+## Vista general del proyecto
+
+```text
 shopping-cart/
-├── client/                   # React frontend (Vite)
+├── client/                  # Frontend React + Vite
 │   └── src/
 │       ├── components/
-│       │   ├── layout/       # PublicLayout, AdminLayout, Navbar, Footer
-│       │   └── ui/           # ProductCard, CartDrawer
-│       ├── context/          # CartContext, AuthContext
+│       │   ├── layout/
+│       │   └── ui/
+│       ├── context/
 │       ├── pages/
-│       │   ├── Landing.jsx
-│       │   ├── Shop.jsx
-│       │   ├── Contact.jsx
-│       │   ├── Location.jsx
-│       │   └── admin/        # Login, Dashboard, Products, Orders, Metrics
-│       └── services/         # api.js (Axios)
-└── server/                   # Express backend
-    ├── config/               # db.js, cloudinary.js
-    ├── controllers/          # auth, products, orders, metrics
-    ├── middleware/            # authMiddleware.js
-    ├── models/               # User, Product, Order
-    ├── routes/               # authRoutes, productRoutes, orderRoutes, metricsRoutes
-    └── scripts/              # seed.js
+│       │   ├── admin/
+│       │   └── ...
+│       └── services/
+└── server/                  # Backend Express + MongoDB
+    ├── config/
+    ├── controllers/
+    ├── middleware/
+    ├── models/
+    ├── routes/
+    ├── scripts/
+    └── utils/
 ```
 
----
+## Requisitos previos
 
-## Configuración inicial
+- Node.js 18 o superior
+- npm
+- cuenta de MongoDB Atlas
+- cuenta de Cloudinary
+- variables de entorno configuradas
 
-### 1. Clonar e instalar dependencias
+## Instalación local
+
+### 1. Clonar el repositorio
+
+```bash
+git clone <url-del-repositorio>
+cd shopping-cart
+```
+
+### 2. Instalar dependencias
 
 ```bash
 npm run install:all
 ```
 
-### 2. Configurar variables de entorno del servidor
+### 3. Configurar variables de entorno
 
-```bash
-cd server
-cp .env.example .env
-```
-
-Editá `server/.env` con tus credenciales:
+Crear y completar `server/.env`.
 
 ```env
-MONGODB_URI_DEVELOPMENT=mongodb+srv://<user>:<pass>@cluster.mongodb.net/shopping_cart_dev
-MONGODB_URI_PREVIEW=mongodb+srv://<user>:<pass>@cluster.mongodb.net/shopping_cart_test
-MONGODB_URI_PRODUCTION=mongodb+srv://<user>:<pass>@cluster.mongodb.net/shopping_cart_prod
-JWT_SECRET=una_clave_muy_secreta_larga
-CLOUDINARY_CLOUD_NAME=...
-CLOUDINARY_API_KEY=...
-CLOUDINARY_API_SECRET=...
-STORE_NAME="Playa y Sol"
-WHATSAPP_NUMBER=5493534224607   # Tu número con código de país, sin + ni espacios
-ADMIN_EMAIL=admin@mitienda.com
-ADMIN_PASSWORD=TuPassword123!
+MONGODB_URI_DEVELOPMENT=mongodb+srv://<user>:<pass>@<cluster>/<db_dev>
+MONGODB_URI_PREVIEW=mongodb+srv://<user>:<pass>@<cluster>/<db_test>
+MONGODB_URI_PRODUCTION=mongodb+srv://<user>:<pass>@<cluster>/<db_prod>
+
+JWT_SECRET=una_clave_larga_y_segura
+
+CLOUDINARY_CLOUD_NAME=tu_cloud_name
+CLOUDINARY_API_KEY=tu_api_key
+CLOUDINARY_API_SECRET=tu_api_secret
+
+STORE_NAME=Nombre de tu tienda
+WHATSAPP_NUMBER=549XXXXXXXXXX
+
+ADMIN_EMAIL=admin@tudominio.com
+ADMIN_PASSWORD=TuPasswordSeguro123!
+
 APP_ENV=development
+CLIENT_URL=http://localhost:5173
+PORT=5000
 ```
 
-### 3. Crear usuario admin y productos de ejemplo
+## Levantar el proyecto en local
 
-```bash
-npm run seed
-```
-
-Opcional para elegir entorno de seed:
-
-```bash
-cd server
-$env:SEED_ENV="preview"; npm run seed
-```
-
-### 4. Iniciar en desarrollo
+### Backend + frontend juntos
 
 ```bash
 npm run dev
 ```
 
-- Frontend: http://localhost:5173
-- API: http://localhost:5000/api
+- Frontend: `http://localhost:5173`
+- API: `http://localhost:5000/api`
 
----
-
-## Comandos diarios (guía rápida)
-
-Desde la raíz del proyecto:
+### Solo frontend
 
 ```bash
-npm run dev
+npm run dev:client
 ```
-Levanta backend + frontend en desarrollo.
+
+### Solo backend
 
 ```bash
-npm run dev:open
+npm run dev:server
 ```
-Levanta solo frontend y abre el navegador automáticamente.
 
-```bash
-npm run dev:full:open
-```
-Levanta backend + frontend y abre el navegador automáticamente.
+## Scripts disponibles
 
-```bash
-npm run build
-```
-Compila el frontend para producción local.
+### Raíz del proyecto
 
-```bash
-npm --prefix client run preview
-```
-Sirve el build compilado del frontend para previsualización local.
+- `npm run dev` - levanta backend y frontend juntos
+- `npm run dev:open` - levanta solo frontend y abre navegador
+- `npm run dev:full:open` - levanta backend + frontend y abre navegador
+- `npm run build` - build del frontend
+- `npm run build:vercel` - build pensado para despliegue en Vercel
+- `npm run seed` - carga datos iniciales de ejemplo
 
-```bash
-npm run build:vercel
-```
-Build completo pensado para deploy en Vercel.
+### Frontend
 
-Nota: si cerrás el proceso con `Ctrl + C`, es normal ver `exit code 1` en `concurrently`; no implica error de la app.
+- `npm --prefix client run dev`
+- `npm --prefix client run build`
+- `npm --prefix client run preview`
 
----
+### Backend
 
-## Rutas públicas
+- `npm --prefix server run dev`
+- `npm --prefix server run start`
+- `npm --prefix server run seed`
 
-| Ruta | Descripción |
-|------|-------------|
-| `/` | Landing page del local |
-| `/tienda` | Shop con carrito y búsqueda/filtros |
-| `/contacto` | Formulario de contacto → WhatsApp |
-| `/ubicacion` | Mapa y horarios del local |
+## Entornos y bases de datos
 
-## Panel Admin
+El backend resuelve automáticamente a qué MongoDB conectarse según el entorno:
 
-| Ruta | Descripción |
-|------|-------------|
-| `/admin/login` | Login con email + contraseña |
-| `/admin/dashboard` | Resumen general |
-| `/admin/productos` | CRUD productos + upload de imágenes |
-| `/admin/pedidos` | Lista de pedidos con estados |
-| `/admin/metricas` | Gráficos de revenue, pedidos, categorías |
-| `/admin/logs` | Auditoría de acciones (usuarios, productos, pedidos, configuración) |
+- `production` → `MONGODB_URI_PRODUCTION`
+- `preview` / `testing` → `MONGODB_URI_PREVIEW`
+- `development` → `MONGODB_URI_DEVELOPMENT`
 
----
+Regla práctica:
 
-## Personalización
+- si trabajás local, usá una URI de testing/desarrollo
+- si desplegás en Vercel producción, usá la URI de productivo
+- si desplegás preview/testing, usá la URI de testing
 
-### Nombre del local
-Buscá y reemplazá `MiTienda` en los archivos de componentes.
-
-### Número de WhatsApp
-Configurá `WHATSAPP_NUMBER` en `server/.env`:
-```
-WHATSAPP_NUMBER=5491198765432
-```
-Y actualizá la constante en `client/src/pages/Contact.jsx`.
-
-### Dirección y mapa
-Actualizá el objeto `LOCATION` en `client/src/pages/Location.jsx` con tu dirección y coordenadas reales.
-
-### Colores del tema
-Editá `client/tailwind.config.js` → sección `colors.brand` con tus colores.
-
-### Redes sociales y email
-Editá los links en `client/src/components/layout/Footer.jsx` y `Contact.jsx`.
-
----
-
-## API Endpoints
+## Endpoints principales
 
 ### Públicos
-```
-GET    /api/products           # Listar productos (con filtros)
-GET    /api/products/categories # Categorías disponibles
-GET    /api/products/:id        # Producto por ID
-POST   /api/orders             # Crear pedido (cart → WhatsApp)
-```
 
-### Admin (requieren Bearer JWT)
-```
-GET    /api/products/admin/all  # Todos los productos
-POST   /api/products           # Crear producto
-PUT    /api/products/:id        # Actualizar producto
-PATCH  /api/products/:id/stock  # Actualizar stock
-DELETE /api/products/:id        # Eliminar producto
+- `GET /api/products`
+- `GET /api/products/categories`
+- `GET /api/products/:id`
+- `POST /api/orders`
 
-GET    /api/orders             # Listar pedidos
-PATCH  /api/orders/:id/status  # Cambiar estado
+### Admin
 
-GET    /api/metrics/summary
-GET    /api/metrics/orders-over-time
-GET    /api/metrics/top-products
-GET    /api/metrics/categories
+- `GET /api/products/admin/all`
+- `POST /api/products`
+- `PUT /api/products/:id`
+- `PATCH /api/products/:id/stock`
+- `DELETE /api/products/:id`
+- `GET /api/orders`
+- `PATCH /api/orders/:id/status`
+- `GET /api/metrics/summary`
+- `GET /api/metrics/orders-over-time`
+- `GET /api/metrics/top-products`
+- `GET /api/metrics/categories`
+- `GET /api/logs`
 
-GET    /api/logs               # Auditoría de acciones (filtros + paginación)
-```
+## Flujo de compra
 
----
+1. El cliente agrega productos al carrito.
+2. El carrito se mantiene persistente en `localStorage`.
+3. Al confirmar, el frontend llama a `POST /api/orders`.
+4. El backend guarda el pedido y construye el mensaje de WhatsApp.
+5. El usuario es redirigido a WhatsApp con el pedido listo para enviar.
 
-## Flujo del carrito → WhatsApp
+## Deploy en Vercel
 
-1. Usuario agrega productos al carrito (persiste en `localStorage`)
-2. Abre el drawer del carrito y hace click en **"Enviar pedido por WhatsApp"**
-3. El front llama a `POST /api/orders` con los items
-4. El server guarda el pedido en MongoDB y retorna un `whatsappUrl`
-5. Se abre WhatsApp con el mensaje pre-escrito con el detalle del pedido
+El proyecto está preparado para desplegar frontend y backend en Vercel.
 
----
+### Variables de entorno en Vercel
 
-## Deploy (producción)
-
-### Full stack en Vercel (frontend + API serverless)
-
-Este repo ya incluye configuración para desplegar todo junto en Vercel:
-
-- Frontend estático desde `client/dist`
-- API Express como función serverless en `/api/*`
-
-#### Variables de entorno en Vercel
-
-Configurá estas variables (Project Settings → Environment Variables):
+Configurar en Project Settings > Environment Variables:
 
 ```env
 MONGODB_URI_PRODUCTION=...
@@ -248,6 +247,22 @@ STORE_NAME=...
 WHATSAPP_NUMBER=...
 CLIENT_URL=https://tu-proyecto.vercel.app,http://localhost:5173
 ```
+
+## Estado del proyecto
+
+Proyecto activo y optimizado para uso real, con foco en:
+
+- velocidad de carga
+- experiencia de usuario simple
+- administración clara
+- compatibilidad con Vercel
+- escalabilidad básica sobre MongoDB Atlas
+
+## Notas
+
+- No subir credenciales reales al repositorio.
+- Para producción, cada entorno debe apuntar a su propia base de datos.
+- Si querés adaptar el branding, revisá el nombre del local, WhatsApp, colores y textos públicos.
 
 Notas:
 - `CLIENT_URL` acepta múltiples orígenes separados por coma.

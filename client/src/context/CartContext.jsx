@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer, useEffect } from 'react';
+import { createContext, useContext, useReducer, useEffect, useCallback, useMemo } from 'react';
 
 const CartContext = createContext(null);
 
@@ -55,7 +55,7 @@ export function CartProvider({ children }) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
   }, [items]);
 
-  const addItem = (product, quantity = 1) => {
+  const addItem = useCallback((product, quantity = 1) => {
     dispatch({
       type: 'ADD',
       item: {
@@ -67,23 +67,37 @@ export function CartProvider({ children }) {
         quantity,
       },
     });
-  };
+  }, []);
 
-  const removeItem = (productId) => dispatch({ type: 'REMOVE', productId });
+  const removeItem = useCallback((productId) => dispatch({ type: 'REMOVE', productId }), []);
 
-  const updateQty = (productId, quantity) => dispatch({ type: 'UPDATE_QTY', productId, quantity });
+  const updateQty = useCallback((productId, quantity) => {
+    dispatch({ type: 'UPDATE_QTY', productId, quantity });
+  }, []);
 
-  const clearCart = () => dispatch({ type: 'CLEAR' });
+  const clearCart = useCallback(() => dispatch({ type: 'CLEAR' }), []);
+  const toggleCart = useCallback(() => setIsOpen(), []);
 
-  const totalItems = items.reduce((acc, i) => acc + i.quantity, 0);
-  const totalPrice = items.reduce((acc, i) => acc + i.price * i.quantity, 0);
+  const totalItems = useMemo(() => items.reduce((acc, i) => acc + i.quantity, 0), [items]);
+  const totalPrice = useMemo(() => items.reduce((acc, i) => acc + i.price * i.quantity, 0), [items]);
+
+  const value = useMemo(
+    () => ({
+      items,
+      addItem,
+      removeItem,
+      updateQty,
+      clearCart,
+      totalItems,
+      totalPrice,
+      isOpen,
+      toggleCart,
+    }),
+    [items, addItem, removeItem, updateQty, clearCart, totalItems, totalPrice, isOpen, toggleCart]
+  );
 
   return (
-    <CartContext.Provider
-      value={{ items, addItem, removeItem, updateQty, clearCart, totalItems, totalPrice, isOpen, toggleCart: setIsOpen }}
-    >
-      {children}
-    </CartContext.Provider>
+    <CartContext.Provider value={value}>{children}</CartContext.Provider>
   );
 }
 

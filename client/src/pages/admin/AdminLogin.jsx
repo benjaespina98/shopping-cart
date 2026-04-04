@@ -13,6 +13,7 @@ export default function AdminLogin() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('Submit login', form);
     setLoading(true);
     try {
       await login(form.email, form.password);

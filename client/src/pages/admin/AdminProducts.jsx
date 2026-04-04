@@ -41,12 +41,22 @@ function ProductModal({ product, onClose, onSaved }) {
     setSaving(true);
     try {
       const fd = new FormData();
-      Object.entries(form).forEach(([k, v]) => {
-        if (!['images'].includes(k)) fd.append(k, v);
-      });
-      fd.set('featured', String(form.featured));
-      fd.set('active', String(form.active));
-      if (form.tags) fd.set('tags', JSON.stringify(form.tags.split(',').map((t) => t.trim()).filter(Boolean)));
+      fd.append('name', form.name);
+      fd.append('description', form.description);
+      fd.append('price', form.price);
+      fd.append('stock', form.stock);
+      fd.append('category', form.category);
+      fd.append('featured', String(form.featured));
+      fd.append('active', String(form.active));
+
+      const tagList = form.tags
+        .split(',')
+        .map((t) => t.trim())
+        .filter(Boolean);
+      if (tagList.length > 0) {
+        fd.append('tags', JSON.stringify(tagList));
+      }
+
       newFiles.forEach((f) => fd.append('images', f));
       if (removeIds.length) fd.append('removeImages', JSON.stringify(removeIds));
 

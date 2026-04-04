@@ -22,7 +22,9 @@ export const createOrder = asyncHandler(async (req, res) => {
   }
 
   const productIds = Array.from(quantityByProduct.keys());
-  const products = await Product.find({ _id: { $in: productIds }, active: true });
+  const products = await Product.find({ _id: { $in: productIds }, active: true })
+    .select('name price stock images active')
+    .lean();
   const productById = new Map(products.map((product) => [String(product._id), product]));
 
   // Verify products, stock, and build items with current prices.
@@ -148,7 +150,8 @@ export const getOrders = asyncHandler(async (req, res) => {
     .sort({ createdAt: -1 })
     .limit(Number(limit))
     .skip((Number(page) - 1) * Number(limit))
-    .populate('items.product', 'name');
+    .populate('items.product', 'name')
+    .lean();
 
   res.json({ orders, total });
 });

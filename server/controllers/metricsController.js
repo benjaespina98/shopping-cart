@@ -6,22 +6,44 @@ import Product from '../models/Product.js';
 export const getSummary = asyncHandler(async (req, res) => {
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
-  const [totalProducts, activeProducts, outOfStock, totalOrders, recentOrders] = await Promise.all([
+  const [
+    totalProducts,
+    activeProducts,
+    outOfStock,
+    totalOrders,
+    recentOrders,
+    statusSummary,
+    soldItemsResult,
+    recentRevenueResult,
+  ] = await Promise.all([
     Product.countDocuments(),
     Product.countDocuments({ active: true }),
     Product.countDocuments({ stock: 0, active: true }),
     Order.countDocuments(),
     Order.countDocuments({ createdAt: { $gte: thirtyDaysAgo } }),
-  ]);
-
-  const statusSummary = await Order.aggregate([
-    {
-      $group: {
-        _id: '$status',
-        orders: { $sum: 1 },
-        revenue: { $sum: '$total' },
+    Order.aggregate([
+      {
+        $group: {
+          _id: '$status',
+          orders: { $sum: 1 },
+          revenue: { $sum: '$total' },
+        },
       },
-    },
+    ]),
+    Order.aggregate([
+      { $match: { status: 'confirmed' } },
+      { $unwind: '$items' },
+      { $group: { _id: null, totalItemsSold: { $sum: '$items.quantity' } } },
+    ]),
+    Order.aggregate([
+      {
+        $match: {
+          status: 'confirmed',
+          createdAt: { $gte: thirtyDaysAgo },
+        },
+      },
+      { $group: { _id: null, total: { $sum: '$total' } } },
+    ]),
   ]);
 
   const statusMap = statusSummary.reduce((acc, entry) => {
@@ -34,22 +56,6 @@ export const getSummary = asyncHandler(async (req, res) => {
   const cancelledOrders = statusMap.cancelled?.orders || 0;
   const totalRevenue = statusMap.confirmed?.revenue || 0;
   const pendingRevenue = statusMap.whatsapp_sent?.revenue || 0;
-
-  const soldItemsResult = await Order.aggregate([
-    { $match: { status: 'confirmed' } },
-    { $unwind: '$items' },
-    { $group: { _id: null, totalItemsSold: { $sum: '$items.quantity' } } },
-  ]);
-
-  const recentRevenueResult = await Order.aggregate([
-    {
-      $match: {
-        status: 'confirmed',
-        createdAt: { $gte: thirtyDaysAgo },
-      },
-    },
-    { $group: { _id: null, total: { $sum: '$total' } } },
-  ]);
 
   const recentRevenue = recentRevenueResult[0]?.total || 0;
   const totalItemsSold = soldItemsResult[0]?.totalItemsSold || 0;

@@ -1,19 +1,17 @@
-import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { FiShoppingCart, FiPlus, FiMinus, FiCheck, FiAlertTriangle } from 'react-icons/fi';
 import { useCart } from '../../context/CartContext';
 import { toast } from 'react-toastify';
 
-export default function ProductCard({ product }) {
-  const { addItem, items } = useCart();
+function ProductCard({ product, inCartQuantity = 0 }) {
+  const { addItem } = useCart();
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
   const addedTimeoutRef = useRef(null);
 
-  const inCart = items.find((i) => i.productId === product._id);
-  const alreadyInCartQty = inCart?.quantity || 0;
   const isOutOfStock = product.stock === 0;
   const isLowStock = !isOutOfStock && product.stock <= 5;
-  const remainingStock = Math.max(0, product.stock - alreadyInCartQty);
+  const remainingStock = Math.max(0, product.stock - inCartQuantity);
   const maxSelectableQty = Math.max(1, remainingStock);
   const hasReachedCartStockLimit = !isOutOfStock && remainingStock === 0;
 
@@ -72,7 +70,7 @@ export default function ProductCard({ product }) {
             <span className="badge bg-white text-slate-700 font-semibold text-sm px-4 py-1.5 shadow">Sin stock</span>
           </div>
         )}
-        {inCart && !isOutOfStock && (
+        {inCartQuantity > 0 && !isOutOfStock && (
           <span className="absolute top-2.5 right-2.5 badge bg-green-500 text-white shadow-sm">✓ En carrito</span>
         )}
       </div>
@@ -167,3 +165,5 @@ export default function ProductCard({ product }) {
     </div>
   );
 }
+
+export default memo(ProductCard);

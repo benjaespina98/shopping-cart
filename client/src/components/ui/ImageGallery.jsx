@@ -161,16 +161,14 @@ export default function ImageGallery() {
         <div className="relative group overflow-hidden rounded-2xl aspect-[16/9] bg-slate-200 cursor-pointer shadow-xl"
           onClick={() => setLightbox(active)}
         >
-          {images.map((img, i) => (
-            <img
-              key={i}
-              src={img.url}
-              alt={img.alt}
-              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
-                i === active ? 'opacity-100' : 'opacity-0'
-              }`}
-            />
-          ))}
+          <img
+            key={images[active].url}
+            src={images[active].url}
+            alt={images[active].alt}
+            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 opacity-100"
+            loading="eager"
+            decoding="async"
+          />
 
           {/* Overlay on hover */}
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
@@ -225,7 +223,7 @@ export default function ImageGallery() {
                   : 'border-transparent opacity-60 hover:opacity-100 hover:border-brand/40'
               }`}
             >
-              <img src={img.thumb} alt={img.alt} className="w-full h-full object-cover" />
+              <img src={img.thumb} alt={img.alt} className="w-full h-full object-cover" loading="lazy" decoding="async" />
             </button>
           ))}
         </div>

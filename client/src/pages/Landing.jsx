@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
 import { FiArrowRight, FiDroplet, FiSun, FiShield, FiHeadphones } from 'react-icons/fi';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { productsAPI } from '../services/api';
 import ProductCard from '../components/ui/ProductCard';
 import ImageGallery from '../components/ui/ImageGallery';
+import { useCart } from '../context/CartContext';
 
 const features = [
   { Icon: FiDroplet,    title: 'Tratamiento de agua',   desc: 'Productos químicos y equipos para mantener el agua cristalina' },
@@ -20,7 +21,16 @@ const services = [
 ];
 
 export default function Landing() {
+  const { items } = useCart();
   const [featured, setFeatured] = useState([]);
+
+  const inCartByProductId = useMemo(() => {
+    const map = new Map();
+    items.forEach((item) => {
+      map.set(item.productId, item.quantity);
+    });
+    return map;
+  }, [items]);
 
   useEffect(() => {
     productsAPI.getAll({ featured: true, limit: 4 })
@@ -144,7 +154,13 @@ export default function Landing() {
               </Link>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {featured.map((p) => <ProductCard key={p._id} product={p} />)}
+              {featured.map((p) => (
+                <ProductCard
+                  key={p._id}
+                  product={p}
+                  inCartQuantity={inCartByProductId.get(p._id) || 0}
+                />
+              ))}
             </div>
           </div>
         </section>
