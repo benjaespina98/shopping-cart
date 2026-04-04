@@ -22,7 +22,7 @@ api.interceptors.response.use(
   async (err) => {
     const originalConfig = err.config || {};
 
-    // If an external API URL is configured but unavailable (e.g. paused Render), retry once on same-origin /api.
+    // If an external API URL is configured but unavailable, retry once on same-origin /api.
     const shouldFallbackToLocalApi =
       !isProduction &&
       configuredApiUrl &&

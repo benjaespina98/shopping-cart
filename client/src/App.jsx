@@ -2,10 +2,17 @@ import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import PublicLayout from './components/layout/PublicLayout';
-import Landing from './pages/Landing';
-import Shop from './pages/Shop';
-import Contact from './pages/Contact';
-import Location from './pages/Location';
+
+const Landing = lazy(() => import('./pages/Landing'));
+const Shop = lazy(() => import('./pages/Shop'));
+const Contact = lazy(() => import('./pages/Contact'));
+const Location = lazy(() => import('./pages/Location'));
+
+const PublicFallback = () => (
+  <div className="flex items-center justify-center min-h-[50vh]">
+    <div className="w-8 h-8 border-4 border-brand border-t-transparent rounded-full animate-spin" />
+  </div>
+);
 
 // Admin — carga solo cuando el usuario navega al panel
 const AdminLayout    = lazy(() => import('./components/layout/AdminLayout'));
@@ -36,10 +43,10 @@ export default function App() {
     <Routes>
       {/* Public routes */}
       <Route element={<PublicLayout />}>
-        <Route path="/" element={<Landing />} />
-        <Route path="/tienda" element={<Shop />} />
-        <Route path="/contacto" element={<Contact />} />
-        <Route path="/ubicacion" element={<Location />} />
+        <Route path="/" element={<Suspense fallback={<PublicFallback />}><Landing /></Suspense>} />
+        <Route path="/tienda" element={<Suspense fallback={<PublicFallback />}><Shop /></Suspense>} />
+        <Route path="/contacto" element={<Suspense fallback={<PublicFallback />}><Contact /></Suspense>} />
+        <Route path="/ubicacion" element={<Suspense fallback={<PublicFallback />}><Location /></Suspense>} />
       </Route>
 
       {/* Admin login (no layout) */}

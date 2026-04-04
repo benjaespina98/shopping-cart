@@ -3,6 +3,22 @@ import Product from '../models/Product.js';
 import { cloudinary } from '../config/cloudinary.js';
 import { writeAuditLog } from '../utils/auditLogger.js';
 
+const parseJsonArray = (value, fallback = []) => {
+  if (value === undefined || value === null || value === '') return fallback;
+  if (Array.isArray(value)) return value;
+
+  if (typeof value === 'string') {
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed : fallback;
+    } catch {
+      return fallback;
+    }
+  }
+
+  return fallback;
+};
+
 // GET /api/products — público
 export const getProducts = asyncHandler(async (req, res) => {
   const { category, search, featured, sort, page = 1, limit = 20 } = req.query;
@@ -23,11 +39,15 @@ export const getProducts = asyncHandler(async (req, res) => {
 
   const sortQuery = sortMap[sort] || (featured === 'true' ? { featured: -1, createdAt: -1 } : { createdAt: -1 });
 
-  const total = await Product.countDocuments(filter);
-  const products = await Product.find(filter)
-    .sort(sortQuery)
-    .limit(limitNumber)
-    .skip((pageNumber - 1) * limitNumber);
+  const [total, products] = await Promise.all([
+    Product.countDocuments(filter),
+    Product.find(filter)
+      .select('name description price stock category images featured active tags createdAt updatedAt')
+      .sort(sortQuery)
+      .limit(limitNumber)
+      .skip((pageNumber - 1) * limitNumber)
+      .lean(),
+  ]);
 
   res.json({
     products,
@@ -45,7 +65,9 @@ export const getCategories = asyncHandler(async (req, res) => {
 
 // GET /api/products/:id — público
 export const getProductById = asyncHandler(async (req, res) => {
-  const product = await Product.findById(req.params.id);
+  const product = await Product.findById(req.params.id)
+    .select('name description price stock category images featured active tags createdAt updatedAt')
+    .lean();
   if (!product || !product.active) {
     res.status(404);
     throw new Error('Producto no encontrado');
@@ -70,7 +92,7 @@ export const createProduct = asyncHandler(async (req, res) => {
       stock: Number(stock),
       category,
       featured: featured === 'true',
-      tags: tags ? JSON.parse(tags) : [],
+      tags: parseJsonArray(tags),
       images,
     });
 
@@ -107,8 +129,8 @@ export const updateProduct = asyncHandler(async (req, res) => {
   }
 
   // Remove selected images from Cloudinary
-  if (removeImages) {
-    const toRemove = JSON.parse(removeImages);
+  const toRemove = parseJsonArray(removeImages);
+  if (toRemove.length > 0) {
     for (const publicId of toRemove) {
       await cloudinary.uploader.destroy(publicId);
     }
@@ -128,7 +150,7 @@ export const updateProduct = asyncHandler(async (req, res) => {
   if (category !== undefined) product.category = category;
   if (featured !== undefined) product.featured = featured === 'true';
   if (active !== undefined) product.active = active === 'true';
-  if (tags !== undefined) product.tags = JSON.parse(tags);
+  if (tags !== undefined) product.tags = parseJsonArray(tags);
 
   const updated = await product.save();
 
@@ -207,10 +229,16 @@ export const deleteProduct = asyncHandler(async (req, res) => {
 // GET /api/products/admin/all — admin (incluye inactivos)
 export const getAllProductsAdmin = asyncHandler(async (req, res) => {
   const { page = 1, limit = 50 } = req.query;
-  const total = await Product.countDocuments();
-  const products = await Product.find()
-    .sort({ createdAt: -1 })
-    .limit(Number(limit))
-    .skip((Number(page) - 1) * Number(limit));
+  const pageNumber = Math.max(1, Number(page) || 1);
+  const limitNumber = Math.min(100, Math.max(1, Number(limit) || 50));
+  const [total, products] = await Promise.all([
+    Product.countDocuments(),
+    Product.find()
+      .select('name description price stock category images featured active tags createdAt updatedAt')
+      .sort({ createdAt: -1 })
+      .limit(limitNumber)
+      .skip((pageNumber - 1) * limitNumber)
+      .lean(),
+  ]);
   res.json({ products, total });
 });

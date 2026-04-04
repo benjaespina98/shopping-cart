@@ -26,7 +26,8 @@ export const getAuditLogs = asyncHandler(async (req, res) => {
   const logs = await AuditLog.find(filter)
     .sort({ createdAt: -1 })
     .limit(limitNumber)
-    .skip((pageNumber - 1) * limitNumber);
+    .skip((pageNumber - 1) * limitNumber)
+    .lean();
 
   res.json({
     logs,
