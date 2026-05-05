@@ -262,7 +262,6 @@ Proyecto activo y optimizado para uso real, con foco en:
 
 - No subir credenciales reales al repositorio.
 - Para producción, cada entorno debe apuntar a su propia base de datos.
-- Si querés adaptar el branding, revisá el nombre del local, WhatsApp, colores y textos públicos.
 
 Notas:
 - `CLIENT_URL` acepta múltiples orígenes separados por coma.
