@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer, useEffect, useCallback, useMemo } from 'react';
+import { createContext, useContext, useReducer, useEffect, useCallback, useMemo, useState } from 'react';
 
 const CartContext = createContext(null);
 
@@ -36,16 +36,39 @@ function cartReducer(state, action) {
 
 export function CartProvider({ children }) {
   const [items, dispatch] = useReducer(cartReducer, []);
-  const [isOpen, setIsOpen] = useReducer((s) => !s, false);
+  const [isOpen, setIsOpen] = useState(false);
 
   // Hydrate from localStorage
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       try {
-        dispatch({ type: 'HYDRATE', items: JSON.parse(stored) });
-      } catch {
-        // ignore
+        const parsed = JSON.parse(stored);
+        // Validate items before hydrating:
+        // 1. Ensure each item has required fields
+        // 2. Quantity should not exceed current stock
+        // 3. Remove invalid entries
+        const validItems = Array.isArray(parsed)
+          ? parsed.filter(item => 
+              item.productId && 
+              typeof item.quantity === 'number' && 
+              item.quantity > 0 &&
+              typeof item.stock === 'number' &&
+              item.quantity <= item.stock
+            )
+          : [];
+        
+        if (validItems.length > 0) {
+          dispatch({ type: 'HYDRATE', items: validItems });
+        }
+        
+        // Log if we filtered out invalid items
+        if (Array.isArray(parsed) && parsed.length > validItems.length) {
+          console.info(`Cart: Removed ${parsed.length - validItems.length} invalid items from storage`);
+        }
+      } catch (err) {
+        // Corrupted data, start fresh
+        console.warn('Cart: Failed to restore from storage, starting fresh');
       }
     }
   }, []);
@@ -76,7 +99,7 @@ export function CartProvider({ children }) {
   }, []);
 
   const clearCart = useCallback(() => dispatch({ type: 'CLEAR' }), []);
-  const toggleCart = useCallback(() => setIsOpen(), []);
+  const toggleCart = useCallback(() => setIsOpen(prev => !prev), []);
 
   const totalItems = useMemo(() => items.reduce((acc, i) => acc + i.quantity, 0), [items]);
   const totalPrice = useMemo(() => items.reduce((acc, i) => acc + i.price * i.quantity, 0), [items]);

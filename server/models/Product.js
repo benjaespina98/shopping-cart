@@ -22,6 +22,10 @@ const productSchema = new mongoose.Schema(
 
 productSchema.index({ name: 'text', description: 'text', category: 'text', tags: 'text' });
 productSchema.index({ active: 1, category: 1, createdAt: -1 });
+// Additional indexes for performance
+productSchema.index({ active: 1, stock: 1 }); // For filtering active products with stock
+productSchema.index({ category: 1, active: 1, featured: -1 }); // For category + featured queries
+productSchema.index({ createdAt: -1 }); // For sorting by newest
 
 const Product = mongoose.model('Product', productSchema);
 export default Product;

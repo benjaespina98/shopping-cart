@@ -3,25 +3,25 @@ import { FiInstagram, FiFacebook, FiMapPin, FiPhone, FiMail } from 'react-icons/
 
 export default function Footer() {
   return (
-    <footer className="bg-slate-900 text-slate-300 border-t border-slate-800/80">
+    <footer className="bg-neutral-900 text-neutral-200 border-t border-neutral-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Brand */}
           <div>
             <div className="flex items-center gap-1 mb-3">
-              <span className="text-2xl font-extrabold text-brand">Playa</span>
-              <span className="text-2xl font-extrabold text-white">y Sol</span>
+              <span className="text-2xl font-extrabold text-white">Playa</span>
+              <span className="text-2xl font-extrabold brand-sun">y Sol</span>
             </div>
-            <p className="text-sm text-slate-400 leading-relaxed max-w-sm">
+            <p className="text-sm text-neutral-300 leading-relaxed max-w-sm font-medium">
               Especialistas en piscinas, tratamiento de agua y accesorios. Tu pileta, nuestra pasión.
             </p>
             <div className="flex gap-3 mt-4">
               <a href="https://instagram.com" target="_blank" rel="noreferrer"
-                className="p-2 rounded-lg bg-slate-800 hover:bg-brand transition-colors">
+                className="p-2 rounded-lg bg-neutral-800 hover:bg-primary-700 hover:text-white transition-all">
                 <FiInstagram size={18} />
               </a>
               <a href="https://facebook.com" target="_blank" rel="noreferrer"
-                className="p-2 rounded-lg bg-slate-800 hover:bg-brand transition-colors">
+                className="p-2 rounded-lg bg-neutral-800 hover:bg-primary-700 hover:text-white transition-all">
                 <FiFacebook size={18} />
               </a>
             </div>
@@ -29,11 +29,11 @@ export default function Footer() {
 
           {/* Links */}
           <div>
-            <h3 className="text-white font-semibold mb-4">Navegación</h3>
-            <ul className="space-y-2 text-sm">
+            <h3 className="text-white font-bold mb-4">Navegación</h3>
+            <ul className="space-y-2 text-sm text-neutral-300">
               {[['/', 'Inicio'], ['/tienda', 'Tienda'], ['/contacto', 'Contacto'], ['/ubicacion', 'Ubicación']].map(([to, label]) => (
                 <li key={to}>
-                  <Link to={to} className="hover:text-brand transition-colors inline-flex py-0.5">{label}</Link>
+                  <Link to={to} className="hover:text-primary-700 hover:translate-x-1 transition-all inline-flex py-0.5">{label}</Link>
                 </li>
               ))}
             </ul>
@@ -41,27 +41,27 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h3 className="text-white font-semibold mb-4">Contacto</h3>
-            <ul className="space-y-2 text-sm">
+            <h3 className="text-white font-bold mb-4">Contacto</h3>
+            <ul className="space-y-2 text-sm text-neutral-300">
               <li className="flex items-center gap-2">
-                <FiMapPin size={15} className="text-brand shrink-0" />
+                <FiMapPin size={15} className="text-primary-700 shrink-0" />
                 <span>Corrientes 1210, Villa María, Cba.</span>
               </li>
               <li className="flex items-center gap-2">
-                <FiPhone size={15} className="text-brand shrink-0" />
-                <a href="tel:+543534224607" className="hover:text-brand">3534224607</a>
+                <FiPhone size={15} className="text-primary-700 shrink-0" />
+                <a href="tel:+543534224607" className="hover:text-white transition-colors">3534224607</a>
               </li>
               <li className="flex items-center gap-2">
-                <FiMail size={15} className="text-brand shrink-0" />
-                <a href="mailto:benjaespina98@gmail.com" className="hover:text-brand">benjaespina98@gmail.com</a>
+                <FiMail size={15} className="text-primary-700 shrink-0" />
+                <a href="mailto:benjaespina98@gmail.com" className="hover:text-white transition-colors">benjaespina98@gmail.com</a>
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="border-t border-slate-800 mt-10 pt-6 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 gap-2">
+        <div className="border-t border-neutral-800 mt-10 pt-6 flex flex-col sm:flex-row justify-between items-center text-xs text-neutral-400 gap-2">
           <span>© {new Date().getFullYear()} Playa y Sol. Todos los derechos reservados.</span>
-          <Link to="/admin/login" className="hover:text-slate-400 transition-colors">Portal admin</Link>
+          <Link to="/admin/login" className="hover:text-neutral-200 transition-colors">Portal admin</Link>
         </div>
       </div>
     </footer>

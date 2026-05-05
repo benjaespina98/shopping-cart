@@ -1,6 +1,9 @@
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
+import helmet from 'helmet';
+import mongoSanitize from 'express-mongo-sanitize';
+import rateLimit from 'express-rate-limit';
 import { connectDB } from './config/db.js';
 import { loadServerEnv } from './config/env.js';
 import authRoutes from './routes/authRoutes.js';
@@ -48,6 +51,26 @@ const isAllowedOrigin = (origin) => {
   return false;
 };
 
+// Trust proxy if we are behind Vercel/proxies
+app.set('trust proxy', 1);
+
+app.use(helmet());
+app.use(mongoSanitize());
+
+// Global Rate Limiter
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 100, // Límite de 100 peticiones por IP por ventana
+  message: 'Demasiadas peticiones desde esta IP, por favor intenta de nuevo en 15 minutos.',
+});
+
+// Login Rate Limiter (stricter)
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: 'Demasiados intentos de inicio de sesión, intenta de nuevo en 15 minutos.',
+});
+
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -61,7 +84,9 @@ app.use(
   })
 );
 app.use(express.json());
-app.use(morgan('dev'));
+// Logging: usa 'combined' en producción
+app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
+app.use('/api/', apiLimiter);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Server running' });
@@ -81,6 +106,7 @@ app.use('/api', async (req, res, next) => {
   }
 });
 
+app.use('/api/auth/login', loginLimiter);
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);

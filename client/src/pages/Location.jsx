@@ -12,82 +12,86 @@ const LOCATION = {
 
 export default function Location() {
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      <div className="text-center mb-12">
-        <span className="section-eyebrow">Ubicación</span>
-        <h1 className="section-title mb-3">Nuestra Ubicación</h1>
-        <p className="text-slate-500 max-w-lg mx-auto">
-          Visitanos en nuestro local. Estamos listos para atenderte.
-        </p>
+    <div className="bg-slate-100 min-h-screen">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
+        <div className="text-center space-y-3 max-w-2xl mx-auto">
+          <span className="section-eyebrow">Showroom</span>
+          <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 leading-tight">Visitanos en persona</h1>
+          <p className="text-slate-700 text-xl font-semibold">
+            Conocé nuestro local con atención personalizada. Te esperamos.
+          </p>
+        </div>
       </div>
 
-      <div className="grid md:grid-cols-5 gap-8">
-        {/* Map */}
-        <div className="md:col-span-3 card overflow-hidden">
-          <iframe
-            title="Ubicación del local"
-            src={LOCATION.embedUrl}
-            width="100%"
-            height="400"
-            style={{ border: 0 }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          />
-        </div>
-
-        {/* Info */}
-        <div className="md:col-span-2 space-y-4">
-          <div className="card p-6 space-y-4">
-            <h2 className="font-semibold text-slate-800 text-lg">Información del local</h2>
-
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-brand-light flex items-center justify-center shrink-0 mt-0.5">
-                <FiMapPin size={18} className="text-brand" />
-              </div>
-              <div>
-                <p className="text-xs text-slate-400 font-medium mb-0.5">Dirección</p>
-                <p className="text-sm font-medium text-slate-700">{LOCATION.address}</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-brand-light flex items-center justify-center shrink-0 mt-0.5">
-                <FiClock size={18} className="text-brand" />
-              </div>
-              <div>
-                <p className="text-xs text-slate-400 font-medium mb-1">Horarios</p>
-                <div className="space-y-0.5 text-sm text-slate-600">
-                  <p><span className="font-medium">Lun – Vie:</span> 9:00 – 18:00</p>
-                  <p><span className="font-medium">Sábados:</span> 9:00 – 13:00</p>
-                  <p className="text-slate-400"><span className="font-medium">Domingos:</span> Cerrado</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-brand-light flex items-center justify-center shrink-0 mt-0.5">
-                <FiPhone size={18} className="text-brand" />
-              </div>
-              <div>
-                <p className="text-xs text-slate-400 font-medium mb-0.5">Teléfono</p>
-                <a href="tel:+543534224607" className="text-sm font-medium text-brand hover:underline">
-                  3534224607
-                </a>
-              </div>
-            </div>
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+        <div className="grid md:grid-cols-5 gap-8">
+          {/* Map */}
+          <div className="md:col-span-3 card overflow-hidden">
+            <iframe
+              title="Ubicación del local"
+              src={LOCATION.embedUrl}
+              width="100%"
+              height="400"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
           </div>
 
-          {/* Direction button */}
-          <a
-            href={LOCATION.mapsUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="flex items-center justify-center gap-2 w-full bg-brand text-white font-semibold py-3 rounded-xl hover:bg-brand-dark transition-colors active:scale-95 shadow-sm"
-          >
-            <FiNavigation size={17} />
-            Cómo llegar
-          </a>
+          {/* Info */}
+          <div className="md:col-span-2 space-y-4">
+            <div className="card p-7 bg-gradient-to-br from-sky-50/50 to-white border-sky-100">
+              <h2 className="font-bold text-slate-900 text-xl mb-6">Información del local</h2>
+
+              <div className="flex items-start gap-4 mb-6">
+                <div className="w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center shrink-0 mt-0.5">
+                  <FiMapPin size={22} className="text-primary-700" />
+                </div>
+                <div>
+                  <p className="text-base text-slate-500 font-bold mb-1">Dirección</p>
+                  <p className="text-lg font-bold text-slate-800">{LOCATION.address}</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4 mb-6">
+                <div className="w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center shrink-0 mt-0.5">
+                  <FiClock size={22} className="text-primary-700" />
+                </div>
+                <div>
+                  <p className="text-base text-slate-500 font-bold mb-2">Horarios</p>
+                  <div className="space-y-1.5 text-base text-slate-700 font-medium">
+                    <p><span className="font-bold">Lun – Vie:</span> 9:00 – 18:00</p>
+                    <p><span className="font-bold">Sábados:</span> 9:00 – 13:00</p>
+                    <p className="text-slate-500"><span className="font-bold">Domingos:</span> Cerrado</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4 mb-6">
+                <div className="w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center shrink-0 mt-0.5">
+                  <FiPhone size={22} className="text-primary-700" />
+                </div>
+                <div>
+                  <p className="text-base text-slate-500 font-bold mb-1">Teléfono</p>
+                  <a href="tel:+543534224607" className="text-lg font-bold text-primary-700 hover:underline">
+                    3534224607
+                  </a>
+                </div>
+              </div>
+
+              {/* Direction button */}
+              <a
+                href={LOCATION.mapsUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center justify-center gap-2 w-full bg-primary-700 text-white font-bold py-3 rounded-xl hover:bg-primary-800 transition-colors active:scale-95 shadow-sm"
+              >
+                <FiNavigation size={18} />
+                Cómo llegar
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </div>

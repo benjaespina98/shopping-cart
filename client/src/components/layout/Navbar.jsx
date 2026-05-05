@@ -27,7 +27,7 @@ export default function Navbar() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-1.5">
             <span className="text-2xl font-extrabold text-white">Playa</span>
-            <span className="text-2xl font-extrabold text-sol"> y Sol</span>
+            <span className="text-2xl font-extrabold brand-sun"> y Sol</span>
           </Link>
 
           {/* Desktop nav */}
@@ -40,8 +40,8 @@ export default function Navbar() {
                 className={({ isActive }) =>
                   `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     isActive
-                      ? 'bg-white/10 text-sol font-semibold'
-                      : 'text-slate-300 hover:text-white hover:bg-white/10'
+                      ? 'bg-white/10 brand-sun font-semibold'
+                        : 'text-slate-300 hover:text-white hover:bg-white/10'
                   }`
                 }
               >
@@ -59,7 +59,7 @@ export default function Navbar() {
             >
               <FiShoppingCart size={22} />
               {totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 bg-brand text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-error text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                   {totalItems > 99 ? '99+' : totalItems}
                 </span>
               )}
@@ -87,7 +87,7 @@ export default function Navbar() {
                 end
                 className={({ isActive }) =>
                   `px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-                    isActive ? 'bg-white/10 text-sol' : 'text-slate-300 hover:text-white hover:bg-white/10'
+                    isActive ? 'bg-white/10 brand-sun' : 'text-slate-300 hover:text-white hover:bg-white/10'
                   }`
                 }
               >

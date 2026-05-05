@@ -88,17 +88,21 @@ export default function Shop() {
   const hasFilters = search || selectedCategory || sort;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      {/* Header */}
-      <div className="mb-8">
-        <span className="section-eyebrow">Catálogo</span>
-        <h1 className="section-title">Tienda</h1>
-        <p className="text-slate-500 mt-1">Explorá todos nuestros productos para piscinas</p>
+    <div className="bg-slate-100 min-h-screen">
+      {/* Header Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
+        <div className="space-y-3 max-w-2xl">
+          <span className="section-eyebrow">Catálogo completo</span>
+          <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 leading-tight">Tienda de Piscinas</h1>
+          <p className="text-slate-700 text-xl font-semibold max-w-lg">Encontrá todo lo que necesitás para mantener y disfrutar tu piscina cristalina</p>
+        </div>
       </div>
 
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10">
+
       {/* Search + Sort */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 mb-5 shadow-sm">
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className="bg-white border border-slate-100 rounded-3xl p-4 sm:p-5 mb-8 shadow-sm hover:shadow-md transition-shadow">
+        <div className="flex flex-col sm:flex-row gap-3">
         {/* Search */}
         <div className="relative flex-1 max-w-md">
           <FiSearch size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -128,23 +132,23 @@ export default function Shop() {
           ))}
         </select>
 
-        {hasFilters && (
-          <button onClick={clearFilters} className="btn-ghost flex items-center gap-1.5 text-sm border border-slate-200 shrink-0">
-            <FiX size={14} /> Limpiar filtros
-          </button>
-        )}
-      </div>
+          {hasFilters && (
+            <button onClick={clearFilters} className="btn-ghost flex items-center gap-1.5 text-sm border border-slate-200 shrink-0 hover:border-rose-300 hover:text-rose-600 transition-all">
+              <FiX size={14} /> Limpiar filtros
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Categories */}
       {categories.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-6">
+        <div className="flex flex-wrap gap-3 mb-8">
           <button
             onClick={() => handleCategoryChange('')}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-all duration-150 ${
+            className={`px-5 py-2 rounded-full text-base font-bold border-2 transition-all duration-200 ${
               !selectedCategory
-                ? 'bg-brand text-white border-brand shadow-sm'
-                : 'border-slate-200 text-slate-600 hover:border-brand hover:text-brand bg-white'
+                ? 'bg-primary-700 text-white border-primary-700 shadow-md shadow-primary scale-105'
+                : 'border-slate-200 text-slate-600 hover:border-primary-700/60 hover:text-primary-700 hover:bg-slate-50 bg-white'
             }`}
           >
             Todos
@@ -153,10 +157,10 @@ export default function Shop() {
             <button
               key={cat}
               onClick={() => handleCategoryChange(cat)}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-all duration-150 ${
+              className={`px-5 py-2 rounded-full text-base font-bold border-2 transition-all duration-200 ${
                 selectedCategory === cat
-                  ? 'bg-brand text-white border-brand shadow-sm'
-                  : 'border-slate-200 text-slate-600 hover:border-brand hover:text-brand bg-white'
+                  ? 'bg-primary-700 text-white border-primary-700 shadow-md shadow-primary scale-105'
+                  : 'border-slate-200 text-slate-600 hover:border-primary-700/60 hover:text-primary-700 hover:bg-slate-50 bg-white'
               }`}
             >
               {cat}
@@ -171,7 +175,7 @@ export default function Shop() {
           {totalProducts > 0
             ? `Mostrando ${products.length} de ${totalProducts} producto${totalProducts !== 1 ? 's' : ''}`
             : `${products.length} producto${products.length !== 1 ? 's' : ''}`}
-          {selectedCategory && <span className="text-brand font-medium"> en "{selectedCategory}"</span>}
+          {selectedCategory && <span className="text-primary-700 font-medium"> en "{selectedCategory}"</span>}
         </p>
       )}
 
@@ -249,7 +253,7 @@ export default function Shop() {
                         onClick={() => setPage(p)}
                         className={`w-9 h-9 rounded-xl text-sm font-medium transition-all ${
                           page === p
-                            ? 'bg-brand text-white shadow-sm'
+                            ? 'bg-primary-700 text-white shadow-sm'
                             : 'text-slate-600 hover:bg-slate-100 border border-slate-200'
                         }`}
                       >
@@ -271,6 +275,7 @@ export default function Shop() {
           )}
         </>
       )}
+      </div>
     </div>
   );
 }

@@ -49,20 +49,20 @@ export default function Landing() {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             {/* Text */}
             <div>
-              <span className="inline-block bg-sol/20 border border-sol/40 text-sol text-sm font-medium px-4 py-1.5 rounded-full mb-6">
+              <span className="sol-badge">
                 🏊‍♂️ Especialistas en piscinas
               </span>
               <h1 className="text-4xl md:text-5xl font-extrabold leading-tight mb-6">
-                Tu piscina perfecta <span className="text-sol">empieza acá</span>
+                Tu piscina perfecta <span className="brand-sun">empieza acá</span>
               </h1>
               <p className="text-lg text-sky-100/80 mb-8 leading-relaxed">
-                En <strong className="text-white">Playa y Sol</strong> te ofrecemos todo para construir, equipar y mantener tu piscina con productos de primera calidad y asesoramiento personalizado.
+                En <strong className="text-white">Playa</strong><strong className="brand-sun"> y Sol</strong> te ofrecemos todo para construir, equipar y mantener tu piscina con productos de primera calidad y asesoramiento personalizado.
               </p>
-              <div className="flex flex-wrap gap-4">
-                <Link to="/tienda" className="btn-primary flex items-center gap-2 text-base px-7 py-3">
-                  Ver productos <FiArrowRight size={18} />
+              <div className="flex flex-wrap gap-4 mt-8">
+                <Link to="/tienda" className="btn-primary">
+                  Ver catálogo <FiArrowRight size={20} />
                 </Link>
-                <Link to="/contacto" className="bg-white/10 hover:bg-white/20 border border-white/20 text-white flex items-center gap-2 text-base px-7 py-3 rounded-xl font-semibold transition-colors">
+                <Link to="/contacto" className="btn-primary">
                   Consultanos
                 </Link>
               </div>
@@ -77,7 +77,7 @@ export default function Landing() {
                 { n: '24hs', l: 'Respuesta técnica' },
               ].map(({ n, l }) => (
                 <div key={l} className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-4 text-center">
-                  <p className="text-2xl font-extrabold text-sol">{n}</p>
+                  <p className="text-2xl font-extrabold brand-sun">{n}</p>
                   <p className="text-xs text-sky-200 mt-0.5">{l}</p>
                 </div>
               ))}
@@ -87,17 +87,17 @@ export default function Landing() {
       </section>
 
       {/* ── Features ─────────────────────────────────────── */}
-      <section className="bg-slate-900 py-14">
+      <section className="bg-gradient-to-b from-primary-50 to-white py-14 border-y border-primary-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {features.map(({ Icon, title, desc }) => (
-              <div key={title} className="flex flex-col items-center text-center gap-3 p-5 rounded-2xl hover:bg-white/5 transition-colors">
-                <div className="w-12 h-12 bg-sol/20 rounded-xl flex items-center justify-center">
-                  <Icon size={22} className="text-sol" />
+              <div key={title} className="flex flex-col items-center text-center gap-3 p-5 rounded-2xl bg-white hover:bg-primary-50 border border-primary-100 hover:border-primary-300 transition-all hover:shadow-md">
+                <div className="w-12 h-12 bg-primary-700/10 rounded-xl flex items-center justify-center">
+                  <Icon size={22} className="text-primary-700 font-bold" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-white text-sm">{title}</h3>
-                  <p className="text-xs text-slate-400 mt-1">{desc}</p>
+                  <h3 className="font-semibold text-neutral-900 text-sm">{title}</h3>
+                  <p className="text-xs text-neutral-600 mt-1 leading-relaxed">{desc}</p>
                 </div>
               </div>
             ))}
@@ -129,9 +129,9 @@ export default function Landing() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {services.map(({ title, desc, emoji }) => (
-              <div key={title} className="card p-6 hover:border-brand transition-colors group cursor-default">
+              <div key={title} className="card p-6 hover:border-primary-700 transition-colors group cursor-default">
                 <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-200 origin-left">{emoji}</div>
-                <h3 className="font-semibold text-slate-800 mb-2 group-hover:text-brand transition-colors">{title}</h3>
+                <h3 className="font-semibold text-slate-800 mb-2 group-hover:text-primary-700 transition-colors">{title}</h3>
                 <p className="text-sm text-slate-500 leading-relaxed">{desc}</p>
               </div>
             ))}
@@ -149,7 +149,7 @@ export default function Landing() {
                 <h2 className="section-title">Productos Destacados</h2>
                 <p className="text-slate-500 mt-1">Los más elegidos de nuestra tienda</p>
               </div>
-              <Link to="/tienda" className="btn-ghost flex items-center gap-1 text-brand font-semibold">
+              <Link to="/tienda" className="btn-ghost flex items-center gap-1 text-primary-700 font-semibold">
                 Ver todos <FiArrowRight size={16} />
               </Link>
             </div>
@@ -179,12 +179,10 @@ export default function Landing() {
             Pedí tu presupuesto sin cargo o comprá nuestros productos directo por WhatsApp
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link to="/tienda"
-              className="inline-flex items-center gap-2 bg-sol text-slate-900 font-bold px-8 py-4 rounded-xl hover:bg-sol-dark hover:text-white transition-colors text-base active:scale-95">
-              Ir a la tienda <FiArrowRight size={18} />
+            <Link to="/tienda" className="btn-cta">
+              Ir a la tienda <FiArrowRight size={20} />
             </Link>
-            <Link to="/contacto"
-              className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/30 text-white font-semibold px-8 py-4 rounded-xl transition-colors text-base">
+            <Link to="/contacto" className="btn-primary">
               Pedir presupuesto
             </Link>
           </div>

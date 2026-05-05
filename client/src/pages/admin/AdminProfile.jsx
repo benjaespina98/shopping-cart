@@ -21,13 +21,6 @@ export default function AdminProfile() {
           </span>
         </div>
       </div>
-
-      <div className="card p-6">
-        <h2 className="font-semibold text-slate-800 mb-2">Seguridad</h2>
-        <p className="text-sm text-slate-500">
-          La edición de contraseña desde el panel fue deshabilitada.
-        </p>
-      </div>
     </div>
   );
 }

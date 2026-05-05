@@ -96,58 +96,60 @@ export default function Contact() {
   };
 
   return (
-    <div className="bg-gradient-to-b from-slate-50 to-white">
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      <div className="text-center mb-12">
-        <span className="section-eyebrow">Contacto</span>
-        <h1 className="section-title mb-3">Contactanos</h1>
-        <p className="text-slate-500 max-w-lg mx-auto">
-          ¿Tenés alguna consulta? Escribinos y te respondemos a la brevedad.
-        </p>
+    <div className="bg-slate-100 min-h-screen">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
+        <div className="text-center space-y-3 max-w-2xl mx-auto">
+          <span className="section-eyebrow">Hablemos</span>
+          <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 leading-tight">¿Tenés una consulta?</h1>
+          <p className="text-slate-700 text-xl font-semibold max-w-2xl mx-auto">
+            Nuestro equipo experto está listo para ayudarte. Elige tu canal preferido.
+          </p>
+        </div>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-10">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+
+      <div className="grid md:grid-cols-2 gap-12">
         {/* Contact info */}
         <div className="space-y-6">
-          <div className="card p-6 space-y-5">
-            <h2 className="font-semibold text-slate-800 text-lg">Información de contacto</h2>
+          <div className="card p-7 bg-gradient-to-br from-sky-50/50 to-white border-sky-100 space-y-5">
+            <h2 className="font-bold text-slate-900 text-xl">Información de contacto</h2>
 
-            <a
-              href={`https://wa.me/${WHATSAPP_NUMBER}`}
+            <a href={`https://wa.me/${WHATSAPP_NUMBER}`}
               target="_blank"
               rel="noreferrer"
-              className="flex items-center gap-4 group"
+              className="flex items-center gap-4 group p-4 rounded-2xl hover:bg-green-50 transition-colors"
             >
-              <div className="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center group-hover:bg-green-500 transition-colors">
-                <FaWhatsapp size={22} className="text-green-500 group-hover:text-white" />
+              <div className="w-14 h-14 rounded-xl bg-green-100 flex items-center justify-center group-hover:bg-green-500 transition-colors shrink-0">
+                <FaWhatsapp size={24} className="text-green-600 group-hover:text-white" />
               </div>
               <div>
-                <p className="text-xs text-slate-400 font-medium">WhatsApp</p>
-                <p className="text-sm font-semibold text-slate-700 group-hover:text-green-600 transition-colors">
+                <p className="text-base text-slate-400 font-semibold">WhatsApp</p>
+                <p className="text-lg font-bold text-slate-800 group-hover:text-green-600 transition-colors">
                   {PHONE_DISPLAY}
                 </p>
               </div>
             </a>
 
-            <a href={PHONE_LINK} className="flex items-center gap-4 group">
-              <div className="w-12 h-12 rounded-xl bg-brand-light flex items-center justify-center group-hover:bg-brand transition-colors">
-                <FiPhone size={20} className="text-brand group-hover:text-white" />
+            <a href={PHONE_LINK} className="flex items-center gap-4 group p-4 rounded-2xl hover:bg-blue-50 transition-colors">
+              <div className="w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center group-hover:bg-primary-700 transition-colors shrink-0">
+                <FiPhone size={24} className="text-primary-700 group-hover:text-white" />
               </div>
               <div>
-                <p className="text-xs text-slate-400 font-medium">Teléfono</p>
-                <p className="text-sm font-semibold text-slate-700 group-hover:text-brand transition-colors">
+                <p className="text-base text-slate-400 font-semibold">Teléfono</p>
+                <p className="text-lg font-bold text-slate-800 group-hover:text-primary-700 transition-colors">
                   {PHONE_DISPLAY}
                 </p>
               </div>
             </a>
 
-            <a href={`mailto:${CONTACT_EMAIL}`} className="flex items-center gap-4 group">
-              <div className="w-12 h-12 rounded-xl bg-brand-light flex items-center justify-center group-hover:bg-brand transition-colors">
-                <FiMail size={20} className="text-brand group-hover:text-white" />
+            <a href={`mailto:${CONTACT_EMAIL}`} className="flex items-center gap-4 group p-4 rounded-2xl hover:bg-purple-50 transition-colors">
+              <div className="w-14 h-14 rounded-xl bg-purple-100 flex items-center justify-center group-hover:bg-primary-700 transition-colors shrink-0">
+                <FiMail size={24} className="text-primary-700 group-hover:text-white" />
               </div>
               <div>
-                <p className="text-xs text-slate-400 font-medium">Email</p>
-                <p className="text-sm font-semibold text-slate-700 group-hover:text-brand transition-colors">
+                <p className="text-base text-slate-400 font-semibold">Email</p>
+                <p className="text-lg font-bold text-slate-800 group-hover:text-primary-700 transition-colors">
                   {CONTACT_EMAIL}
                 </p>
               </div>
@@ -155,39 +157,39 @@ export default function Contact() {
           </div>
 
           {/* Horario */}
-          <div className="card p-6">
-            <h2 className="font-semibold text-slate-800 text-lg mb-4">Horarios de atención</h2>
-            <div className="space-y-2 text-sm">
+          <div className="card p-6 bg-gradient-to-br from-blue-50/40 to-white border-blue-100">
+            <h2 className="font-bold text-slate-900 text-xl mb-5">Horarios de atención</h2>
+            <div className="space-y-3 text-base">
               {contactSettings.businessHours.map(({ day, hours }) => (
-                <div key={`${day}-${hours}`} className="flex justify-between text-slate-600">
-                  <span className="font-medium">{day}</span>
-                  <span className={hours.toLowerCase() === 'cerrado' ? 'text-slate-400' : 'text-brand font-semibold'}>{hours}</span>
+                <div key={`${day}-${hours}`} className="flex justify-between text-slate-700">
+                  <span className="font-bold">{day}</span>
+                  <span className={hours.toLowerCase() === 'cerrado' ? 'text-slate-400 font-medium' : 'text-primary-700 font-bold'}>{hours}</span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Social */}
-          <div className="card p-6">
-            <h2 className="font-semibold text-slate-800 text-lg mb-4">Redes sociales</h2>
+          <div className="card p-6 bg-gradient-to-br from-amber-50/40 to-white border-amber-100">
+            <h2 className="font-bold text-slate-900 text-xl mb-5">Redes sociales</h2>
             <div className="flex gap-3">
               <a href="https://instagram.com" target="_blank" rel="noreferrer"
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 hover:border-brand hover:text-brand transition-colors text-sm font-medium text-slate-600">
-                <FiInstagram size={16} /> Instagram
+                className="flex items-center gap-2 px-5 py-3 rounded-xl border-2 border-slate-200 hover:border-primary-700 hover:bg-blue-50 hover:text-primary-700 transition-colors text-base font-bold text-slate-700">
+                <FiInstagram size={18} /> Instagram
               </a>
               <a href="https://facebook.com" target="_blank" rel="noreferrer"
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 hover:border-brand hover:text-brand transition-colors text-sm font-medium text-slate-600">
-                <FiFacebook size={16} /> Facebook
+                className="flex items-center gap-2 px-5 py-3 rounded-xl border-2 border-slate-200 hover:border-primary-700 hover:bg-blue-50 hover:text-primary-700 transition-colors text-base font-bold text-slate-700">
+                <FiFacebook size={18} /> Facebook
               </a>
             </div>
           </div>
         </div>
 
         {/* Form */}
-        <div className="card p-6 sm:p-8 border-slate-200">
-          <div className="mb-6">
-            <h2 className="font-semibold text-slate-800 text-lg">Envianos tu consulta</h2>
-            <p className="text-sm text-slate-500 mt-1">
+        <div className="card p-7 sm:p-8 bg-gradient-to-br from-sky-50/50 to-white border-sky-100">
+          <div className="mb-6 space-y-2">
+            <h2 className="font-bold text-slate-900 text-xl">Envíanos tu consulta</h2>
+            <p className="text-base text-slate-600 font-medium">
               Elegí el canal que prefieras. Preparamos el mensaje automáticamente con tus datos.
             </p>
           </div>
@@ -203,7 +205,7 @@ export default function Contact() {
             <button
               type="button"
               onClick={handleEmail}
-              className="w-full flex items-center justify-center gap-2.5 bg-brand text-white font-semibold text-sm sm:text-base whitespace-nowrap py-3 rounded-xl hover:bg-brand-dark transition-colors active:scale-95"
+              className="w-full flex items-center justify-center gap-2.5 bg-primary-700 text-white font-semibold text-sm sm:text-base whitespace-nowrap py-3 rounded-xl hover:bg-primary-800 transition-colors active:scale-95"
             >
               <FiMail size={18} />
               {sendingChannel === 'email' ? '¡Listo! Abriendo email...' : 'Enviar por Email'}

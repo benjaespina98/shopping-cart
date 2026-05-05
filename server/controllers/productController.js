@@ -39,6 +39,8 @@ export const getProducts = asyncHandler(async (req, res) => {
 
   const sortQuery = sortMap[sort] || (featured === 'true' ? { featured: -1, createdAt: -1 } : { createdAt: -1 });
 
+  res.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120');
+
   const [total, products] = await Promise.all([
     Product.countDocuments(filter),
     Product.find(filter)
@@ -59,12 +61,14 @@ export const getProducts = asyncHandler(async (req, res) => {
 
 // GET /api/products/categories — público
 export const getCategories = asyncHandler(async (req, res) => {
+  res.set('Cache-Control', 'public, s-maxage=120, stale-while-revalidate=240');
   const categories = await Product.distinct('category', { active: true });
   res.json(categories);
 });
 
 // GET /api/products/:id — público
 export const getProductById = asyncHandler(async (req, res) => {
+  res.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120');
   const product = await Product.findById(req.params.id)
     .select('name description price stock category images featured active tags createdAt updatedAt')
     .lean();

@@ -6,6 +6,7 @@ const router = Router();
 
 router.post('/login', login);
 router.get('/me', protect, getMe);
-router.put('/change-password', protect, changePassword);
+// endpoint deshabilitado por seguridad a petición
+// router.put('/change-password', protect, changePassword);
 
 export default router;
