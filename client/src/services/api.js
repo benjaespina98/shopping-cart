@@ -102,6 +102,17 @@ export const settingsAPI = {
   deleteUser: (id) => api.delete(`/settings/users/${id}`),
 };
 
+// ─── Projects (sitio web) ────────────────────────────────
+export const projectsAPI = {
+  getAll: (params) => api.get('/projects', { params }),
+  create: (formData) =>
+    api.post('/projects', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  update: (id, formData) =>
+    api.put(`/projects/${id}`, formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  reorder: (items) => api.put('/projects/reorder', { items }),
+  delete: (id) => api.delete(`/projects/${id}`),
+};
+
 // ─── Logs ───────────────────────────────────────────────
 export const logsAPI = {
   getAll: (params) => api.get('/logs', { params }),

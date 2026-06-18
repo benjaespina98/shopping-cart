@@ -2,15 +2,19 @@ import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import PublicLayout from './components/layout/PublicLayout';
+import ErrorBoundary from './components/ErrorBoundary';
 
 const Landing = lazy(() => import('./pages/Landing'));
 const Shop = lazy(() => import('./pages/Shop'));
 const Contact = lazy(() => import('./pages/Contact'));
 const Location = lazy(() => import('./pages/Location'));
+const Services = lazy(() => import('./pages/Services'));
+const Projects = lazy(() => import('./pages/Projects'));
+const Quote = lazy(() => import('./pages/Quote'));
 
 const PublicFallback = () => (
   <div className="flex items-center justify-center min-h-[50vh]">
-    <div className="w-8 h-8 border-4 border-brand border-t-transparent rounded-full animate-spin" />
+    <div className="w-8 h-8 border-4 border-primary-700 border-t-transparent rounded-full animate-spin" />
   </div>
 );
 
@@ -25,10 +29,11 @@ const AdminProfile   = lazy(() => import('./pages/admin/AdminProfile'));
 const AdminGallery   = lazy(() => import('./pages/admin/AdminGallery'));
 const AdminSettings  = lazy(() => import('./pages/admin/AdminSettings'));
 const AdminLogs      = lazy(() => import('./pages/admin/AdminLogs'));
+const AdminSite      = lazy(() => import('./pages/admin/AdminSite'));
 
 const AdminFallback = () => (
   <div className="flex items-center justify-center h-screen bg-slate-100">
-    <div className="w-8 h-8 border-4 border-brand border-t-transparent rounded-full animate-spin" />
+    <div className="w-8 h-8 border-4 border-primary-700 border-t-transparent rounded-full animate-spin" />
   </div>
 );
 
@@ -40,14 +45,18 @@ function ProtectedRoute({ children }) {
 
 export default function App() {
   return (
-    <Routes>
-      {/* Public routes */}
-      <Route element={<PublicLayout />}>
-        <Route path="/" element={<Suspense fallback={<PublicFallback />}><Landing /></Suspense>} />
-        <Route path="/tienda" element={<Suspense fallback={<PublicFallback />}><Shop /></Suspense>} />
-        <Route path="/contacto" element={<Suspense fallback={<PublicFallback />}><Contact /></Suspense>} />
-        <Route path="/ubicacion" element={<Suspense fallback={<PublicFallback />}><Location /></Suspense>} />
-      </Route>
+    <ErrorBoundary>
+      <Routes>
+        {/* Public routes */}
+        <Route element={<PublicLayout />}>
+          <Route path="/" element={<Suspense fallback={<PublicFallback />}><Landing /></Suspense>} />
+          <Route path="/tienda" element={<Suspense fallback={<PublicFallback />}><Shop /></Suspense>} />
+          <Route path="/contacto" element={<Suspense fallback={<PublicFallback />}><Contact /></Suspense>} />
+          <Route path="/ubicacion" element={<Suspense fallback={<PublicFallback />}><Location /></Suspense>} />
+          <Route path="/servicios" element={<Suspense fallback={<PublicFallback />}><Services /></Suspense>} />
+          <Route path="/proyectos" element={<Suspense fallback={<PublicFallback />}><Projects /></Suspense>} />
+          <Route path="/presupuesto" element={<Suspense fallback={<PublicFallback />}><Quote /></Suspense>} />
+        </Route>
 
       {/* Admin login (no layout) */}
       <Route path="/admin/login" element={<Suspense fallback={<AdminFallback />}><AdminLogin /></Suspense>} />
@@ -65,6 +74,7 @@ export default function App() {
       >
         <Route index element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="dashboard" element={<AdminDashboard />} />
+        <Route path="sitio" element={<AdminSite />} />
         <Route path="productos" element={<AdminProducts />} />
         <Route path="pedidos" element={<AdminOrders />} />
         <Route path="metricas" element={<AdminMetrics />} />
@@ -77,5 +87,6 @@ export default function App() {
       {/* Catch-all */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    </ErrorBoundary>
   );
 }

@@ -73,7 +73,7 @@ export default function CartDrawer() {
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
           <div className="flex items-center gap-2">
-            <FiShoppingCart size={20} className="text-brand" />
+            <FiShoppingCart size={20} className="text-primary-700" />
             <h2 className="font-semibold text-slate-800 text-lg">
               Carrito
               {totalItems > 0 && (
@@ -124,7 +124,7 @@ export default function CartDrawer() {
                 {/* Details */}
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-slate-800 leading-snug line-clamp-2">{item.name}</p>
-                  <p className="text-sm text-brand font-semibold mt-0.5">
+                  <p className="text-sm text-primary-700 font-semibold mt-0.5">
                     ${(item.price * item.quantity).toLocaleString('es-AR')}
                   </p>
                   <p className="text-xs text-slate-400">${item.price.toLocaleString('es-AR')} c/u</p>
@@ -173,13 +173,16 @@ export default function CartDrawer() {
             <button
               onClick={handleWhatsApp}
               disabled={sending}
-              className="w-full flex items-center justify-center gap-2.5 bg-green-500 hover:bg-green-600 text-white font-semibold py-3.5 rounded-xl transition-colors active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed text-sm"
+              className="w-full flex flex-col items-center justify-center gap-1.5 bg-success-500 hover:bg-success-600 text-white font-bold py-4 rounded-xl shadow-success hover:shadow-lg hover:-translate-y-1 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed text-sm transition-all duration-standard shimmer-soft"
             >
-              <FiMessageCircle size={18} />
-              {sending ? 'Procesando...' : 'Enviar pedido por WhatsApp'}
+              <div className="flex items-center gap-2.5">
+                <FiMessageCircle size={20} />
+                <span>{sending ? 'Procesando...' : '🛒 Finalizar compra'}</span>
+              </div>
+              <span className="text-xs font-medium opacity-90">Por WhatsApp • Sin recargo</span>
             </button>
-            <p className="text-xs text-center text-slate-400">
-              Se abrirá WhatsApp con el detalle de tu pedido
+            <p className="text-xs text-center text-neutral-500">
+              Se abrirá WhatsApp con tu pedido
             </p>
           </div>
         )}

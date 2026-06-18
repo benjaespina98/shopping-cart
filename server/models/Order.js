@@ -26,6 +26,9 @@ const orderSchema = new mongoose.Schema(
 
 orderSchema.index({ createdAt: -1 });
 orderSchema.index({ status: 1, createdAt: -1 });
+// Additional indexes for performance
+orderSchema.index({ customerPhone: 1 }); // For finding orders by phone
+orderSchema.index({ status: 1 }); // For filtering by status alone
 
 const Order = mongoose.model('Order', orderSchema);
 export default Order;

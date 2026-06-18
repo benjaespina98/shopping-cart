@@ -1,0 +1,141 @@
+/* ============================================================
+   Playa & Sol — Responsive overrides
+   Only the outer <section> manages horizontal padding.
+   Inner maxWidth containers have no padding of their own.
+   ============================================================ */
+
+/* ── Hero vertical padding override ────────────────────── */
+/* Horizontal padding is handled inline (20px) on all pages */
+@media (max-width: 767px) {
+  .ps-hero-section { padding-top: 44px !important; padding-bottom: 52px !important; }
+}
+
+/* ── Hero ──────────────────────────────────────────────── */
+.ps-hero-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 56px;
+  align-items: center;
+}
+@media (max-width: 767px) {
+  .ps-hero-grid       { grid-template-columns: 1fr; gap: 0; }
+  .ps-hero-photo      { display: none; }
+  .ps-hero-section    { padding: 44px 20px 52px !important; }
+  .ps-hero-title      { font-size: 36px !important; line-height: 1.1 !important; }
+  .ps-hero-subtitle   { font-size: 15px !important; }
+  .ps-hero-btns       { flex-direction: column !important; }
+  .ps-hero-btns > *   { width: 100%; justify-content: center; }
+}
+
+/* ── Stats band ────────────────────────────────────────── */
+.ps-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+@media (max-width: 767px) {
+  .ps-stats-section { padding: 18px 20px !important; }
+  .ps-stats-grid    { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+}
+
+/* ── Services cards (home) ─────────────────────────────── */
+.ps-services-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+@media (max-width: 1023px) { .ps-services-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px)  { .ps-services-grid { grid-template-columns: 1fr; } }
+
+/* ── Projects grid (home) ──────────────────────────────── */
+.ps-projects-grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr;
+  grid-template-rows: 180px 180px;
+  gap: 16px;
+}
+@media (max-width: 767px) {
+  .ps-projects-grid                    { grid-template-columns: 1fr 1fr;
+                                         grid-template-rows: repeat(3, 150px); }
+  .ps-projects-grid > div:first-child  { grid-row: auto !important; }
+}
+@media (max-width: 480px) {
+  .ps-projects-grid { grid-template-columns: 1fr; grid-template-rows: repeat(5, 180px); }
+}
+
+/* ── CTA block ─────────────────────────────────────────── */
+.ps-cta-block {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+@media (max-width: 767px) {
+  .ps-cta-block   { flex-direction: column; align-items: flex-start; gap: 20px;
+                    padding: 32px 24px !important; border-radius: 20px !important; }
+  .ps-cta-block > button,
+  .ps-cta-block > a { width: 100%; justify-content: center; }
+}
+
+/* ── Services page rows ────────────────────────────────── */
+.ps-service-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: center;
+}
+@media (max-width: 767px) {
+  .ps-service-row       { grid-template-columns: 1fr !important; gap: 20px !important;
+                          direction: ltr !important; }
+  .ps-service-row > *   { direction: ltr !important; }
+  .ps-service-photo     { order: -1; }
+}
+
+/* ── Projects masonry ──────────────────────────────────── */
+.ps-masonry { column-count: 3; column-gap: 16px; }
+@media (max-width: 767px) { .ps-masonry { column-count: 2; } }
+@media (max-width: 480px)  { .ps-masonry { column-count: 1; } }
+
+/* ── Quote layout ──────────────────────────────────────── */
+.ps-quote-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: start;
+}
+@media (max-width: 767px) {
+  .ps-quote-grid  { grid-template-columns: 1fr; gap: 24px; }
+  .ps-quote-photo { display: none; }
+}
+
+/* ── Footer grid ───────────────────────────────────────── */
+.ps-footer-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  gap: 40px;
+}
+@media (max-width: 1023px) { .ps-footer-grid { grid-template-columns: 1fr 1fr; gap: 28px; } }
+@media (max-width: 480px)  { .ps-footer-grid { grid-template-columns: 1fr; gap: 24px; } }
+
+/* ── Page typography ────────────────────────────────────── */
+/* font sizes use clamp() in inline styles — no overrides needed here */
+
+/* ── Form helpers ───────────────────────────────────────── */
+.ps-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 767px) {
+  .ps-form-row { grid-template-columns: 1fr; }
+}
+
+/* ── Products grid (shop) ───────────────────────────────── */
+.ps-products-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+@media (max-width: 1023px) { .ps-products-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 767px)  { .ps-products-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; } }
+@media (max-width: 480px)  { .ps-products-grid { grid-template-columns: 1fr; } }
+
+/* ── Global overflow guard ──────────────────────────────── */
+html, body { overflow-x: hidden; }

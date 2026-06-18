@@ -12,6 +12,17 @@ export const createOrder = asyncHandler(async (req, res) => {
     throw new Error('No hay productos en el carrito');
   }
 
+  // Validate WhatsApp configuration
+  const whatsappNumber = (process.env.WHATSAPP_NUMBER || '').trim();
+  if (!whatsappNumber) {
+    res.status(500);
+    throw new Error('WhatsApp number not configured. Contact support.');
+  }
+  if (!/^\d+$/.test(whatsappNumber)) {
+    res.status(500);
+    throw new Error('Invalid WhatsApp number format. Must contain only digits.');
+  }
+
   // Merge duplicated lines from the cart to avoid discounting stock twice for same product row.
   const quantityByProduct = new Map();
   for (const item of items) {
@@ -136,7 +147,7 @@ export const createOrder = asyncHandler(async (req, res) => {
 
   res.status(201).json({
     order,
-    whatsappUrl: `https://wa.me/${process.env.WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`,
+    whatsappUrl: `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`,
   });
 });
 

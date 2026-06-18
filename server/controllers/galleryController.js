@@ -4,6 +4,7 @@ import { cloudinary } from '../config/cloudinary.js';
 
 // GET /api/gallery — público
 export const getGallery = asyncHandler(async (req, res) => {
+  res.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120');
   const images = await GalleryImage.find().sort({ order: 1, createdAt: 1 });
   res.json(images);
 });

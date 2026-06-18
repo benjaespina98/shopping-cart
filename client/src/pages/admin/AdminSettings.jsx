@@ -235,57 +235,9 @@ export default function AdminSettings() {
                 <p className="text-sm font-semibold text-slate-800 truncate">{item.name}</p>
                 <p className="text-xs text-slate-500 truncate">{item.email}</p>
               </div>
-              <button
-                type="button"
-                className="btn-ghost text-red-500 hover:bg-red-50"
-                disabled={item._id === user?._id}
-                onClick={() => handleDeleteUser(item._id)}
-                title={item._id === user?._id ? 'No podes eliminar tu usuario en sesion' : 'Eliminar usuario'}
-              >
-                <FiTrash2 size={16} />
-              </button>
             </div>
           ))}
         </div>
-
-        <form onSubmit={handleCreateUser} className="grid sm:grid-cols-3 gap-3 items-end">
-          <div>
-            <label className="label">Nombre</label>
-            <input
-              className="input"
-              required
-              value={newUser.name}
-              onChange={(e) => setNewUser((prev) => ({ ...prev, name: e.target.value }))}
-            />
-          </div>
-          <div>
-            <label className="label">Email</label>
-            <input
-              className="input"
-              type="email"
-              required
-              value={newUser.email}
-              onChange={(e) => setNewUser((prev) => ({ ...prev, email: e.target.value }))}
-            />
-          </div>
-          <div>
-            <label className="label">Contrasena temporal</label>
-            <input
-              className="input"
-              type="password"
-              minLength={6}
-              required
-              value={newUser.password}
-              onChange={(e) => setNewUser((prev) => ({ ...prev, password: e.target.value }))}
-            />
-          </div>
-          <div className="sm:col-span-3">
-            <button type="submit" disabled={creatingUser} className="btn-primary inline-flex items-center gap-2">
-              <FiPlus size={16} />
-              {creatingUser ? 'Creando...' : 'Crear usuario admin'}
-            </button>
-          </div>
-        </form>
       </div>
 
       <div>

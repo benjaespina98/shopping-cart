@@ -2,19 +2,20 @@ import { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import {
   FiGrid, FiPackage, FiShoppingBag, FiBarChart2,
-  FiLogOut, FiMenu, FiX, FiUser, FiSettings, FiImage, FiActivity,
+  FiLogOut, FiMenu, FiX, FiUser, FiSettings, FiImage, FiActivity, FiLayout,
 } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 
 const navItems = [
-  { to: '/admin/dashboard', label: 'Dashboard', Icon: FiGrid },
-  { to: '/admin/productos', label: 'Productos', Icon: FiPackage },
-  { to: '/admin/pedidos', label: 'Pedidos', Icon: FiShoppingBag },
-  { to: '/admin/metricas', label: 'Métricas', Icon: FiBarChart2 },
-  { to: '/admin/logs', label: 'Logs', Icon: FiActivity },
-  { to: '/admin/galeria', label: 'Galería', Icon: FiImage },
+  { to: '/admin/dashboard',   label: 'Dashboard',   Icon: FiGrid },
+  { to: '/admin/sitio',       label: 'Sitio web',   Icon: FiLayout },
+  { to: '/admin/productos',   label: 'Productos',   Icon: FiPackage },
+  { to: '/admin/pedidos',     label: 'Pedidos',     Icon: FiShoppingBag },
+  { to: '/admin/metricas',    label: 'Métricas',    Icon: FiBarChart2 },
+  { to: '/admin/logs',        label: 'Logs',        Icon: FiActivity },
+  { to: '/admin/galeria',     label: 'Galería',     Icon: FiImage },
   { to: '/admin/configuracion', label: 'Configuracion', Icon: FiSettings },
-  { to: '/admin/perfil', label: 'Mi perfil', Icon: FiUser },
+  { to: '/admin/perfil',      label: 'Mi perfil',   Icon: FiUser },
 ];
 
 export default function AdminLayout() {
@@ -37,9 +38,9 @@ export default function AdminLayout() {
         {/* Logo */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-slate-700">
           <div className="flex items-center gap-1">
-            <span className="text-xl font-extrabold text-brand">Playa</span>
+            <span className="text-xl font-extrabold text-primary-700">Playa</span>
             <span className="text-xl font-extrabold text-white">y Sol</span>
-            <span className="ml-1 text-xs font-medium bg-brand px-1.5 py-0.5 rounded text-white">Admin</span>
+            <span className="ml-1 text-xs font-medium bg-primary-700 px-1.5 py-0.5 rounded text-white">Admin</span>
           </div>
           <button className="lg:hidden" onClick={() => setSideOpen(false)}>
             <FiX size={20} />
@@ -56,7 +57,7 @@ export default function AdminLayout() {
               className={({ isActive }) =>
                 `flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                   isActive
-                    ? 'bg-brand text-white'
+                    ? 'bg-primary-700 text-white'
                     : 'text-slate-400 hover:bg-slate-800 hover:text-white'
                 }`
               }
@@ -70,7 +71,7 @@ export default function AdminLayout() {
         {/* User + logout */}
         <div className="px-4 py-4 border-t border-slate-700">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-8 h-8 rounded-full bg-brand flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-primary-700 flex items-center justify-center">
               <FiUser size={16} />
             </div>
             <div className="overflow-hidden">

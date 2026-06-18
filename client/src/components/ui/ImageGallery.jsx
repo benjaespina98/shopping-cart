@@ -119,7 +119,7 @@ function Lightbox({ images, index, onClose }) {
             key={i}
             onClick={() => setCurrent(i)}
             className={`shrink-0 w-12 h-12 rounded-lg overflow-hidden border-2 transition-all ${
-              i === current ? 'border-brand scale-110' : 'border-white/20 opacity-50 hover:opacity-80'
+              i === current ? 'border-primary-700 scale-110' : 'border-white/20 opacity-50 hover:opacity-80'
             }`}
           >
             <img src={img.thumb} alt="" className="w-full h-full object-cover" />
@@ -219,8 +219,8 @@ export default function ImageGallery() {
               onClick={() => setActive(i)}
               className={`shrink-0 w-20 h-14 rounded-xl overflow-hidden border-2 transition-all ${
                 i === active
-                  ? 'border-brand shadow-md scale-105'
-                  : 'border-transparent opacity-60 hover:opacity-100 hover:border-brand/40'
+                  ? 'border-primary-700 shadow-md scale-105'
+                  : 'border-transparent opacity-60 hover:opacity-100 hover:border-primary-700/40'
               }`}
             >
               <img src={img.thumb} alt={img.alt} className="w-full h-full object-cover" loading="lazy" decoding="async" />

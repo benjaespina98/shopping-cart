@@ -1,0 +1,135 @@
+/* Playa & Sol — Design System Tokens */
+
+:root {
+  /* Petrol teal */
+  --teal-50:  #F1F7F9;
+  --teal-100: #DEEBEF;
+  --teal-200: #BCD6DD;
+  --teal-300: #8FB6C2;
+  --teal-400: #5C93A4;
+  --teal-500: #3B7488;
+  --teal-600: #2B5C6D;
+  --teal-700: #214C5A;
+  --teal-800: #193A45;
+  --teal-900: #122B33;
+
+  /* Sun yellow */
+  --sun-50:   #FFFBEF;
+  --sun-100:  #FFF4D2;
+  --sun-200:  #FFE9A6;
+  --sun-300:  #FFDD78;
+  --sun-400:  #FFD150;
+  --sun-500:  #FFC526;
+  --sun-600:  #EBAD10;
+  --sun-700:  #C28C0A;
+  --sun-800:  #946A0B;
+
+  /* Warm sand */
+  --sand-50:  #FBF9F5;
+  --sand-100: #F4F1EA;
+  --sand-200: #E9E4D9;
+  --sand-300: #D8D1C2;
+
+  /* Cool grey */
+  --grey-0:   #FFFFFF;
+  --grey-50:  #F7F8F9;
+  --grey-100: #EEF1F2;
+  --grey-200: #E0E5E7;
+  --grey-300: #C7CFD2;
+  --grey-400: #9AA5AA;
+  --grey-500: #6E797E;
+  --grey-600: #4D5862;
+  --grey-700: #353E45;
+  --grey-800: #222A30;
+  --grey-900: #141A1E;
+
+  /* Semantic status */
+  --green-500:  #2E9E6B;
+  --green-100:  #DCF3E8;
+  --amber-500:  #E5921C;
+  --amber-100:  #FCEBCF;
+  --red-500:    #D6452E;
+  --red-100:    #FBE2DC;
+  --info-500:   #2F7FA6;
+  --info-100:   #DDEEF6;
+
+  /* Brand aliases */
+  --brand-primary:        var(--teal-700);
+  --brand-primary-hover:  var(--teal-800);
+  --brand-primary-press:  var(--teal-900);
+  --brand-primary-soft:   var(--teal-50);
+  --brand-accent:         var(--sun-500);
+  --brand-accent-hover:   var(--sun-600);
+  --brand-accent-press:   var(--sun-700);
+  --brand-accent-soft:    var(--sun-100);
+
+  /* Surfaces */
+  --bg-page:        var(--sand-50);
+  --bg-page-alt:    var(--teal-700);
+  --surface-card:   var(--grey-0);
+  --surface-sunken: var(--grey-50);
+  --surface-soft:   var(--teal-50);
+
+  /* Text */
+  --text-strong:    var(--teal-900);
+  --text-body:      var(--grey-700);
+  --text-muted:     var(--grey-500);
+  --text-faint:     var(--grey-400);
+  --text-inverse:   var(--grey-0);
+  --text-on-accent: var(--teal-900);
+  --text-link:      var(--teal-600);
+
+  /* Borders */
+  --border-subtle:  var(--grey-200);
+  --border-default: var(--grey-300);
+  --border-strong:  var(--teal-700);
+  --divider:        var(--grey-100);
+  --focus-ring:     var(--sun-500);
+
+  /* Fonts */
+  --font-display: 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-body:    'Mulish', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* Spacing */
+  --space-1:  0.25rem;
+  --space-2:  0.5rem;
+  --space-3:  0.75rem;
+  --space-4:  1rem;
+  --space-5:  1.5rem;
+  --space-6:  2rem;
+  --space-7:  2.5rem;
+  --space-8:  3rem;
+  --space-9:  4rem;
+  --space-10: 5rem;
+
+  /* Radii */
+  --radius-xs:   4px;
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   16px;
+  --radius-xl:   24px;
+  --radius-2xl:  32px;
+  --radius-pill: 999px;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(18, 43, 51, 0.06);
+  --shadow-sm: 0 1px 3px rgba(18, 43, 51, 0.08), 0 1px 2px rgba(18, 43, 51, 0.06);
+  --shadow-md: 0 4px 12px rgba(18, 43, 51, 0.08), 0 2px 4px rgba(18, 43, 51, 0.05);
+  --shadow-lg: 0 12px 28px rgba(18, 43, 51, 0.12), 0 4px 8px rgba(18, 43, 51, 0.06);
+  --shadow-accent: 0 8px 22px rgba(255, 197, 38, 0.32);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-fast:   140ms;
+  --duration-normal: 240ms;
+}
+
+/* Eyebrow helper */
+.ps-eyebrow {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--brand-accent-press);
+}
