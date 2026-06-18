@@ -5,7 +5,7 @@ import {
 } from 'recharts';
 import { metricsAPI } from '../../services/api';
 
-const COLORS = ['#0369a1', '#0284c7', '#0ea5e9', '#38bdf8', '#7dd3fc', '#075985', '#0c4a6e', '#164e63'];
+const COLORS = ['#214C5A', '#FFC526', '#2B5C6D', '#EBAD10', '#3B7488', '#FFD150', '#193A45', '#C28C0A'];
 
 const dayOptions = [7, 14, 30, 60, 90];
 
@@ -106,8 +106,8 @@ export default function AdminMetrics() {
                 <XAxis dataKey="_id" tick={{ fontSize: 10 }} tickFormatter={(v) => v.slice(5)} />
                 <YAxis tick={{ fontSize: 10 }} />
                 <Tooltip formatter={(v, n) => [v, n === 'count' ? 'Pedidos totales' : 'Pedidos confirmados']} labelFormatter={(l) => `Fecha: ${l}`} />
-                <Line type="monotone" dataKey="count" stroke="#94a3b8" strokeWidth={2} dot={false} name="count" />
-                <Line type="monotone" dataKey="confirmedOrders" stroke="#0369a1" strokeWidth={2} dot={false} name="confirmedOrders" />
+                <Line type="monotone" dataKey="count" stroke="#8FB6C2" strokeWidth={2} dot={false} name="count" />
+                <Line type="monotone" dataKey="confirmedOrders" stroke="#214C5A" strokeWidth={2.5} dot={false} name="confirmedOrders" />
               </LineChart>
             </ResponsiveContainer>
           )}
@@ -125,7 +125,7 @@ export default function AdminMetrics() {
                 <XAxis dataKey="_id" tick={{ fontSize: 10 }} tickFormatter={(v) => v.slice(5)} />
                 <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
                 <Tooltip formatter={(v) => [`$${v.toLocaleString('es-AR')}`, 'Ventas confirmadas']} />
-                <Bar dataKey="revenue" fill="#0369a1" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="revenue" fill="#FFC526" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           )}
@@ -143,7 +143,7 @@ export default function AdminMetrics() {
                 <XAxis type="number" tick={{ fontSize: 10 }} />
                 <YAxis dataKey="name" type="category" tick={{ fontSize: 10 }} width={120} />
                 <Tooltip formatter={(v) => [v, 'Cantidad']} />
-                <Bar dataKey="totalQuantity" fill="#0ea5e9" radius={[0, 4, 4, 0]} />
+                <Bar dataKey="totalQuantity" fill="#214C5A" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
           )}

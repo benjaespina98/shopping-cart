@@ -3,6 +3,14 @@ import { FiPlus, FiEdit2, FiTrash2, FiX, FiUpload, FiCheck, FiAlertCircle, FiSav
 import { productsAPI } from '../../services/api';
 import { toast } from 'react-toastify';
 
+const PRODUCT_CATEGORIES = [
+  'Química del agua',
+  'Limpieza',
+  'Cercos y seguridad',
+  'Climatización',
+  'Accesorios',
+];
+
 const EMPTY_FORM = {
   name: '',
   description: '',
@@ -104,7 +112,10 @@ function ProductModal({ product, onClose, onSaved }) {
             </div>
             <div className="col-span-2">
               <label className="label">Categoría *</label>
-              <input className="input" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} required placeholder="Ej: Electrónica, Ropa, etc." />
+              <select className="input" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} required>
+                <option value="">Seleccionar categoría...</option>
+                {PRODUCT_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
             </div>
             <div className="col-span-2">
               <label className="label">Descripción</label>

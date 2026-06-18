@@ -1,7 +1,7 @@
 import { FiInstagram, FiFacebook } from 'react-icons/fi';
 
 const cols = [
-  { title: 'Servicios', items: [['#', 'Piscinas de obra'], ['#', 'Mantenimiento'], ['#', 'Reformas'], ['#', 'Climatización']] },
+  { title: 'Servicios', items: [['/servicios', 'Piscinas de obra'], ['/servicios', 'Reformas'], ['/servicios', 'Climatización'], ['/servicios', 'Cercos y seguridad']] },
   { title: 'Empresa',   items: [['/proyectos', 'Proyectos'], ['/servicios', 'Servicios'], ['/tienda', 'Tienda'], ['/admin/login', 'Portal admin']] },
   { title: 'Contacto',  items: [['tel:+543534224607', '+54 353 422-4607'], ['mailto:piscinas@playaysol.com.ar', 'piscinas@playaysol.com.ar'], ['#', 'Villa María, Córdoba']] },
 ];
@@ -17,7 +17,12 @@ export default function Footer() {
 
         {/* Brand */}
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12, whiteSpace: 'nowrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, whiteSpace: 'nowrap' }}>
+            <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true" style={{ flexShrink: 0 }}>
+              <rect width="32" height="32" rx="6" fill="rgba(255,255,255,0.15)"/>
+              <circle cx="22" cy="10" r="5.5" fill="#FFC526"/>
+              <path d="M0 22 Q4 17 8 22 Q12 27 16 22 Q20 17 24 22 Q28 27 32 22 L32 32 L0 32 Z" fill="#7DD3FC"/>
+            </svg>
             <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 20, color: '#fff' }}>Playa</span>
             <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 20, color: 'var(--sun-400)' }}>&amp; Sol</span>
           </div>

@@ -9,9 +9,9 @@ import { Switch } from '../design-system/Switch';
 import { Photo } from '../design-system/Photo';
 
 const tipos = [
-  { id: 'obra',          label: 'Piscina nueva' },
-  { id: 'reforma',       label: 'Reforma' },
-  { id: 'mantenimiento', label: 'Mantenimiento' },
+  { id: 'obra',   label: 'Piscina nueva' },
+  { id: 'reforma', label: 'Reforma' },
+  { id: 'cerco',  label: 'Cerco / Seguridad' },
 ];
 
 export default function Quote() {

@@ -13,7 +13,6 @@ export default function AdminLogin() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Submit login', form);
     setLoading(true);
     try {
       await login(form.email, form.password);
@@ -26,73 +25,135 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-neutral-900 to-neutral-800 flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
-        {/* Logo */}
+    <div className="min-h-screen flex items-center justify-center px-4"
+         style={{ background: 'linear-gradient(160deg, #122B33 0%, #193A45 60%, #214C5A 100%)' }}>
+
+      {/* Background decoration */}
+      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', top: -80, right: -80, width: 320, height: 320,
+                      borderRadius: '50%', background: 'rgba(255,197,38,0.07)' }} />
+        <div style={{ position: 'absolute', bottom: -60, left: -60, width: 240, height: 240,
+                      borderRadius: '50%', background: 'rgba(125,211,252,0.06)' }} />
+      </div>
+
+      <div className="w-full max-w-sm relative">
+
+        {/* Brand header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-1 mb-2">
-            <span className="text-3xl font-extrabold text-brand">Playa</span>
-            <span className="text-3xl font-extrabold text-neutral-50">y Sol</span>
+          <div className="inline-flex items-center justify-center mb-4">
+            <svg width="52" height="52" viewBox="0 0 32 32">
+              <rect width="32" height="32" rx="8" fill="#214C5A"/>
+              <circle cx="22" cy="10" r="5.5" fill="#FFC526"/>
+              <path d="M0 22 Q4 17 8 22 Q12 27 16 22 Q20 17 24 22 Q28 27 32 22 L32 32 L0 32 Z" fill="#7DD3FC"/>
+            </svg>
           </div>
-          <p className="text-neutral-300 text-sm">Panel de administración</p>
+          <h1 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: 22,
+                       color: '#fff', letterSpacing: '-0.01em', marginBottom: 4 }}>
+            Playa &amp; Sol
+          </h1>
+          <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, fontFamily: 'Mulish, sans-serif' }}>
+            Panel de administración
+          </p>
         </div>
 
         {/* Card */}
-        <div className="bg-neutral-900 rounded-2xl p-8 shadow-2xl border border-neutral-800">
-          <div className="flex items-center justify-center w-14 h-14 logo-sun mx-auto mb-6">
-            <FiLock size={24} className="text-[#C98F06]" />
-          </div>
-          <h1 className="text-xl font-bold text-neutral-50 text-center mb-6">Ingresá a tu cuenta</h1>
+        <div className="rounded-2xl p-7 shadow-2xl"
+             style={{ background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(16px)',
+                      border: '1px solid rgba(255,255,255,0.1)' }}>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="flex items-center justify-center w-12 h-12 rounded-xl mx-auto mb-5"
+               style={{ background: 'rgba(255,197,38,0.15)', border: '1px solid rgba(255,197,38,0.3)' }}>
+            <FiLock size={20} style={{ color: '#FFC526' }} />
+          </div>
+
+          <h2 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: 17,
+                       color: '#fff', textAlign: 'center', marginBottom: 20 }}>
+            Ingresá a tu cuenta
+          </h2>
+
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-neutral-200 mb-1.5">Email</label>
-              <div className="relative">
-                <FiMail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400" />
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, fontFamily: 'Poppins, sans-serif',
+                              color: 'rgba(255,255,255,0.65)', marginBottom: 6, letterSpacing: '0.03em' }}>
+                EMAIL
+              </label>
+              <div style={{ position: 'relative' }}>
+                <FiMail size={15} style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)',
+                                           color: 'rgba(255,255,255,0.35)', pointerEvents: 'none' }} />
                 <input
                   type="email"
-                  className="w-full bg-neutral-800 border border-neutral-700 text-neutral-50 rounded-xl pl-10 pr-4 py-2.5 text-sm
-                    focus:outline-none focus:ring-2 focus:ring-primary-700 focus:border-transparent placeholder-neutral-400"
-                  placeholder="admin@mitienda.com"
+                  placeholder="admin@ejemplo.com"
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   required
+                  style={{ width: '100%', paddingLeft: 38, paddingRight: 14, height: 42,
+                           background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)',
+                           borderRadius: 10, color: '#fff', fontSize: 14, fontFamily: 'Mulish, sans-serif',
+                           outline: 'none', boxSizing: 'border-box',
+                           transition: 'border-color 140ms ease, background 140ms ease' }}
+                  onFocus={e => { e.target.style.borderColor = 'rgba(255,197,38,0.6)'; e.target.style.background = 'rgba(255,255,255,0.10)'; }}
+                  onBlur={e => { e.target.style.borderColor = 'rgba(255,255,255,0.12)'; e.target.style.background = 'rgba(255,255,255,0.07)'; }}
                 />
               </div>
             </div>
 
+            {/* Password */}
             <div>
-              <label className="block text-sm font-medium text-neutral-200 mb-1.5">Contraseña</label>
-              <div className="relative">
-                <FiLock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400" />
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, fontFamily: 'Poppins, sans-serif',
+                              color: 'rgba(255,255,255,0.65)', marginBottom: 6, letterSpacing: '0.03em' }}>
+                CONTRASEÑA
+              </label>
+              <div style={{ position: 'relative' }}>
+                <FiLock size={15} style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)',
+                                           color: 'rgba(255,255,255,0.35)', pointerEvents: 'none' }} />
                 <input
                   type={showPw ? 'text' : 'password'}
-                  className="w-full bg-neutral-800 border border-neutral-700 text-neutral-50 rounded-xl pl-10 pr-10 py-2.5 text-sm
-                    focus:outline-none focus:ring-2 focus:ring-primary-700 focus:border-transparent placeholder-neutral-400"
                   placeholder="••••••••"
                   value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
                   required
+                  style={{ width: '100%', paddingLeft: 38, paddingRight: 40, height: 42,
+                           background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)',
+                           borderRadius: 10, color: '#fff', fontSize: 14, fontFamily: 'Mulish, sans-serif',
+                           outline: 'none', boxSizing: 'border-box',
+                           transition: 'border-color 140ms ease, background 140ms ease' }}
+                  onFocus={e => { e.target.style.borderColor = 'rgba(255,197,38,0.6)'; e.target.style.background = 'rgba(255,255,255,0.10)'; }}
+                  onBlur={e => { e.target.style.borderColor = 'rgba(255,255,255,0.12)'; e.target.style.background = 'rgba(255,255,255,0.07)'; }}
                 />
                 <button
                   type="button"
-                  onClick={() => setShowPw((s) => !s)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-100"
+                  onClick={() => setShowPw(s => !s)}
+                  style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
+                           background: 'none', border: 'none', cursor: 'pointer',
+                           color: 'rgba(255,255,255,0.4)', padding: 2 }}
                 >
                   {showPw ? <FiEyeOff size={15} /> : <FiEye size={15} />}
                 </button>
               </div>
             </div>
 
+            {/* Submit */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full btn-primary mt-2"
+              style={{ marginTop: 6, height: 44, borderRadius: 10, border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
+                       background: loading ? 'rgba(33,76,90,0.5)' : '#214C5A',
+                       color: '#fff', fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: 14,
+                       transition: 'background 140ms ease, transform 120ms ease',
+                       opacity: loading ? 0.7 : 1 }}
+              onMouseEnter={e => { if (!loading) e.target.style.background = '#193A45'; }}
+              onMouseLeave={e => { if (!loading) e.target.style.background = '#214C5A'; }}
             >
-              {loading ? 'Ingresando...' : 'Ingresar'}
+              {loading ? 'Ingresando...' : 'Ingresar al panel'}
             </button>
           </form>
         </div>
+
+        <p style={{ textAlign: 'center', marginTop: 20, fontSize: 12,
+                    color: 'rgba(255,255,255,0.3)', fontFamily: 'Mulish, sans-serif' }}>
+          © {new Date().getFullYear()} Playa &amp; Sol Piscinas
+        </p>
       </div>
     </div>
   );
