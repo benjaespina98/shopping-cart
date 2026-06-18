@@ -32,6 +32,16 @@ const galleryStorage = new CloudinaryStorage({
   },
 });
 
+const projectsStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'shopping-cart/projects',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+    transformation: [{ width: 1400, crop: 'limit', quality: 'auto' }],
+  },
+});
+
 export const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 }, fileFilter });
 export const uploadGallery = multer({ storage: galleryStorage, limits: { fileSize: 8 * 1024 * 1024 }, fileFilter });
+export const uploadProjects = multer({ storage: projectsStorage, limits: { fileSize: 8 * 1024 * 1024 }, fileFilter });
 export { cloudinary };

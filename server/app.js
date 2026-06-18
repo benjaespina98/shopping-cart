@@ -13,6 +13,7 @@ import metricsRoutes from './routes/metricsRoutes.js';
 import galleryRoutes from './routes/galleryRoutes.js';
 import settingsRoutes from './routes/settingsRoutes.js';
 import logRoutes from './routes/logRoutes.js';
+import projectRoutes from './routes/projectRoutes.js';
 
 loadServerEnv();
 
@@ -114,6 +115,7 @@ app.use('/api/metrics', metricsRoutes);
 app.use('/api/gallery', galleryRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/logs', logRoutes);
+app.use('/api/projects', projectRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });

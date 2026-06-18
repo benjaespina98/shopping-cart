@@ -1,68 +1,73 @@
-import { Link } from 'react-router-dom';
-import { FiInstagram, FiFacebook, FiMapPin, FiPhone, FiMail } from 'react-icons/fi';
+import { FiInstagram, FiFacebook } from 'react-icons/fi';
+
+const cols = [
+  { title: 'Servicios', items: [['#', 'Piscinas de obra'], ['#', 'Mantenimiento'], ['#', 'Reformas'], ['#', 'Climatización']] },
+  { title: 'Empresa',   items: [['/proyectos', 'Proyectos'], ['/servicios', 'Servicios'], ['/tienda', 'Tienda'], ['/admin/login', 'Portal admin']] },
+  { title: 'Contacto',  items: [['tel:+543534224607', '+54 353 422-4607'], ['mailto:piscinas@playaysol.com.ar', 'piscinas@playaysol.com.ar'], ['#', 'Villa María, Córdoba']] },
+];
+
+const linkHover = (e, on) => { e.currentTarget.style.color = on ? '#fff' : 'rgba(255,255,255,0.7)'; };
+const iconHover = (e, on) => { e.currentTarget.style.background = on ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)'; };
 
 export default function Footer() {
   return (
-    <footer className="bg-neutral-900 text-neutral-200 border-t border-neutral-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Brand */}
-          <div>
-            <div className="flex items-center gap-1 mb-3">
-              <span className="text-2xl font-extrabold text-white">Playa</span>
-              <span className="text-2xl font-extrabold brand-sun">y Sol</span>
-            </div>
-            <p className="text-sm text-neutral-300 leading-relaxed max-w-sm font-medium">
-              Especialistas en piscinas, tratamiento de agua y accesorios. Tu pileta, nuestra pasión.
-            </p>
-            <div className="flex gap-3 mt-4">
-              <a href="https://instagram.com" target="_blank" rel="noreferrer"
-                className="p-2 rounded-lg bg-neutral-800 hover:bg-primary-700 hover:text-white transition-all">
-                <FiInstagram size={18} />
-              </a>
-              <a href="https://facebook.com" target="_blank" rel="noreferrer"
-                className="p-2 rounded-lg bg-neutral-800 hover:bg-primary-700 hover:text-white transition-all">
-                <FiFacebook size={18} />
-              </a>
-            </div>
-          </div>
+    <footer style={{ background: 'var(--teal-800)', color: 'rgba(255,255,255,0.78)', padding: '48px 40px 28px', fontFamily: 'var(--font-body)' }}
+            className="ps-section">
+      <div className="ps-footer-grid" style={{ maxWidth: 1120, margin: '0 auto' }}>
 
-          {/* Links */}
-          <div>
-            <h3 className="text-white font-bold mb-4">Navegación</h3>
-            <ul className="space-y-2 text-sm text-neutral-300">
-              {[['/', 'Inicio'], ['/tienda', 'Tienda'], ['/contacto', 'Contacto'], ['/ubicacion', 'Ubicación']].map(([to, label]) => (
-                <li key={to}>
-                  <Link to={to} className="hover:text-primary-700 hover:translate-x-1 transition-all inline-flex py-0.5">{label}</Link>
+        {/* Brand */}
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12, whiteSpace: 'nowrap' }}>
+            <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 20, color: '#fff' }}>Playa</span>
+            <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 20, color: 'var(--sun-400)' }}>&amp; Sol</span>
+          </div>
+          <p style={{ fontSize: 14, lineHeight: 1.6, maxWidth: 240, marginBottom: 18 }}>
+            Diseño, construcción y mantenimiento de piscinas en Villa María y la región desde 2004.
+          </p>
+          <div style={{ display: 'flex', gap: 10 }}>
+            {[['https://instagram.com', FiInstagram], ['https://facebook.com', FiFacebook]].map(([href, Icon]) => (
+              <a key={href} href={href} target="_blank" rel="noreferrer"
+                style={{ padding: 8, borderRadius: 8, background: 'rgba(255,255,255,0.1)',
+                         color: 'rgba(255,255,255,0.7)', display: 'inline-flex',
+                         transition: 'background var(--duration-fast) var(--ease-out)' }}
+                onMouseEnter={e => iconHover(e, true)}
+                onMouseLeave={e => iconHover(e, false)}>
+                <Icon size={18} />
+              </a>
+            ))}
+          </div>
+        </div>
+
+        {/* Link columns */}
+        {cols.map(c => (
+          <div key={c.title}>
+            <h4 style={{ color: '#fff', fontFamily: 'var(--font-display)', fontSize: 13,
+                         letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 14 }}>
+              {c.title}
+            </h4>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 9 }}>
+              {c.items.map(([to, label]) => (
+                <li key={label}>
+                  <a href={to} style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)', textDecoration: 'none',
+                                        transition: 'color var(--duration-fast) var(--ease-out)' }}
+                    onMouseEnter={e => linkHover(e, true)}
+                    onMouseLeave={e => linkHover(e, false)}>
+                    {label}
+                  </a>
                 </li>
               ))}
             </ul>
           </div>
+        ))}
+      </div>
 
-          {/* Contact */}
-          <div>
-            <h3 className="text-white font-bold mb-4">Contacto</h3>
-            <ul className="space-y-2 text-sm text-neutral-300">
-              <li className="flex items-center gap-2">
-                <FiMapPin size={15} className="text-primary-700 shrink-0" />
-                <span>Corrientes 1210, Villa María, Cba.</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <FiPhone size={15} className="text-primary-700 shrink-0" />
-                <a href="tel:+543534224607" className="hover:text-white transition-colors">3534224607</a>
-              </li>
-              <li className="flex items-center gap-2">
-                <FiMail size={15} className="text-primary-700 shrink-0" />
-                <a href="mailto:benjaespina98@gmail.com" className="hover:text-white transition-colors">benjaespina98@gmail.com</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="border-t border-neutral-800 mt-10 pt-6 flex flex-col sm:flex-row justify-between items-center text-xs text-neutral-400 gap-2">
-          <span>© {new Date().getFullYear()} Playa y Sol. Todos los derechos reservados.</span>
-          <Link to="/admin/login" className="hover:text-neutral-200 transition-colors">Portal admin</Link>
-        </div>
+      <div style={{ maxWidth: 1120, margin: '32px auto 0', paddingTop: 18,
+                    borderTop: '1px solid rgba(255,255,255,0.14)',
+                    display: 'flex', justifyContent: 'space-between',
+                    flexWrap: 'wrap', gap: 8, fontSize: 13 }}
+           className="ps-section">
+        <span>© {new Date().getFullYear()} Playa &amp; Sol Piscinas</span>
+        <span style={{ opacity: 0.6 }}>Aviso legal · Privacidad · Cookies</span>
       </div>
     </footer>
   );

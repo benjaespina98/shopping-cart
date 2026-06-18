@@ -1,103 +1,120 @@
-import { useEffect, useState } from 'react';
-import { Link, NavLink } from 'react-router-dom';
-import { useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { FiShoppingCart, FiMenu, FiX } from 'react-icons/fi';
 import { useCart } from '../../context/CartContext';
+import { Button } from '../../design-system/Button';
 
 const navLinks = [
-  { to: '/', label: 'Inicio' },
-  { to: '/tienda', label: 'Tienda' },
-  { to: '/contacto', label: 'Contacto' },
-  { to: '/ubicacion', label: 'Ubicación' },
+  { to: '/',          label: 'Inicio',    end: true },
+  { to: '/servicios', label: 'Servicios', end: false },
+  { to: '/proyectos', label: 'Proyectos', end: false },
+  { to: '/tienda',    label: 'Tienda',    end: false },
 ];
+
+const linkStyle = (isActive) => ({
+  border: 'none', background: 'transparent', cursor: 'pointer',
+  fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: 15,
+  padding: '8px 14px', borderRadius: 'var(--radius-sm)',
+  textDecoration: 'none', display: 'block',
+  color: isActive ? 'var(--brand-primary)' : 'var(--text-body)',
+  transition: 'color var(--duration-fast) var(--ease-out)',
+});
 
 export default function Navbar() {
   const { totalItems, toggleCart } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
-  const location = useLocation();
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    setMenuOpen(false);
-  }, [location.pathname]);
+  const handleNav = (to) => { navigate(to); setMenuOpen(false); };
 
   return (
-    <header className="bg-sky-950/95 supports-[backdrop-filter]:bg-sky-950/85 border-b border-white/10 sticky top-0 z-40 backdrop-blur-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-1.5">
-            <span className="text-2xl font-extrabold text-white">Playa</span>
-            <span className="text-2xl font-extrabold brand-sun"> y Sol</span>
-          </Link>
+    <header style={{
+      position: 'sticky', top: 0, zIndex: 40,
+      background: 'rgba(255,255,255,0.92)',
+      backdropFilter: 'blur(10px)',
+      borderBottom: '1px solid var(--border-subtle)',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 40px' }}
+           className="px-5 sm:px-10">
 
-          {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-1">
-            {navLinks.map(({ to, label }) => (
-              <NavLink
-                key={to}
-                to={to}
-                end
-                className={({ isActive }) =>
-                  `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'bg-white/10 brand-sun font-semibold'
-                        : 'text-slate-300 hover:text-white hover:bg-white/10'
-                  }`
-                }
-              >
-                {label}
-              </NavLink>
-            ))}
-          </nav>
+        {/* Logo */}
+        <button onClick={() => handleNav('/')}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+                   display: 'flex', alignItems: 'center', gap: 8, whiteSpace: 'nowrap' }}>
+          <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true" style={{ flexShrink: 0 }}>
+            <rect width="32" height="32" rx="7" fill="#214C5A"/>
+            <circle cx="22" cy="10" r="5.5" fill="#FFC526"/>
+            <path d="M0 22 Q4 17 8 22 Q12 27 16 22 Q20 17 24 22 Q28 27 32 22 L32 32 L0 32 Z" fill="#7DD3FC"/>
+          </svg>
+          <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 20, color: 'var(--teal-700)' }}>Playa</span>
+          <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 20, color: 'var(--sun-600)' }}>&amp; Sol</span>
+        </button>
 
-          {/* Cart button */}
-          <div className="flex items-center gap-3">
-            <button
-              onClick={toggleCart}
-              className="relative p-2 rounded-xl text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
-              aria-label="Carrito de compras"
-            >
-              <FiShoppingCart size={22} />
-              {totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 bg-error text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                  {totalItems > 99 ? '99+' : totalItems}
-                </span>
-              )}
-            </button>
+        {/* Desktop nav — hidden on mobile via className */}
+        <nav className="hidden md:flex" style={{ alignItems: 'center', gap: 4 }}>
+          {navLinks.map(({ to, label, end }) => (
+            <NavLink key={to} to={to} end={end} style={({ isActive }) => linkStyle(isActive)}>
+              {label}
+            </NavLink>
+          ))}
+        </nav>
 
-            {/* Mobile menu toggle */}
-            <button
-              className="md:hidden p-2 rounded-xl text-slate-300 hover:text-white hover:bg-white/10"
-              onClick={() => setMenuOpen((o) => !o)}
-              aria-label="Menú"
-            >
-              {menuOpen ? <FiX size={22} /> : <FiMenu size={22} />}
-            </button>
+        {/* Right actions */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {/* Cart */}
+          <button onClick={toggleCart}
+            style={{ position: 'relative', padding: 8, borderRadius: 12,
+                     background: 'transparent', border: 'none', cursor: 'pointer',
+                     color: 'var(--text-body)' }}
+            aria-label="Carrito">
+            <FiShoppingCart size={22} />
+            {totalItems > 0 && (
+              <span style={{ position: 'absolute', top: -4, right: -4, background: 'var(--red-500)',
+                             color: '#fff', fontSize: 11, fontWeight: 700, borderRadius: '50%',
+                             width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {totalItems > 99 ? '99+' : totalItems}
+              </span>
+            )}
+          </button>
+
+          {/* Desktop CTA — hidden on mobile */}
+          <div className="hidden md:block">
+            <Button variant="primary" size="sm" onClick={() => handleNav('/presupuesto')}>
+              Pide presupuesto
+            </Button>
           </div>
-        </div>
 
-        {/* Mobile nav */}
-        {menuOpen && (
-          <nav className="md:hidden pb-4">
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-2 flex flex-col gap-1">
-            {navLinks.map(({ to, label }) => (
-              <NavLink
-                key={to}
-                to={to}
-                end
-                className={({ isActive }) =>
-                  `px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-                    isActive ? 'bg-white/10 brand-sun' : 'text-slate-300 hover:text-white hover:bg-white/10'
-                  }`
-                }
-              >
+          {/* Mobile hamburger — hidden on desktop */}
+          <button className="md:hidden"
+            style={{ padding: 8, borderRadius: 12, background: 'transparent',
+                     border: 'none', cursor: 'pointer', color: 'var(--text-body)' }}
+            onClick={() => setMenuOpen(o => !o)} aria-label="Menú">
+            {menuOpen ? <FiX size={22} /> : <FiMenu size={22} />}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile dropdown */}
+      {menuOpen && (
+        <div style={{ borderTop: '1px solid var(--border-subtle)', background: '#fff',
+                      padding: '12px 20px 16px', boxShadow: 'var(--shadow-md)' }}>
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: 2, marginBottom: 12 }}>
+            {navLinks.map(({ to, label, end }) => (
+              <NavLink key={to} to={to} end={end} onClick={() => setMenuOpen(false)}
+                style={({ isActive }) => ({
+                  ...linkStyle(isActive),
+                  padding: '10px 14px',
+                  background: isActive ? 'var(--teal-50)' : 'transparent',
+                })}>
                 {label}
               </NavLink>
             ))}
-            </div>
           </nav>
-        )}
-      </div>
+          <Button variant="primary" fullWidth onClick={() => handleNav('/presupuesto')}>
+            Pide presupuesto
+          </Button>
+        </div>
+      )}
     </header>
   );
 }

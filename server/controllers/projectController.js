@@ -1,0 +1,82 @@
+import asyncHandler from 'express-async-handler';
+import Project from '../models/Project.js';
+import { cloudinary } from '../config/cloudinary.js';
+
+// GET /api/projects — público
+export const getProjects = asyncHandler(async (req, res) => {
+  const filter = {};
+  if (req.query.featured === 'true') filter.featured = true;
+  const projects = await Project.find(filter).sort({ order: 1, createdAt: -1 });
+  res.json(projects);
+});
+
+// POST /api/projects — admin
+export const createProject = asyncHandler(async (req, res) => {
+  const { title, location, category, featured } = req.body;
+  if (!title || !location || !category) {
+    res.status(400);
+    throw new Error('title, location y category son requeridos');
+  }
+  const count = await Project.countDocuments();
+  const project = await Project.create({
+    title,
+    location,
+    category,
+    featured: featured === 'true' || featured === true,
+    imageUrl: req.file?.path || '',
+    publicId: req.file?.filename || '',
+    order: count,
+  });
+  res.status(201).json(project);
+});
+
+// PUT /api/projects/:id — admin (edita metadatos; si hay imagen nueva, reemplaza)
+export const updateProject = asyncHandler(async (req, res) => {
+  const project = await Project.findById(req.params.id);
+  if (!project) {
+    res.status(404);
+    throw new Error('Proyecto no encontrado');
+  }
+
+  const { title, location, category, featured } = req.body;
+  if (title !== undefined)    project.title    = title;
+  if (location !== undefined) project.location = location;
+  if (category !== undefined) project.category = category;
+  if (featured !== undefined) project.featured = featured === 'true' || featured === true;
+
+  if (req.file) {
+    if (project.publicId) {
+      await cloudinary.uploader.destroy(project.publicId).catch(() => {});
+    }
+    project.imageUrl = req.file.path;
+    project.publicId = req.file.filename;
+  }
+
+  await project.save();
+  res.json(project);
+});
+
+// PATCH /api/projects/reorder — admin
+export const reorderProjects = asyncHandler(async (req, res) => {
+  const { items } = req.body;
+  if (!Array.isArray(items)) {
+    res.status(400);
+    throw new Error('Se espera un array de items');
+  }
+  await Promise.all(items.map(({ id, order }) => Project.findByIdAndUpdate(id, { order })));
+  res.json({ message: 'Orden actualizado' });
+});
+
+// DELETE /api/projects/:id — admin
+export const deleteProject = asyncHandler(async (req, res) => {
+  const project = await Project.findById(req.params.id);
+  if (!project) {
+    res.status(404);
+    throw new Error('Proyecto no encontrado');
+  }
+  if (project.publicId) {
+    await cloudinary.uploader.destroy(project.publicId).catch(() => {});
+  }
+  await project.deleteOne();
+  res.json({ message: 'Proyecto eliminado' });
+});
