@@ -7,16 +7,24 @@ import {
 import { useAuth } from '../../context/AuthContext';
 
 const navItems = [
-  { to: '/admin/dashboard',   label: 'Dashboard',   Icon: FiGrid },
-  { to: '/admin/sitio',       label: 'Sitio web',   Icon: FiLayout },
-  { to: '/admin/productos',   label: 'Productos',   Icon: FiPackage },
-  { to: '/admin/pedidos',     label: 'Pedidos',     Icon: FiShoppingBag },
-  { to: '/admin/metricas',    label: 'Métricas',    Icon: FiBarChart2 },
-  { to: '/admin/logs',        label: 'Logs',        Icon: FiActivity },
-  { to: '/admin/galeria',     label: 'Galería',     Icon: FiImage },
-  { to: '/admin/configuracion', label: 'Configuracion', Icon: FiSettings },
-  { to: '/admin/perfil',      label: 'Mi perfil',   Icon: FiUser },
+  { to: '/admin/dashboard',     label: 'Dashboard',      Icon: FiGrid },
+  { to: '/admin/sitio',         label: 'Sitio web',      Icon: FiLayout },
+  { to: '/admin/productos',     label: 'Productos',      Icon: FiPackage },
+  { to: '/admin/pedidos',       label: 'Pedidos',        Icon: FiShoppingBag },
+  { to: '/admin/metricas',      label: 'Métricas',       Icon: FiBarChart2 },
+  { to: '/admin/logs',          label: 'Logs',           Icon: FiActivity },
+  { to: '/admin/galeria',       label: 'Galería',        Icon: FiImage },
+  { to: '/admin/configuracion', label: 'Configuración',  Icon: FiSettings },
+  { to: '/admin/perfil',        label: 'Mi perfil',      Icon: FiUser },
 ];
+
+const BrandIcon = () => (
+  <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true" style={{ flexShrink: 0 }}>
+    <rect width="32" height="32" rx="7" fill="#214C5A"/>
+    <circle cx="22" cy="10" r="5.5" fill="#FFC526"/>
+    <path d="M0 22 Q4 17 8 22 Q12 27 16 22 Q20 17 24 22 Q28 27 32 22 L32 32 L0 32 Z" fill="#7DD3FC"/>
+  </svg>
+);
 
 export default function AdminLayout() {
   const { user, logout } = useAuth();
@@ -28,86 +36,125 @@ export default function AdminLayout() {
     navigate('/admin/login');
   };
 
+  const initials = user?.name
+    ? user.name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()
+    : 'A';
+
   return (
-    <div className="flex h-screen bg-slate-100 overflow-hidden">
-      {/* Sidebar */}
+    <div className="flex h-screen overflow-hidden" style={{ background: '#F1F7F9' }}>
+
+      {/* ── Sidebar ────────────────────────────────────────── */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white flex flex-col transition-transform duration-300
+        className={`fixed inset-y-0 left-0 z-50 w-64 flex flex-col transition-transform duration-300
           ${sideOpen ? 'translate-x-0' : '-translate-x-full'} lg:relative lg:translate-x-0`}
+        style={{ background: '#122B33' }}
       >
         {/* Logo */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-slate-700">
-          <div className="flex items-center gap-1">
-            <span className="text-xl font-extrabold text-primary-700">Playa</span>
-            <span className="text-xl font-extrabold text-white">y Sol</span>
-            <span className="ml-1 text-xs font-medium bg-primary-700 px-1.5 py-0.5 rounded text-white">Admin</span>
+        <div className="flex items-center justify-between px-5 py-4"
+             style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+          <div className="flex items-center gap-2.5">
+            <BrandIcon />
+            <div>
+              <div style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: 15, lineHeight: 1, color: '#fff' }}>
+                Playa &amp; Sol
+              </div>
+              <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase',
+                            color: '#FFC526', marginTop: 2 }}>
+                Panel admin
+              </div>
+            </div>
           </div>
-          <button className="lg:hidden" onClick={() => setSideOpen(false)}>
-            <FiX size={20} />
+          <button className="lg:hidden p-1.5 rounded-lg text-white/60 hover:text-white hover:bg-white/10"
+                  onClick={() => setSideOpen(false)}>
+            <FiX size={18} />
           </button>
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        <nav className="flex-1 px-3 py-4 overflow-y-auto" style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {navItems.map(({ to, label, Icon }) => (
             <NavLink
               key={to}
               to={to}
               onClick={() => setSideOpen(false)}
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'bg-primary-700 text-white'
-                    : 'text-slate-400 hover:bg-slate-800 hover:text-white'
-                }`
-              }
+              style={({ isActive }) => ({
+                display: 'flex', alignItems: 'center', gap: 10,
+                padding: '10px 14px', borderRadius: 10,
+                fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: 13,
+                textDecoration: 'none', transition: 'all 140ms ease',
+                background: isActive ? '#214C5A' : 'transparent',
+                color: isActive ? '#fff' : 'rgba(255,255,255,0.55)',
+              })}
+              className={({ isActive }) => isActive ? '' : 'hover:bg-white/8 hover:!text-white'}
             >
-              <Icon size={18} />
-              {label}
+              {({ isActive }) => (
+                <>
+                  <Icon size={16} style={{ flexShrink: 0, opacity: isActive ? 1 : 0.75 }} />
+                  {label}
+                </>
+              )}
             </NavLink>
           ))}
         </nav>
 
         {/* User + logout */}
-        <div className="px-4 py-4 border-t border-slate-700">
+        <div className="px-4 py-4" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-8 h-8 rounded-full bg-primary-700 flex items-center justify-center">
-              <FiUser size={16} />
+            <div className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white"
+                 style={{ background: '#214C5A', border: '2px solid #FFC526', flexShrink: 0 }}>
+              {initials}
             </div>
             <div className="overflow-hidden">
-              <p className="text-sm font-medium text-white truncate">{user?.name}</p>
-              <p className="text-xs text-slate-400 truncate">{user?.email}</p>
+              <p className="text-sm font-semibold truncate" style={{ color: '#fff', fontFamily: 'Poppins, sans-serif' }}>
+                {user?.name}
+              </p>
+              <p className="text-xs truncate" style={{ color: 'rgba(255,255,255,0.45)' }}>{user?.email}</p>
             </div>
           </div>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 w-full px-3 py-2 rounded-xl text-sm text-slate-400 hover:bg-slate-800 hover:text-red-400 transition-colors"
+            className="flex items-center gap-2 w-full px-3 py-2 rounded-xl text-sm transition-colors hover:bg-red-900/30 hover:text-red-400"
+            style={{ color: 'rgba(255,255,255,0.45)', fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}
           >
-            <FiLogOut size={16} />
+            <FiLogOut size={15} />
             Cerrar sesión
           </button>
         </div>
       </aside>
 
-      {/* Overlay for mobile */}
+      {/* Mobile overlay */}
       {sideOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
-          onClick={() => setSideOpen(false)}
-        />
+        <div className="fixed inset-0 z-40 bg-black/50 lg:hidden" onClick={() => setSideOpen(false)} />
       )}
 
-      {/* Main content */}
+      {/* ── Main content ───────────────────────────────────── */}
       <div className="flex-1 flex flex-col overflow-hidden">
+
         {/* Top bar */}
-        <header className="bg-white border-b border-slate-200 px-4 sm:px-6 h-14 flex items-center gap-4">
-          <button
-            className="lg:hidden p-2 rounded-lg hover:bg-slate-100"
-            onClick={() => setSideOpen(true)}
-          >
+        <header className="h-14 flex items-center gap-4 px-4 sm:px-6 bg-white"
+                style={{ borderBottom: '1px solid #E0E5E7' }}>
+          <button className="lg:hidden p-2 rounded-lg hover:bg-slate-100 text-slate-600"
+                  onClick={() => setSideOpen(true)}>
             <FiMenu size={20} />
           </button>
-          <span className="text-slate-500 text-sm">Panel de administración</span>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium" style={{ color: '#6E797E' }}>
+              Panel de administración
+            </span>
+          </div>
+          {/* Breadcrumb separator could go here */}
+          <div className="ml-auto flex items-center gap-2">
+            <a href="/" target="_blank" rel="noreferrer"
+               className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors hover:bg-primary-50"
+               style={{ color: '#214C5A', border: '1px solid #BCD6DD' }}>
+              <svg width="12" height="12" viewBox="0 0 32 32">
+                <rect width="32" height="32" rx="5" fill="#214C5A"/>
+                <circle cx="22" cy="10" r="5.5" fill="#FFC526"/>
+                <path d="M0 22 Q4 17 8 22 Q12 27 16 22 Q20 17 24 22 Q28 27 32 22 L32 32 L0 32 Z" fill="#7DD3FC"/>
+              </svg>
+              Ver sitio
+            </a>
+          </div>
         </header>
 
         {/* Page content */}

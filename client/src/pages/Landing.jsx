@@ -163,7 +163,7 @@ export default function Landing() {
               </div>
               <Button variant="outline" onClick={() => navigate('/tienda')}>Ver todos</Button>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="ps-products-grid">
               {featured.map((p) => (
                 <ProductCard key={p._id} product={p} inCartQuantity={inCartByProductId.get(p._id) || 0} />
               ))}

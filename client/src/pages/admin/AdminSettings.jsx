@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FiSave, FiPlus, FiTrash2, FiUsers, FiClock, FiMail, FiPhone } from 'react-icons/fi';
+import { FiSave, FiPlus, FiTrash2, FiUsers, FiClock, FiMail, FiPhone, FiUserMinus } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import { settingsAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
@@ -65,7 +65,7 @@ export default function AdminSettings() {
       };
       const { data } = await settingsAPI.updateAdmin(payload);
       setSettings(data.settings);
-      toast.success('Configuracion guardada');
+      toast.success('Configuración guardada');
     } catch (error) {
       toast.error(error?.response?.data?.message || 'No se pudo guardar la configuracion');
     } finally {
@@ -125,7 +125,7 @@ export default function AdminSettings() {
   if (loading) {
     return (
       <div>
-        <h1 className="text-2xl font-bold text-slate-900 mb-1">Configuracion</h1>
+        <h1 className="text-2xl font-bold text-slate-900 mb-1">Configuración</h1>
         <p className="text-slate-500 text-sm mb-8">Ajustes generales del negocio y administradores.</p>
         <div className="card p-6 animate-pulse h-48" />
       </div>
@@ -135,7 +135,7 @@ export default function AdminSettings() {
   return (
     <div className="max-w-5xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900 mb-1">Configuracion</h1>
+        <h1 className="text-2xl font-bold text-slate-900 mb-1">Configuración</h1>
         <p className="text-slate-500 text-sm">Edita datos de contacto, horarios y usuarios administradores.</p>
       </div>
 
@@ -231,9 +231,30 @@ export default function AdminSettings() {
         <div className="space-y-2 mb-5">
           {users.map((item) => (
             <div key={item._id} className="border border-slate-200 rounded-xl p-3 flex items-center justify-between gap-3">
-              <div className="min-w-0">
-                <p className="text-sm font-semibold text-slate-800 truncate">{item.name}</p>
-                <p className="text-xs text-slate-500 truncate">{item.email}</p>
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
+                     style={{ background: '#214C5A' }}>
+                  {item.name?.[0]?.toUpperCase() ?? 'A'}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-slate-800 truncate">{item.name}</p>
+                  <p className="text-xs text-slate-500 truncate">{item.email}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="text-xs font-medium px-2 py-0.5 rounded-full capitalize"
+                      style={{ background: '#F1F7F9', color: '#214C5A' }}>
+                  {item.role || 'admin'}
+                </span>
+                {item._id !== user?._id && (
+                  <button
+                    onClick={() => handleDeleteUser(item._id)}
+                    title="Eliminar usuario"
+                    className="p-1.5 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors"
+                  >
+                    <FiUserMinus size={14} />
+                  </button>
+                )}
               </div>
             </div>
           ))}
