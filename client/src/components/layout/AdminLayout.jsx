@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import {
   FiGrid, FiPackage, FiShoppingBag, FiBarChart2,
-  FiLogOut, FiMenu, FiX, FiUser, FiSettings, FiImage, FiActivity, FiLayout,
+  FiLogOut, FiMenu, FiX, FiUser, FiSettings, FiImage, FiActivity, FiLayout, FiTool,
 } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 
 const navItems = [
   { to: '/admin/dashboard',     label: 'Dashboard',      Icon: FiGrid },
   { to: '/admin/sitio',         label: 'Sitio web',      Icon: FiLayout },
+  { to: '/admin/servicios',     label: 'Servicios',      Icon: FiTool },
   { to: '/admin/productos',     label: 'Productos',      Icon: FiPackage },
   { to: '/admin/pedidos',       label: 'Pedidos',        Icon: FiShoppingBag },
   { to: '/admin/metricas',      label: 'Métricas',       Icon: FiBarChart2 },
