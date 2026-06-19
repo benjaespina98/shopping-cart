@@ -6,9 +6,10 @@ import {
 import { toast } from 'react-toastify';
 import { projectsAPI } from '../../services/api';
 
-const CATEGORIES = ['Obra nueva', 'Reformas', 'Comunidades', 'Spa'];
+const CATEGORIES = ['Obra nueva', 'Reformas', 'Comunidades'];
+const STATUS_OPTIONS = ['Terminada', 'En construcción'];
 
-const emptyForm = { title: '', location: '', category: 'Obra nueva', featured: false };
+const emptyForm = { title: '', location: '', category: 'Obra nueva', status: 'Terminada', featured: false };
 
 export default function AdminSite() {
   const [projects, setProjects] = useState([]);
@@ -62,6 +63,7 @@ export default function AdminSite() {
       fd.append('title', form.title);
       fd.append('location', form.location);
       fd.append('category', form.category);
+      fd.append('status', form.status);
       fd.append('featured', form.featured);
       if (file) fd.append('image', file);
       await projectsAPI.create(fd);
@@ -82,7 +84,7 @@ export default function AdminSite() {
 
   const startEdit = (p) => {
     setEditingId(p._id);
-    setEditForm({ title: p.title, location: p.location, category: p.category, featured: p.featured });
+    setEditForm({ title: p.title, location: p.location, category: p.category, status: p.status || 'Terminada', featured: p.featured });
     setEditFile(null);
     setEditPreview(null);
   };
@@ -106,6 +108,7 @@ export default function AdminSite() {
       fd.append('title', editForm.title);
       fd.append('location', editForm.location);
       fd.append('category', editForm.category);
+      fd.append('status', editForm.status);
       fd.append('featured', editForm.featured);
       if (editFile) fd.append('image', editFile);
       const { data } = await projectsAPI.update(id, fd);
@@ -152,7 +155,7 @@ export default function AdminSite() {
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-slate-900">Sitio web — Proyectos</h1>
         <p className="text-slate-500 text-sm mt-1">
-          Cargá y organizá los proyectos que aparecen en <strong>/proyectos</strong> y en el grid de la home (los marcados como destacados).
+          Cargá y organizá los proyectos que aparecen en <strong>/proyectos</strong>. Los marcados con <FiStar size={12} className="inline text-amber-500" /> <strong>"Destacar en la home"</strong> se muestran en el grid de la portada — el primero de la lista (usá las flechas ↑↓ para ordenar) es además la foto principal del hero, arriba de todo.
         </p>
       </div>
 
@@ -190,6 +193,13 @@ export default function AdminSite() {
                 <select className="input" value={form.category}
                   onChange={(e) => setForm(f => ({ ...f, category: e.target.value }))}>
                   {CATEGORIES.map(c => <option key={c}>{c}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="label">Estado de la obra</label>
+                <select className="input" value={form.status}
+                  onChange={(e) => setForm(f => ({ ...f, status: e.target.value }))}>
+                  {STATUS_OPTIONS.map(s => <option key={s}>{s}</option>)}
                 </select>
               </div>
               <div className="flex items-end">
@@ -234,11 +244,18 @@ export default function AdminSite() {
                 {p.imageUrl
                   ? <img src={p.imageUrl} alt={p.title} className="w-full h-full object-cover" />
                   : <div className="w-full h-full flex items-center justify-center text-slate-300"><FiImage size={32} /></div>}
-                {p.featured && (
-                  <span className="absolute top-2 left-2 bg-amber-400 text-amber-900 text-xs font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                    <FiStar size={10} /> Home
+                <div className="absolute top-2 left-2 flex flex-col gap-1 items-start">
+                  {p.featured && (
+                    <span className="bg-amber-400 text-amber-900 text-xs font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                      <FiStar size={10} /> Home
+                    </span>
+                  )}
+                  <span className="text-xs font-bold px-2 py-0.5 rounded-full"
+                        style={{ background: p.status === 'En construcción' ? '#FFF4D2' : '#DCF3E8',
+                                 color: p.status === 'En construcción' ? '#946A0B' : '#2E9E6B' }}>
+                    {p.status || 'Terminada'}
                   </span>
-                )}
+                </div>
                 <div className="absolute top-2 right-2 flex gap-1">
                   <button onClick={() => handleMove(index, -1)} disabled={index === 0}
                     className="p-1.5 rounded-lg bg-white/90 hover:bg-white text-slate-600 disabled:opacity-30 shadow-sm">
@@ -272,6 +289,10 @@ export default function AdminSite() {
                       onChange={(e) => setEditForm(f => ({ ...f, category: e.target.value }))}>
                       {CATEGORIES.map(c => <option key={c}>{c}</option>)}
                     </select>
+                    <select className="input text-sm" value={editForm.status}
+                      onChange={(e) => setEditForm(f => ({ ...f, status: e.target.value }))}>
+                      {STATUS_OPTIONS.map(s => <option key={s}>{s}</option>)}
+                    </select>
                     <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
                       <input type="checkbox" checked={editForm.featured}
                         onChange={(e) => setEditForm(f => ({ ...f, featured: e.target.checked }))}
@@ -291,7 +312,7 @@ export default function AdminSite() {
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-slate-800 truncate">{p.title}</p>
-                      <p className="text-xs text-slate-500">{p.location} · {p.category}</p>
+                      <p className="text-xs text-slate-500">{p.location} · {p.category} · {p.status || 'Terminada'}</p>
                     </div>
                     <div className="flex gap-1 flex-shrink-0">
                       <button onClick={() => startEdit(p)} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-primary-700">

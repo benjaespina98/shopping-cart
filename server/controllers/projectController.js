@@ -12,7 +12,7 @@ export const getProjects = asyncHandler(async (req, res) => {
 
 // POST /api/projects — admin
 export const createProject = asyncHandler(async (req, res) => {
-  const { title, location, category, featured } = req.body;
+  const { title, location, category, status, featured } = req.body;
   if (!title || !location || !category) {
     res.status(400);
     throw new Error('title, location y category son requeridos');
@@ -22,6 +22,7 @@ export const createProject = asyncHandler(async (req, res) => {
     title,
     location,
     category,
+    status: status || 'Terminada',
     featured: featured === 'true' || featured === true,
     imageUrl: req.file?.path || '',
     publicId: req.file?.filename || '',
@@ -38,10 +39,11 @@ export const updateProject = asyncHandler(async (req, res) => {
     throw new Error('Proyecto no encontrado');
   }
 
-  const { title, location, category, featured } = req.body;
+  const { title, location, category, status, featured } = req.body;
   if (title !== undefined)    project.title    = title;
   if (location !== undefined) project.location = location;
   if (category !== undefined) project.category = category;
+  if (status !== undefined)   project.status   = status;
   if (featured !== undefined) project.featured = featured === 'true' || featured === true;
 
   if (req.file) {

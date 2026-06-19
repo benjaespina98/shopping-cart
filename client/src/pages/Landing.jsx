@@ -74,7 +74,11 @@ export default function Landing() {
             </div>
           </div>
           <div className="ps-hero-photo">
-            <Photo label="Piscina infinity · Villa María" height={360} />
+            <Photo
+              label={featuredProjects[0] ? `${featuredProjects[0].title} · ${featuredProjects[0].location}` : 'Piscina infinity · Villa María'}
+              height={360}
+              src={featuredProjects[0]?.imageUrl || undefined}
+            />
           </div>
         </div>
       </section>
@@ -140,8 +144,18 @@ export default function Landing() {
           ) : (
             <div className="ps-projects-grid">
               {featuredProjects.map((p, i) => (
-                <div key={p._id} style={i === 0 ? { gridRow: '1 / span 2' } : {}}>
+                <div key={p._id} style={{ position: 'relative', ...(i === 0 ? { gridRow: '1 / span 2' } : {}) }}>
                   <Photo label={`${p.title} · ${p.location}`} height="100%" src={p.imageUrl || undefined} />
+                  <span style={{
+                    position: 'absolute', top: 10, right: 10,
+                    fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700,
+                    padding: '4px 10px', borderRadius: 'var(--radius-pill)',
+                    background: p.status === 'En construcción' ? 'var(--sun-100)' : 'var(--green-100)',
+                    color: p.status === 'En construcción' ? 'var(--sun-800)' : 'var(--green-500)',
+                    boxShadow: 'var(--shadow-sm)',
+                  }}>
+                    {p.status || 'Terminada'}
+                  </span>
                 </div>
               ))}
             </div>

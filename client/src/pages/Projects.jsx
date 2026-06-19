@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Photo } from '../design-system/Photo';
 import { projectsAPI } from '../services/api';
 
-const FILTERS = ['Todos', 'Obra nueva', 'Reformas', 'Comunidades', 'Spa'];
+const FILTERS = ['Todos', 'Obra nueva', 'Reformas', 'Comunidades'];
 
 export default function Projects() {
   const [active, setActive] = useState('Todos');
@@ -57,12 +57,22 @@ export default function Projects() {
         ) : (
           <div className="ps-masonry">
             {filtered.map((p, i) => (
-              <div key={p._id} style={{ breakInside: 'avoid', marginBottom: 16 }}>
+              <div key={p._id} style={{ breakInside: 'avoid', marginBottom: 16, position: 'relative' }}>
                 <Photo
                   label={`${p.title} · ${p.location}`}
                   height={i % 3 === 0 ? 260 : 200}
                   src={p.imageUrl || undefined}
                 />
+                <span style={{
+                  position: 'absolute', top: 10, right: 10,
+                  fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700,
+                  padding: '4px 10px', borderRadius: 'var(--radius-pill)',
+                  background: p.status === 'En construcción' ? 'var(--sun-100)' : 'var(--green-100)',
+                  color: p.status === 'En construcción' ? 'var(--sun-800)' : 'var(--green-500)',
+                  boxShadow: 'var(--shadow-sm)',
+                }}>
+                  {p.status || 'Terminada'}
+                </span>
               </div>
             ))}
           </div>

@@ -5,9 +5,9 @@ import { toast } from 'react-toastify';
 import { settingsAPI } from '../services/api';
 
 const defaultContactSettings = {
-  whatsappNumber: import.meta.env.VITE_WHATSAPP_NUMBER || '5493534224607',
-  phoneNumberDisplay: '3534224607',
-  phoneNumberLink: 'tel:+543534224607',
+  whatsappNumber: import.meta.env.VITE_WHATSAPP_NUMBER || '5493534224605',
+  phoneNumberDisplay: '3534224605',
+  phoneNumberLink: 'tel:+543534224605',
   contactEmail: 'benjaespina98@gmail.com',
   businessHours: [
     { day: 'Lunes a Viernes', hours: '9:00 - 18:00' },
@@ -171,15 +171,18 @@ export default function Contact() {
 
           {/* Social */}
           <div className="card p-6 bg-gradient-to-br from-amber-50/40 to-white border-amber-100">
-            <h2 className="font-bold text-slate-900 text-xl mb-5">Redes sociales</h2>
+            <h2 className="font-bold text-slate-900 text-xl mb-1">Seguinos en redes</h2>
+            <p className="text-sm text-slate-500 mb-5">Mirá nuestras últimas obras terminadas y en construcción.</p>
             <div className="flex gap-3">
-              <a href="https://instagram.com" target="_blank" rel="noreferrer"
-                className="flex items-center gap-2 px-5 py-3 rounded-xl border-2 border-slate-200 hover:border-primary-700 hover:bg-blue-50 hover:text-primary-700 transition-colors text-base font-bold text-slate-700">
-                <FiInstagram size={18} /> Instagram
+              <a href="https://www.instagram.com/playaysol.piscinas/" target="_blank" rel="noreferrer"
+                className="flex-1 flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl text-white text-base font-bold transition-transform hover:-translate-y-0.5 active:scale-95 shadow-md"
+                style={{ background: 'linear-gradient(135deg, #FEDA75, #FA7E1E, #D62976, #962FBF, #4F5BD5)' }}>
+                <FiInstagram size={20} /> Instagram
               </a>
-              <a href="https://facebook.com" target="_blank" rel="noreferrer"
-                className="flex items-center gap-2 px-5 py-3 rounded-xl border-2 border-slate-200 hover:border-primary-700 hover:bg-blue-50 hover:text-primary-700 transition-colors text-base font-bold text-slate-700">
-                <FiFacebook size={18} /> Facebook
+              <a href="https://www.facebook.com/playaysol.piscinas" target="_blank" rel="noreferrer"
+                className="flex-1 flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl text-white text-base font-bold transition-transform hover:-translate-y-0.5 active:scale-95 shadow-md"
+                style={{ background: '#1877F2' }}>
+                <FiFacebook size={20} /> Facebook
               </a>
             </div>
           </div>

@@ -4,7 +4,8 @@ const projectSchema = new Schema(
   {
     title:     { type: String, required: true, trim: true },
     location:  { type: String, required: true, trim: true },
-    category:  { type: String, required: true, enum: ['Obra nueva', 'Reformas', 'Comunidades', 'Spa'] },
+    category:  { type: String, required: true, enum: ['Obra nueva', 'Reformas', 'Comunidades'] },
+    status:    { type: String, enum: ['Terminada', 'En construcción'], default: 'Terminada' },
     imageUrl:  { type: String, default: '' },
     publicId:  { type: String, default: '' },
     featured:  { type: Boolean, default: false },

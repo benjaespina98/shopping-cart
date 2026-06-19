@@ -19,10 +19,10 @@ const navItems = [
 ];
 
 const BrandIcon = () => (
-  <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true" style={{ flexShrink: 0 }}>
-    <rect width="32" height="32" rx="7" fill="#214C5A"/>
-    <circle cx="22" cy="10" r="5.5" fill="#FFC526"/>
-    <path d="M0 22 Q4 17 8 22 Q12 27 16 22 Q20 17 24 22 Q28 27 32 22 L32 32 L0 32 Z" fill="#7DD3FC"/>
+  <svg width="30" height="30" viewBox="0 0 64 64" aria-hidden="true" style={{ flexShrink: 0 }}>
+    <circle cx="32" cy="22" r="13" fill="none" stroke="#FFC526" strokeWidth="6"/>
+    <path d="M8 42 Q14 37 20 42 Q26 47 32 42 Q38 37 44 42 Q50 47 56 42" stroke="#ffffff" strokeWidth="6" strokeLinecap="round" fill="none"/>
+    <line x1="8" y1="52" x2="56" y2="52" stroke="#ffffff" strokeWidth="6" strokeLinecap="round"/>
   </svg>
 );
 
@@ -147,10 +147,10 @@ export default function AdminLayout() {
             <a href="/" target="_blank" rel="noreferrer"
                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors hover:bg-primary-50"
                style={{ color: '#214C5A', border: '1px solid #BCD6DD' }}>
-              <svg width="12" height="12" viewBox="0 0 32 32">
-                <rect width="32" height="32" rx="5" fill="#214C5A"/>
-                <circle cx="22" cy="10" r="5.5" fill="#FFC526"/>
-                <path d="M0 22 Q4 17 8 22 Q12 27 16 22 Q20 17 24 22 Q28 27 32 22 L32 32 L0 32 Z" fill="#7DD3FC"/>
+              <svg width="14" height="14" viewBox="0 0 64 64">
+                <circle cx="32" cy="22" r="13" fill="none" stroke="#FFC526" strokeWidth="7"/>
+                <path d="M8 42 Q14 37 20 42 Q26 47 32 42 Q38 37 44 42 Q50 47 56 42" stroke="#214C5A" strokeWidth="7" strokeLinecap="round" fill="none"/>
+                <line x1="8" y1="52" x2="56" y2="52" stroke="#214C5A" strokeWidth="7" strokeLinecap="round"/>
               </svg>
               Ver sitio
             </a>
