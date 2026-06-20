@@ -5,7 +5,6 @@ import { Card } from '../design-system/Card';
 import { Badge } from '../design-system/Badge';
 import { Input } from '../design-system/Input';
 import { Checkbox } from '../design-system/Checkbox';
-import { Switch } from '../design-system/Switch';
 import { Photo } from '../design-system/Photo';
 
 const tipos = [
@@ -91,7 +90,6 @@ export default function Quote() {
               </div>
               <Input label="Email" placeholder="hola@ejemplo.com" type="email" required />
               <Input label="Localidad" placeholder="Corrientes 1210, Villa María…" />
-              <Switch label="Quiero también plan de mantenimiento" />
               <Checkbox label="Acepto la política de privacidad" defaultChecked />
               <Button type="submit" variant="primary" size="lg" fullWidth>
                 Solicitar presupuesto

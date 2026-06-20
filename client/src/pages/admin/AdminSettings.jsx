@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
-import { FiSave, FiPlus, FiTrash2, FiUsers, FiClock, FiMail, FiPhone, FiUserMinus } from 'react-icons/fi';
+import { FiSave, FiPlus, FiTrash2, FiUsers, FiClock, FiMail, FiPhone, FiUserMinus, FiDownload, FiLink } from 'react-icons/fi';
 import { toast } from 'react-toastify';
+import QRCode from 'qrcode';
 import { settingsAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 
 const defaultSettings = {
   contactEmail: 'benjaespina98@gmail.com',
-  whatsappNumber: '5493534224607',
-  phoneNumberDisplay: '3534224607',
-  phoneNumberLink: 'tel:+543534224607',
+  whatsappNumber: '5493534224605',
+  phoneNumberDisplay: '3534224605',
+  phoneNumberLink: 'tel:+543534224605',
   businessHours: [
     { day: 'Lunes a Viernes', hours: '9:00 - 18:00' },
     { day: 'Sabados', hours: '9:00 - 13:00' },
@@ -24,6 +25,8 @@ export default function AdminSettings() {
   const [saving, setSaving] = useState(false);
   const [creatingUser, setCreatingUser] = useState(false);
   const [newUser, setNewUser] = useState({ name: '', email: '', password: '' });
+  const [siteUrl, setSiteUrl] = useState(typeof window !== 'undefined' ? window.location.origin : '');
+  const [qrDataUrl, setQrDataUrl] = useState('');
 
   const loadData = async () => {
     setLoading(true);
@@ -55,6 +58,25 @@ export default function AdminSettings() {
   useEffect(() => {
     loadData();
   }, []);
+
+  useEffect(() => {
+    if (!siteUrl) return;
+    QRCode.toDataURL(siteUrl, {
+      width: 280,
+      margin: 1,
+      color: { dark: '#214C5A', light: '#FFFFFF' },
+    })
+      .then(setQrDataUrl)
+      .catch(() => setQrDataUrl(''));
+  }, [siteUrl]);
+
+  const downloadQr = () => {
+    if (!qrDataUrl) return;
+    const link = document.createElement('a');
+    link.href = qrDataUrl;
+    link.download = 'playa-y-sol-qr.png';
+    link.click();
+  };
 
   const handleSaveSettings = async () => {
     setSaving(true);
@@ -258,6 +280,45 @@ export default function AdminSettings() {
               </div>
             </div>
           ))}
+        </div>
+      </div>
+
+      <div className="card p-6">
+        <h2 className="font-semibold text-slate-800 mb-1 flex items-center gap-2">
+          <FiLink size={16} />
+          Código QR del sitio
+        </h2>
+        <p className="text-slate-500 text-sm mb-4">
+          Generá un QR que redirige directamente a tu web. Ideal para tarjetas, carteles o el local.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-5 items-start">
+          <div className="p-3 bg-white rounded-xl border border-slate-200 shrink-0">
+            {qrDataUrl
+              ? <img src={qrDataUrl} alt="Código QR del sitio" width={160} height={160} />
+              : <div className="w-[160px] h-[160px] flex items-center justify-center text-slate-300 text-xs">Generando...</div>}
+          </div>
+          <div className="flex-1 flex flex-col gap-3 w-full">
+            <div>
+              <label className="label">URL de destino</label>
+              <input
+                className="input"
+                value={siteUrl}
+                onChange={(e) => setSiteUrl(e.target.value)}
+                placeholder="https://playaysol.com.ar"
+              />
+              <p className="text-xs text-slate-400 mt-1">
+                Por defecto apunta al dominio desde el que estás accediendo al panel. Cambialo si tu dominio público es distinto.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={downloadQr}
+              disabled={!qrDataUrl}
+              className="btn-secondary inline-flex items-center gap-2 self-start disabled:opacity-50"
+            >
+              <FiDownload size={15} /> Descargar QR (PNG)
+            </button>
+          </div>
         </div>
       </div>
 

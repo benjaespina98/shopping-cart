@@ -1,13 +1,23 @@
 import { FiInstagram, FiFacebook } from 'react-icons/fi';
+import { FaWhatsapp } from 'react-icons/fa';
+
+const SOCIAL_LINKS = [
+  { href: 'https://www.instagram.com/playaysol.piscinas/', Icon: FiInstagram, label: 'Instagram', bg: 'linear-gradient(135deg, #FEDA75, #FA7E1E, #D62976, #962FBF, #4F5BD5)' },
+  { href: 'https://www.facebook.com/playaysol.piscinas', Icon: FiFacebook, label: 'Facebook', bg: '#1877F2' },
+  { href: 'https://wa.me/5493534224605', Icon: FaWhatsapp, label: 'WhatsApp', bg: '#25D366' },
+];
 
 const cols = [
   { title: 'Servicios', items: [['/servicios', 'Piscinas de obra'], ['/servicios', 'Reformas'], ['/servicios', 'Climatización'], ['/servicios', 'Cercos y seguridad']] },
   { title: 'Empresa',   items: [['/proyectos', 'Proyectos'], ['/servicios', 'Servicios'], ['/tienda', 'Tienda'], ['/admin/login', 'Portal admin']] },
-  { title: 'Contacto',  items: [['tel:+543534224607', '+54 353 422-4607'], ['mailto:piscinas@playaysol.com.ar', 'piscinas@playaysol.com.ar'], ['#', 'Villa María, Córdoba']] },
+  { title: 'Contacto',  items: [['tel:+543534224605', '353 422-4605'], ['https://wa.me/5493534224605', 'WhatsApp'], ['mailto:piscinas@playaysol.com.ar', 'piscinas@playaysol.com.ar'], ['#', 'Villa María, Córdoba']] },
 ];
 
 const linkHover = (e, on) => { e.currentTarget.style.color = on ? '#fff' : 'rgba(255,255,255,0.7)'; };
-const iconHover = (e, on) => { e.currentTarget.style.background = on ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)'; };
+const socialHover = (e, on) => {
+  e.currentTarget.style.transform = on ? 'translateY(-3px) scale(1.06)' : 'translateY(0) scale(1)';
+  e.currentTarget.style.boxShadow = on ? '0 8px 18px rgba(0,0,0,0.28)' : '0 2px 6px rgba(0,0,0,0.18)';
+};
 
 export default function Footer() {
   return (
@@ -18,10 +28,10 @@ export default function Footer() {
         {/* Brand */}
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, whiteSpace: 'nowrap' }}>
-            <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true" style={{ flexShrink: 0 }}>
-              <rect width="32" height="32" rx="6" fill="rgba(255,255,255,0.15)"/>
-              <circle cx="22" cy="10" r="5.5" fill="#FFC526"/>
-              <path d="M0 22 Q4 17 8 22 Q12 27 16 22 Q20 17 24 22 Q28 27 32 22 L32 32 L0 32 Z" fill="#7DD3FC"/>
+            <svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true" style={{ flexShrink: 0 }}>
+              <circle cx="32" cy="22" r="13" fill="none" stroke="#FFC526" strokeWidth="6"/>
+              <path d="M8 42 Q14 37 20 42 Q26 47 32 42 Q38 37 44 42 Q50 47 56 42" stroke="#ffffff" strokeWidth="6" strokeLinecap="round" fill="none"/>
+              <line x1="8" y1="52" x2="56" y2="52" stroke="#ffffff" strokeWidth="6" strokeLinecap="round"/>
             </svg>
             <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 20, color: '#fff' }}>Playa</span>
             <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 20, color: 'var(--sun-400)' }}>&amp; Sol</span>
@@ -29,15 +39,20 @@ export default function Footer() {
           <p style={{ fontSize: 14, lineHeight: 1.6, maxWidth: 240, marginBottom: 18 }}>
             Diseño, construcción y mantenimiento de piscinas en Villa María y la región desde 2004.
           </p>
-          <div style={{ display: 'flex', gap: 10 }}>
-            {[['https://instagram.com', FiInstagram], ['https://facebook.com', FiFacebook]].map(([href, Icon]) => (
-              <a key={href} href={href} target="_blank" rel="noreferrer"
-                style={{ padding: 8, borderRadius: 8, background: 'rgba(255,255,255,0.1)',
-                         color: 'rgba(255,255,255,0.7)', display: 'inline-flex',
-                         transition: 'background var(--duration-fast) var(--ease-out)' }}
-                onMouseEnter={e => iconHover(e, true)}
-                onMouseLeave={e => iconHover(e, false)}>
-                <Icon size={18} />
+          <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase',
+                      color: 'rgba(255,255,255,0.5)', marginBottom: 10 }}>
+            Seguinos
+          </p>
+          <div style={{ display: 'flex', gap: 12 }}>
+            {SOCIAL_LINKS.map(({ href, Icon, label, bg }) => (
+              <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={label}
+                style={{ width: 42, height: 42, borderRadius: 12, background: bg,
+                         color: '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                         boxShadow: '0 2px 6px rgba(0,0,0,0.18)',
+                         transition: 'transform 180ms ease, box-shadow 180ms ease' }}
+                onMouseEnter={e => socialHover(e, true)}
+                onMouseLeave={e => socialHover(e, false)}>
+                <Icon size={20} />
               </a>
             ))}
           </div>

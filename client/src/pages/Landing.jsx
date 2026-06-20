@@ -1,17 +1,17 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
-import { productsAPI, projectsAPI } from '../services/api';
+import { productsAPI, projectsAPI, servicesAPI } from '../services/api';
 import ProductCard from '../components/ui/ProductCard';
 import { useCart } from '../context/CartContext';
 import { Button } from '../design-system/Button';
 import { Card } from '../design-system/Card';
 import { Photo } from '../design-system/Photo';
 
-const services = [
-  { t: 'Piscinas de obra',   d: 'Diseño y construcción a medida, de hormigón gunitado.',             a: 'sun' },
-  { t: 'Reformas',           d: 'Renovamos vaso, coronación y depuración.',                           a: 'teal' },
-  { t: 'Climatización',      d: 'Bombas de calor y cubiertas para nadar más meses.',                  a: 'sun' },
-  { t: 'Cercos y seguridad', d: 'Cercos removibles y fijos para proteger a niños y mascotas.',        a: 'teal' },
+const FALLBACK_SERVICES = [
+  { title: 'Piscinas de obra',   description: 'Diseño y construcción a medida, de hormigón gunitado.',          tone: 'sun' },
+  { title: 'Reformas',           description: 'Renovamos vaso, coronación y depuración.',                        tone: 'teal' },
+  { title: 'Climatización',      description: 'Bombas de calor y cubiertas para nadar más meses.',                tone: 'sun' },
+  { title: 'Cercos y seguridad', description: 'Cercos removibles y fijos para proteger a niños y mascotas.',      tone: 'teal' },
 ];
 
 const stats = [
@@ -26,6 +26,7 @@ export default function Landing() {
   const { items } = useCart();
   const [featured, setFeatured] = useState([]);
   const [featuredProjects, setFeaturedProjects] = useState([]);
+  const [services, setServices] = useState(FALLBACK_SERVICES);
 
   const inCartByProductId = useMemo(() => {
     const map = new Map();
@@ -39,6 +40,9 @@ export default function Landing() {
       .catch(() => {});
     projectsAPI.getAll({ featured: true })
       .then(({ data }) => setFeaturedProjects(data.slice(0, 5)))
+      .catch(() => {});
+    servicesAPI.getAll()
+      .then(({ data }) => { if (data?.length > 0) setServices(data.slice(0, 4)); })
       .catch(() => {});
   }, []);
 
@@ -74,7 +78,11 @@ export default function Landing() {
             </div>
           </div>
           <div className="ps-hero-photo">
-            <Photo label="Piscina infinity · Villa María" height={360} />
+            <Photo
+              label={featuredProjects[0] ? `${featuredProjects[0].title} · ${featuredProjects[0].location}` : 'Piscina infinity · Villa María'}
+              height={360}
+              src={featuredProjects[0]?.imageUrl || undefined}
+            />
           </div>
         </div>
       </section>
@@ -102,10 +110,10 @@ export default function Landing() {
           </div>
           <div className="ps-services-grid">
             {services.map(s => (
-              <Card key={s.t} accent={s.a} interactive padding="lg" onClick={() => navigate('/servicios')}>
+              <Card key={s._id || s.title} accent={s.tone} interactive padding="lg" onClick={() => navigate('/servicios')}>
                 <h3 style={{ fontSize: 18, marginBottom: 10, fontFamily: 'var(--font-display)',
-                             color: 'var(--text-strong)' }}>{s.t}</h3>
-                <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.55 }}>{s.d}</p>
+                             color: 'var(--text-strong)' }}>{s.title}</h3>
+                <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.55 }}>{s.description}</p>
                 <div style={{ marginTop: 16, color: 'var(--text-link)', fontWeight: 700, fontSize: 14 }}>
                   Saber más →
                 </div>
@@ -140,8 +148,18 @@ export default function Landing() {
           ) : (
             <div className="ps-projects-grid">
               {featuredProjects.map((p, i) => (
-                <div key={p._id} style={i === 0 ? { gridRow: '1 / span 2' } : {}}>
+                <div key={p._id} style={{ position: 'relative', ...(i === 0 ? { gridRow: '1 / span 2' } : {}) }}>
                   <Photo label={`${p.title} · ${p.location}`} height="100%" src={p.imageUrl || undefined} />
+                  <span style={{
+                    position: 'absolute', top: 10, right: 10,
+                    fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700,
+                    padding: '4px 10px', borderRadius: 'var(--radius-pill)',
+                    background: p.status === 'En construcción' ? 'var(--sun-100)' : 'var(--green-100)',
+                    color: p.status === 'En construcción' ? 'var(--sun-800)' : 'var(--green-500)',
+                    boxShadow: 'var(--shadow-sm)',
+                  }}>
+                    {p.status || 'Terminada'}
+                  </span>
                 </div>
               ))}
             </div>

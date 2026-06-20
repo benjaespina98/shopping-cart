@@ -118,4 +118,16 @@ export const logsAPI = {
   getAll: (params) => api.get('/logs', { params }),
 };
 
+// ─── Services (sitio web) ────────────────────────────────
+export const servicesAPI = {
+  getAll: () => api.get('/services'),
+  getAllAdmin: () => api.get('/services/admin'),
+  create: (formData) =>
+    api.post('/services', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  update: (id, formData) =>
+    api.put(`/services/${id}`, formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  reorder: (items) => api.put('/services/reorder', { items }),
+  delete: (id) => api.delete(`/services/${id}`),
+};
+
 export default api;
