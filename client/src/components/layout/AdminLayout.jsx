@@ -33,7 +33,7 @@ function SidebarLink({ to, label, Icon, onClick }) {
         padding: '10px 14px', borderRadius: 10,
         fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: 13,
         textDecoration: 'none', transition: 'background 140ms ease, color 140ms ease',
-        background: isActive ? '#214C5A' : hovered ? 'rgba(255,255,255,0.08)' : 'transparent',
+        background: isActive ? '#244B5A' : hovered ? 'rgba(255,255,255,0.08)' : 'transparent',
         color: isActive || hovered ? '#fff' : 'rgba(255,255,255,0.55)',
       })}
     >
@@ -49,7 +49,7 @@ function SidebarLink({ to, label, Icon, onClick }) {
 
 const BrandIcon = () => (
   <svg width="32" height="32" viewBox="0 0 100 100" aria-hidden="true" style={{ flexShrink: 0 }}>
-    <circle cx="50" cy="33" r="19" fill="none" stroke="#FFC526" strokeWidth="7"/>
+    <circle cx="50" cy="33" r="19" fill="none" stroke="#FFC629" strokeWidth="7"/>
     <path d="M10 64 Q20 57 30 64 Q40 71 50 64 Q60 57 70 64 Q80 71 90 64" stroke="#ffffff" strokeWidth="7" strokeLinecap="round" fill="none"/>
     <line x1="10" y1="80" x2="90" y2="80" stroke="#ffffff" strokeWidth="7" strokeLinecap="round"/>
   </svg>
@@ -88,7 +88,7 @@ export default function AdminLayout() {
                 Playa &amp; Sol
               </div>
               <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase',
-                            color: '#FFC526', marginTop: 2 }}>
+                            color: '#FFC629', marginTop: 2 }}>
                 Panel admin
               </div>
             </div>
@@ -110,7 +110,7 @@ export default function AdminLayout() {
         <div className="px-4 py-4" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
           <div className="flex items-center gap-3 mb-3">
             <div className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white"
-                 style={{ background: '#214C5A', border: '2px solid #FFC526', flexShrink: 0 }}>
+                 style={{ background: '#244B5A', border: '2px solid #FFC629', flexShrink: 0 }}>
               {initials}
             </div>
             <div className="overflow-hidden">
@@ -157,11 +157,11 @@ export default function AdminLayout() {
           <div className="ml-auto flex items-center gap-2">
             <a href="/" target="_blank" rel="noreferrer"
                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors hover:bg-primary-50"
-               style={{ color: '#214C5A', border: '1px solid #BCD6DD' }}>
+               style={{ color: '#244B5A', border: '1px solid #BCD6DD' }}>
               <svg width="14" height="14" viewBox="0 0 100 100">
-                <circle cx="50" cy="33" r="19" fill="none" stroke="#FFC526" strokeWidth="9"/>
-                <path d="M10 64 Q20 57 30 64 Q40 71 50 64 Q60 57 70 64 Q80 71 90 64" stroke="#214C5A" strokeWidth="9" strokeLinecap="round" fill="none"/>
-                <line x1="10" y1="80" x2="90" y2="80" stroke="#214C5A" strokeWidth="9" strokeLinecap="round"/>
+                <circle cx="50" cy="33" r="19" fill="none" stroke="#FFC629" strokeWidth="9"/>
+                <path d="M10 64 Q20 57 30 64 Q40 71 50 64 Q60 57 70 64 Q80 71 90 64" stroke="#244B5A" strokeWidth="9" strokeLinecap="round" fill="none"/>
+                <line x1="10" y1="80" x2="90" y2="80" stroke="#244B5A" strokeWidth="9" strokeLinecap="round"/>
               </svg>
               Ver sitio
             </a>

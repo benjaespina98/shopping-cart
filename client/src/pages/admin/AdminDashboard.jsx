@@ -4,7 +4,7 @@ import { FiPackage, FiShoppingBag, FiAlertCircle, FiDollarSign, FiArrowRight } f
 import { metricsAPI, ordersAPI } from '../../services/api';
 
 const STAT_THEME = {
-  products:  { bg: '#214C5A', light: '#F1F7F9', text: '#214C5A' },
+  products:  { bg: '#244B5A', light: '#F1F7F9', text: '#244B5A' },
   orders:    { bg: '#2B5C6D', light: '#DEEBEF', text: '#2B5C6D' },
   stock:     { bg: '#D6452E', light: '#FBE2DC', text: '#D6452E' },
   revenue:   { bg: '#C28C0A', light: '#FFF4D2', text: '#C28C0A' },
@@ -126,7 +126,7 @@ export default function AdminDashboard() {
               Últimos pedidos
             </h2>
             <Link to="/admin/pedidos"
-                  style={{ fontSize: 12, color: '#214C5A', fontWeight: 600, textDecoration: 'none',
+                  style={{ fontSize: 12, color: '#244B5A', fontWeight: 600, textDecoration: 'none',
                             display: 'flex', alignItems: 'center', gap: 3 }}>
               Ver todos <FiArrowRight size={12} />
             </Link>

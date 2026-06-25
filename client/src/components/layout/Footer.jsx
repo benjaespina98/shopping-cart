@@ -29,7 +29,7 @@ export default function Footer() {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, whiteSpace: 'nowrap' }}>
             <svg width="30" height="30" viewBox="0 0 100 100" aria-hidden="true" style={{ flexShrink: 0 }}>
-              <circle cx="50" cy="33" r="19" fill="none" stroke="#FFC526" strokeWidth="7"/>
+              <circle cx="50" cy="33" r="19" fill="none" stroke="#FFC629" strokeWidth="7"/>
               <path d="M10 64 Q20 57 30 64 Q40 71 50 64 Q60 57 70 64 Q80 71 90 64" stroke="#ffffff" strokeWidth="7" strokeLinecap="round" fill="none"/>
               <line x1="10" y1="80" x2="90" y2="80" stroke="#ffffff" strokeWidth="7" strokeLinecap="round"/>
             </svg>

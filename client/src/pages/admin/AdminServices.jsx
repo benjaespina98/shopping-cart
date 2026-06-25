@@ -298,7 +298,7 @@ export default function AdminServices() {
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="text-sm font-semibold text-slate-800">{s.title}</p>
                       <span className="text-xs font-bold px-2 py-0.5 rounded-full"
-                            style={{ background: s.tone === 'sun' ? '#FFF4D2' : '#DEEBEF', color: s.tone === 'sun' ? '#946A0B' : '#214C5A' }}>
+                            style={{ background: s.tone === 'sun' ? '#FFF4D2' : '#DEEBEF', color: s.tone === 'sun' ? '#946A0B' : '#244B5A' }}>
                         {s.tag}
                       </span>
                       {!s.active && <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">Oculto</span>}

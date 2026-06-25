@@ -68,14 +68,14 @@ export default function AdminProfile() {
       {/* Profile card */}
       <div className="card p-5 flex items-center gap-4">
         <div className="w-14 h-14 rounded-full flex items-center justify-center text-white text-xl font-bold shrink-0"
-             style={{ background: '#214C5A', border: '3px solid #BCD6DD' }}>
+             style={{ background: '#244B5A', border: '3px solid #BCD6DD' }}>
           {initials}
         </div>
         <div>
           <p className="font-semibold text-slate-900 text-lg">{user?.name}</p>
           <p className="text-sm text-slate-500">{user?.email}</p>
           <span className="inline-flex items-center gap-1 mt-1.5 text-xs font-semibold px-2.5 py-0.5 rounded-full capitalize"
-                style={{ background: '#F1F7F9', color: '#214C5A', border: '1px solid #BCD6DD' }}>
+                style={{ background: '#F1F7F9', color: '#244B5A', border: '1px solid #BCD6DD' }}>
             <FiUser size={10} /> {user?.role || 'admin'}
           </span>
         </div>
@@ -84,7 +84,7 @@ export default function AdminProfile() {
       {/* Change password */}
       <div className="card p-5">
         <h2 className="font-semibold text-slate-800 mb-4 flex items-center gap-2">
-          <FiLock size={16} style={{ color: '#214C5A' }} />
+          <FiLock size={16} style={{ color: '#244B5A' }} />
           Cambiar contraseña
         </h2>
         <form onSubmit={handlePasswordChange} className="space-y-3">
