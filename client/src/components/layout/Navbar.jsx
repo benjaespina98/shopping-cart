@@ -11,18 +11,36 @@ const navLinks = [
   { to: '/tienda',    label: 'Tienda',    end: false },
 ];
 
-const linkStyle = (isActive) => ({
-  border: 'none', background: 'transparent', cursor: 'pointer',
-  fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: 15,
-  padding: '8px 14px', borderRadius: 'var(--radius-sm)',
-  textDecoration: 'none', display: 'block',
-  color: isActive ? 'var(--brand-primary)' : 'var(--text-body)',
-  transition: 'color var(--duration-fast) var(--ease-out)',
-});
+function NavItem({ to, label, end, onClick, mobile = false }) {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <NavLink
+      to={to}
+      end={end}
+      onClick={onClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={({ isActive }) => ({
+        border: 'none', cursor: 'pointer',
+        fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: 15,
+        padding: mobile ? '10px 14px' : '8px 14px', borderRadius: 'var(--radius-sm)',
+        textDecoration: 'none', display: 'block',
+        color: isActive ? 'var(--brand-primary)' : hovered ? 'var(--teal-600)' : 'var(--text-body)',
+        background: isActive ? 'var(--teal-50)' : hovered ? 'var(--grey-50)' : 'transparent',
+        transition: 'color var(--duration-fast) var(--ease-out), background var(--duration-fast) var(--ease-out)',
+      })}
+    >
+      {label}
+    </NavLink>
+  );
+}
 
 export default function Navbar() {
   const { totalItems, toggleCart } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [cartHover, setCartHover] = useState(false);
+  const [menuHover, setMenuHover] = useState(false);
   const navigate = useNavigate();
 
   const handleNav = (to) => { navigate(to); setMenuOpen(false); };
@@ -41,10 +59,10 @@ export default function Navbar() {
         <button onClick={() => handleNav('/')}
           style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0,
                    display: 'flex', alignItems: 'center', gap: 8, whiteSpace: 'nowrap' }}>
-          <svg width="30" height="30" viewBox="0 0 64 64" aria-hidden="true" style={{ flexShrink: 0 }}>
-            <circle cx="32" cy="22" r="13" fill="none" stroke="#FFC526" strokeWidth="6"/>
-            <path d="M8 42 Q14 37 20 42 Q26 47 32 42 Q38 37 44 42 Q50 47 56 42" stroke="#214C5A" strokeWidth="6" strokeLinecap="round" fill="none"/>
-            <line x1="8" y1="52" x2="56" y2="52" stroke="#214C5A" strokeWidth="6" strokeLinecap="round"/>
+          <svg width="32" height="32" viewBox="0 0 100 100" aria-hidden="true" style={{ flexShrink: 0 }}>
+            <circle cx="50" cy="33" r="19" fill="none" stroke="#FFC629" strokeWidth="7"/>
+            <path d="M10 64 Q20 57 30 64 Q40 71 50 64 Q60 57 70 64 Q80 71 90 64" stroke="#244B5A" strokeWidth="7" strokeLinecap="round" fill="none"/>
+            <line x1="10" y1="80" x2="90" y2="80" stroke="#244B5A" strokeWidth="7" strokeLinecap="round"/>
           </svg>
           <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 20, color: 'var(--teal-700)' }}>Playa</span>
           <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 20, color: 'var(--sun-600)' }}>&amp; Sol</span>
@@ -52,20 +70,19 @@ export default function Navbar() {
 
         {/* Desktop nav — hidden on mobile via className */}
         <nav className="hidden md:flex" style={{ alignItems: 'center', gap: 4 }}>
-          {navLinks.map(({ to, label, end }) => (
-            <NavLink key={to} to={to} end={end} style={({ isActive }) => linkStyle(isActive)}>
-              {label}
-            </NavLink>
-          ))}
+          {navLinks.map((link) => <NavItem key={link.to} {...link} />)}
         </nav>
 
         {/* Right actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {/* Cart */}
           <button onClick={toggleCart}
+            onMouseEnter={() => setCartHover(true)}
+            onMouseLeave={() => setCartHover(false)}
             style={{ position: 'relative', padding: 8, borderRadius: 12,
-                     background: 'transparent', border: 'none', cursor: 'pointer',
-                     color: 'var(--text-body)' }}
+                     background: cartHover ? 'var(--grey-50)' : 'transparent', border: 'none', cursor: 'pointer',
+                     color: cartHover ? 'var(--brand-primary)' : 'var(--text-body)',
+                     transition: 'background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out)' }}
             aria-label="Carrito">
             <FiShoppingCart size={22} />
             {totalItems > 0 && (
@@ -86,8 +103,11 @@ export default function Navbar() {
 
           {/* Mobile hamburger — hidden on desktop */}
           <button className="md:hidden"
-            style={{ padding: 8, borderRadius: 12, background: 'transparent',
-                     border: 'none', cursor: 'pointer', color: 'var(--text-body)' }}
+            onMouseEnter={() => setMenuHover(true)}
+            onMouseLeave={() => setMenuHover(false)}
+            style={{ padding: 8, borderRadius: 12, background: menuHover ? 'var(--grey-50)' : 'transparent',
+                     border: 'none', cursor: 'pointer', color: 'var(--text-body)',
+                     transition: 'background var(--duration-fast) var(--ease-out)' }}
             onClick={() => setMenuOpen(o => !o)} aria-label="Menú">
             {menuOpen ? <FiX size={22} /> : <FiMenu size={22} />}
           </button>
@@ -99,15 +119,8 @@ export default function Navbar() {
         <div style={{ borderTop: '1px solid var(--border-subtle)', background: '#fff',
                       padding: '12px 20px 16px', boxShadow: 'var(--shadow-md)' }}>
           <nav style={{ display: 'flex', flexDirection: 'column', gap: 2, marginBottom: 12 }}>
-            {navLinks.map(({ to, label, end }) => (
-              <NavLink key={to} to={to} end={end} onClick={() => setMenuOpen(false)}
-                style={({ isActive }) => ({
-                  ...linkStyle(isActive),
-                  padding: '10px 14px',
-                  background: isActive ? 'var(--teal-50)' : 'transparent',
-                })}>
-                {label}
-              </NavLink>
+            {navLinks.map((link) => (
+              <NavItem key={link.to} {...link} mobile onClick={() => setMenuOpen(false)} />
             ))}
           </nav>
           <Button variant="primary" fullWidth onClick={() => handleNav('/presupuesto')}>

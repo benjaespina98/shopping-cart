@@ -5,7 +5,7 @@ import {
 } from 'recharts';
 import { metricsAPI } from '../../services/api';
 
-const COLORS = ['#214C5A', '#FFC526', '#2B5C6D', '#EBAD10', '#3B7488', '#FFD150', '#193A45', '#C28C0A'];
+const COLORS = ['#244B5A', '#FFC629', '#2B5C6D', '#EBAD10', '#3B7488', '#FFD150', '#193A45', '#C28C0A'];
 
 const dayOptions = [7, 14, 30, 60, 90];
 
@@ -82,7 +82,7 @@ export default function AdminMetrics() {
           {[
             { label: 'Ventas confirmadas', value: `$${(summary.totalRevenue || 0).toLocaleString('es-AR')}`, color: 'text-green-600' },
             { label: 'Pedidos confirmados', value: summary.confirmedOrders || 0, color: 'text-brand' },
-            { label: 'Ticket promedio', value: `$${Math.round(summary.averageOrderValue || 0).toLocaleString('es-AR')}`, color: 'text-blue-600' },
+            { label: 'Ticket promedio', value: `$${Math.round(summary.averageOrderValue || 0).toLocaleString('es-AR')}`, color: 'text-accent-700' },
             { label: 'Sin stock', value: summary.outOfStock, color: summary.outOfStock > 0 ? 'text-red-500' : 'text-slate-500' },
           ].map(({ label, value, color }) => (
             <div key={label} className="card p-5 text-center">
@@ -102,12 +102,12 @@ export default function AdminMetrics() {
           ) : (
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={ordersTime}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#EEF1F2" />
                 <XAxis dataKey="_id" tick={{ fontSize: 10 }} tickFormatter={(v) => v.slice(5)} />
                 <YAxis tick={{ fontSize: 10 }} />
                 <Tooltip formatter={(v, n) => [v, n === 'count' ? 'Pedidos totales' : 'Pedidos confirmados']} labelFormatter={(l) => `Fecha: ${l}`} />
                 <Line type="monotone" dataKey="count" stroke="#8FB6C2" strokeWidth={2} dot={false} name="count" />
-                <Line type="monotone" dataKey="confirmedOrders" stroke="#214C5A" strokeWidth={2.5} dot={false} name="confirmedOrders" />
+                <Line type="monotone" dataKey="confirmedOrders" stroke="#244B5A" strokeWidth={2.5} dot={false} name="confirmedOrders" />
               </LineChart>
             </ResponsiveContainer>
           )}
@@ -121,11 +121,11 @@ export default function AdminMetrics() {
           ) : (
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={ordersTime}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#EEF1F2" />
                 <XAxis dataKey="_id" tick={{ fontSize: 10 }} tickFormatter={(v) => v.slice(5)} />
                 <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
                 <Tooltip formatter={(v) => [`$${v.toLocaleString('es-AR')}`, 'Ventas confirmadas']} />
-                <Bar dataKey="revenue" fill="#FFC526" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="revenue" fill="#FFC629" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           )}
@@ -139,11 +139,11 @@ export default function AdminMetrics() {
           ) : (
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={topProducts} layout="vertical" margin={{ left: 10 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#EEF1F2" />
                 <XAxis type="number" tick={{ fontSize: 10 }} />
                 <YAxis dataKey="name" type="category" tick={{ fontSize: 10 }} width={120} />
                 <Tooltip formatter={(v) => [v, 'Cantidad']} />
-                <Bar dataKey="totalQuantity" fill="#214C5A" radius={[0, 4, 4, 0]} />
+                <Bar dataKey="totalQuantity" fill="#244B5A" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
           )}

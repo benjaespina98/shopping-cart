@@ -64,7 +64,7 @@ export default function AdminSettings() {
     QRCode.toDataURL(siteUrl, {
       width: 280,
       margin: 1,
-      color: { dark: '#214C5A', light: '#FFFFFF' },
+      color: { dark: '#244B5A', light: '#FFFFFF' },
     })
       .then(setQrDataUrl)
       .catch(() => setQrDataUrl(''));
@@ -255,7 +255,7 @@ export default function AdminSettings() {
             <div key={item._id} className="border border-slate-200 rounded-xl p-3 flex items-center justify-between gap-3">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
-                     style={{ background: '#214C5A' }}>
+                     style={{ background: '#244B5A' }}>
                   {item.name?.[0]?.toUpperCase() ?? 'A'}
                 </div>
                 <div className="min-w-0">
@@ -265,7 +265,7 @@ export default function AdminSettings() {
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 <span className="text-xs font-medium px-2 py-0.5 rounded-full capitalize"
-                      style={{ background: '#F1F7F9', color: '#214C5A' }}>
+                      style={{ background: '#F1F7F9', color: '#244B5A' }}>
                   {item.role || 'admin'}
                 </span>
                 {item._id !== user?._id && (

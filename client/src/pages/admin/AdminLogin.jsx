@@ -26,7 +26,7 @@ export default function AdminLogin() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4"
-         style={{ background: 'linear-gradient(160deg, #122B33 0%, #193A45 60%, #214C5A 100%)' }}>
+         style={{ background: 'linear-gradient(160deg, #122B33 0%, #193A45 60%, #244B5A 100%)' }}>
 
       {/* Background decoration */}
       <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
@@ -41,10 +41,10 @@ export default function AdminLogin() {
         {/* Brand header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center mb-4">
-            <svg width="58" height="58" viewBox="0 0 64 64">
-              <circle cx="32" cy="22" r="13" fill="none" stroke="#FFC526" strokeWidth="6"/>
-              <path d="M8 42 Q14 37 20 42 Q26 47 32 42 Q38 37 44 42 Q50 47 56 42" stroke="#ffffff" strokeWidth="6" strokeLinecap="round" fill="none"/>
-              <line x1="8" y1="52" x2="56" y2="52" stroke="#ffffff" strokeWidth="6" strokeLinecap="round"/>
+            <svg width="62" height="62" viewBox="0 0 100 100">
+              <circle cx="50" cy="33" r="19" fill="none" stroke="#FFC629" strokeWidth="7"/>
+              <path d="M10 64 Q20 57 30 64 Q40 71 50 64 Q60 57 70 64 Q80 71 90 64" stroke="#ffffff" strokeWidth="7" strokeLinecap="round" fill="none"/>
+              <line x1="10" y1="80" x2="90" y2="80" stroke="#ffffff" strokeWidth="7" strokeLinecap="round"/>
             </svg>
           </div>
           <h1 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: 22,
@@ -63,7 +63,7 @@ export default function AdminLogin() {
 
           <div className="flex items-center justify-center w-12 h-12 rounded-xl mx-auto mb-5"
                style={{ background: 'rgba(255,197,38,0.15)', border: '1px solid rgba(255,197,38,0.3)' }}>
-            <FiLock size={20} style={{ color: '#FFC526' }} />
+            <FiLock size={20} style={{ color: '#FFC629' }} />
           </div>
 
           <h2 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: 17,
@@ -138,12 +138,12 @@ export default function AdminLogin() {
               type="submit"
               disabled={loading}
               style={{ marginTop: 6, height: 44, borderRadius: 10, border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
-                       background: loading ? 'rgba(33,76,90,0.5)' : '#214C5A',
+                       background: loading ? 'rgba(33,76,90,0.5)' : '#244B5A',
                        color: '#fff', fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: 14,
                        transition: 'background 140ms ease, transform 120ms ease',
                        opacity: loading ? 0.7 : 1 }}
               onMouseEnter={e => { if (!loading) e.target.style.background = '#193A45'; }}
-              onMouseLeave={e => { if (!loading) e.target.style.background = '#214C5A'; }}
+              onMouseLeave={e => { if (!loading) e.target.style.background = '#244B5A'; }}
             >
               {loading ? 'Ingresando...' : 'Ingresar al panel'}
             </button>

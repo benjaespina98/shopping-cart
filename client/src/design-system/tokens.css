@@ -9,7 +9,7 @@
   --teal-400: #5C93A4;
   --teal-500: #3B7488;
   --teal-600: #2B5C6D;
-  --teal-700: #214C5A;
+  --teal-700: #244B5A; /* Pantone 7477C — color institucional exacto */
   --teal-800: #193A45;
   --teal-900: #122B33;
 
@@ -19,7 +19,7 @@
   --sun-200:  #FFE9A6;
   --sun-300:  #FFDD78;
   --sun-400:  #FFD150;
-  --sun-500:  #FFC526;
+  --sun-500:  #FFC629; /* Pantone 123 C — color secundario exacto */
   --sun-600:  #EBAD10;
   --sun-700:  #C28C0A;
   --sun-800:  #946A0B;

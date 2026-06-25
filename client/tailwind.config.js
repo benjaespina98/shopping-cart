@@ -13,12 +13,12 @@ export default {
           400: '#5C93A4',
           500: '#3B7488',
           600: '#2B5C6D',
-          700: '#214C5A', // Brand principal
+          700: '#244B5A', // Brand principal
           800: '#193A45',
           900: '#122B33',
         },
         // Brand alias for backward-compat (bg-brand, text-brand, etc.)
-        brand: '#214C5A',
+        brand: '#244B5A',
         'brand-light': '#F1F7F9',
         // Accent — amarillo sol (energía, acción)
         accent: {
@@ -27,7 +27,7 @@ export default {
           200: '#FFE9A6',
           300: '#FFDD78',
           400: '#FFD150',
-          500: '#FFC526', // Accent principal
+          500: '#FFC629', // Accent principal
           600: '#EBAD10',
           700: '#C28C0A',
           800: '#946A0B',
@@ -74,7 +74,7 @@ export default {
           200: '#FFE9A6',
           300: '#FFDD78',
           400: '#FFD150',
-          500: '#FFC526',
+          500: '#FFC629',
           600: '#EBAD10',
           700: '#C28C0A',
           800: '#946A0B',

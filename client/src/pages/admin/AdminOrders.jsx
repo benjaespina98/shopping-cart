@@ -4,7 +4,7 @@ import { ordersAPI } from '../../services/api';
 import { toast } from 'react-toastify';
 
 const STATUS_LABELS = {
-  whatsapp_sent: { label: 'Enviado WA', color: 'bg-blue-50 text-blue-700' },
+  whatsapp_sent: { label: 'Enviado WA', color: 'bg-primary-50 text-primary-700' },
   confirmed: { label: 'Confirmado', color: 'bg-green-50 text-green-700' },
   cancelled: { label: 'Cancelado', color: 'bg-red-50 text-red-500' },
 };

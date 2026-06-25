@@ -9,6 +9,7 @@ const projectSchema = new Schema(
     imageUrl:  { type: String, default: '' },
     publicId:  { type: String, default: '' },
     featured:  { type: Boolean, default: false },
+    isHero:    { type: Boolean, default: false },
     order:     { type: Number, default: 0 },
   },
   { timestamps: true }

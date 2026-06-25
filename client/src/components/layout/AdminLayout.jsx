@@ -19,11 +19,39 @@ const navItems = [
   { to: '/admin/perfil',        label: 'Mi perfil',      Icon: FiUser },
 ];
 
+function SidebarLink({ to, label, Icon, onClick }) {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <NavLink
+      to={to}
+      onClick={onClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={({ isActive }) => ({
+        display: 'flex', alignItems: 'center', gap: 10,
+        padding: '10px 14px', borderRadius: 10,
+        fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: 13,
+        textDecoration: 'none', transition: 'background 140ms ease, color 140ms ease',
+        background: isActive ? '#244B5A' : hovered ? 'rgba(255,255,255,0.08)' : 'transparent',
+        color: isActive || hovered ? '#fff' : 'rgba(255,255,255,0.55)',
+      })}
+    >
+      {({ isActive }) => (
+        <>
+          <Icon size={16} style={{ flexShrink: 0, opacity: isActive || hovered ? 1 : 0.75 }} />
+          {label}
+        </>
+      )}
+    </NavLink>
+  );
+}
+
 const BrandIcon = () => (
-  <svg width="30" height="30" viewBox="0 0 64 64" aria-hidden="true" style={{ flexShrink: 0 }}>
-    <circle cx="32" cy="22" r="13" fill="none" stroke="#FFC526" strokeWidth="6"/>
-    <path d="M8 42 Q14 37 20 42 Q26 47 32 42 Q38 37 44 42 Q50 47 56 42" stroke="#ffffff" strokeWidth="6" strokeLinecap="round" fill="none"/>
-    <line x1="8" y1="52" x2="56" y2="52" stroke="#ffffff" strokeWidth="6" strokeLinecap="round"/>
+  <svg width="32" height="32" viewBox="0 0 100 100" aria-hidden="true" style={{ flexShrink: 0 }}>
+    <circle cx="50" cy="33" r="19" fill="none" stroke="#FFC629" strokeWidth="7"/>
+    <path d="M10 64 Q20 57 30 64 Q40 71 50 64 Q60 57 70 64 Q80 71 90 64" stroke="#ffffff" strokeWidth="7" strokeLinecap="round" fill="none"/>
+    <line x1="10" y1="80" x2="90" y2="80" stroke="#ffffff" strokeWidth="7" strokeLinecap="round"/>
   </svg>
 );
 
@@ -60,7 +88,7 @@ export default function AdminLayout() {
                 Playa &amp; Sol
               </div>
               <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase',
-                            color: '#FFC526', marginTop: 2 }}>
+                            color: '#FFC629', marginTop: 2 }}>
                 Panel admin
               </div>
             </div>
@@ -73,28 +101,8 @@ export default function AdminLayout() {
 
         {/* Nav */}
         <nav className="flex-1 px-3 py-4 overflow-y-auto" style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {navItems.map(({ to, label, Icon }) => (
-            <NavLink
-              key={to}
-              to={to}
-              onClick={() => setSideOpen(false)}
-              style={({ isActive }) => ({
-                display: 'flex', alignItems: 'center', gap: 10,
-                padding: '10px 14px', borderRadius: 10,
-                fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: 13,
-                textDecoration: 'none', transition: 'all 140ms ease',
-                background: isActive ? '#214C5A' : 'transparent',
-                color: isActive ? '#fff' : 'rgba(255,255,255,0.55)',
-              })}
-              className={({ isActive }) => isActive ? '' : 'hover:bg-white/8 hover:!text-white'}
-            >
-              {({ isActive }) => (
-                <>
-                  <Icon size={16} style={{ flexShrink: 0, opacity: isActive ? 1 : 0.75 }} />
-                  {label}
-                </>
-              )}
-            </NavLink>
+          {navItems.map((item) => (
+            <SidebarLink key={item.to} {...item} onClick={() => setSideOpen(false)} />
           ))}
         </nav>
 
@@ -102,7 +110,7 @@ export default function AdminLayout() {
         <div className="px-4 py-4" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
           <div className="flex items-center gap-3 mb-3">
             <div className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white"
-                 style={{ background: '#214C5A', border: '2px solid #FFC526', flexShrink: 0 }}>
+                 style={{ background: '#244B5A', border: '2px solid #FFC629', flexShrink: 0 }}>
               {initials}
             </div>
             <div className="overflow-hidden">
@@ -114,8 +122,10 @@ export default function AdminLayout() {
           </div>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 w-full px-3 py-2 rounded-xl text-sm transition-colors hover:bg-red-900/30 hover:text-red-400"
-            style={{ color: 'rgba(255,255,255,0.45)', fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}
+            className="flex items-center gap-2 w-full px-3 py-2 rounded-xl text-sm transition-colors"
+            style={{ color: 'rgba(255,255,255,0.45)', fontFamily: 'Poppins, sans-serif', fontWeight: 500, background: 'transparent' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(220,38,38,0.18)'; e.currentTarget.style.color = '#f87171'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'rgba(255,255,255,0.45)'; }}
           >
             <FiLogOut size={15} />
             Cerrar sesión
@@ -147,11 +157,11 @@ export default function AdminLayout() {
           <div className="ml-auto flex items-center gap-2">
             <a href="/" target="_blank" rel="noreferrer"
                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors hover:bg-primary-50"
-               style={{ color: '#214C5A', border: '1px solid #BCD6DD' }}>
-              <svg width="14" height="14" viewBox="0 0 64 64">
-                <circle cx="32" cy="22" r="13" fill="none" stroke="#FFC526" strokeWidth="7"/>
-                <path d="M8 42 Q14 37 20 42 Q26 47 32 42 Q38 37 44 42 Q50 47 56 42" stroke="#214C5A" strokeWidth="7" strokeLinecap="round" fill="none"/>
-                <line x1="8" y1="52" x2="56" y2="52" stroke="#214C5A" strokeWidth="7" strokeLinecap="round"/>
+               style={{ color: '#244B5A', border: '1px solid #BCD6DD' }}>
+              <svg width="14" height="14" viewBox="0 0 100 100">
+                <circle cx="50" cy="33" r="19" fill="none" stroke="#FFC629" strokeWidth="9"/>
+                <path d="M10 64 Q20 57 30 64 Q40 71 50 64 Q60 57 70 64 Q80 71 90 64" stroke="#244B5A" strokeWidth="9" strokeLinecap="round" fill="none"/>
+                <line x1="10" y1="80" x2="90" y2="80" stroke="#244B5A" strokeWidth="9" strokeLinecap="round"/>
               </svg>
               Ver sitio
             </a>
