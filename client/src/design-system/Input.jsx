@@ -15,7 +15,7 @@ export function Input({ label, helper, error, id, leading, trailing, size = 'md'
     : focused ? 'var(--brand-primary)' : 'var(--border-default)';
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', ...style }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0, width: '100%', boxSizing: 'border-box', ...style }}>
       {label && (
         <label htmlFor={inputId} style={{
           fontFamily: 'var(--font-body)', fontWeight: 600,
@@ -29,6 +29,8 @@ export function Input({ label, helper, error, id, leading, trailing, size = 'md'
         borderRadius: 'var(--radius-md)',
         padding: sizes[size].padding,
         minHeight: sizes[size].minHeight,
+        minWidth: 0,
+        boxSizing: 'border-box',
         boxShadow: focused && !error ? '0 0 0 4px var(--sun-100)' : 'none',
         transition: 'border-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out)',
         opacity: disabled ? 0.6 : 1,

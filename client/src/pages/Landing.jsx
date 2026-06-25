@@ -25,6 +25,7 @@ export default function Landing() {
   const navigate = useNavigate();
   const { items } = useCart();
   const [featured, setFeatured] = useState([]);
+  const [heroProject, setHeroProject] = useState(null);
   const [featuredProjects, setFeaturedProjects] = useState([]);
   const [services, setServices] = useState(FALLBACK_SERVICES);
 
@@ -38,8 +39,14 @@ export default function Landing() {
     productsAPI.getAll({ featured: true, limit: 4 })
       .then(({ data }) => setFeatured(data.products))
       .catch(() => {});
-    projectsAPI.getAll({ featured: true })
-      .then(({ data }) => setFeaturedProjects(data.slice(0, 5)))
+    projectsAPI.getAll()
+      .then(({ data }) => {
+        const hero = data.find((p) => p.isHero) || data.find((p) => p.featured) || null;
+        setHeroProject(hero);
+        setFeaturedProjects(
+          data.filter((p) => p.featured && p._id !== hero?._id).slice(0, 5)
+        );
+      })
       .catch(() => {});
     servicesAPI.getAll()
       .then(({ data }) => { if (data?.length > 0) setServices(data.slice(0, 4)); })
@@ -79,9 +86,9 @@ export default function Landing() {
           </div>
           <div className="ps-hero-photo">
             <Photo
-              label={featuredProjects[0] ? `${featuredProjects[0].title} · ${featuredProjects[0].location}` : 'Piscina infinity · Villa María'}
+              label={heroProject ? `${heroProject.title} · ${heroProject.location}` : 'Piscina infinity · Villa María'}
               height={360}
-              src={featuredProjects[0]?.imageUrl || undefined}
+              src={heroProject?.imageUrl || undefined}
             />
           </div>
         </div>

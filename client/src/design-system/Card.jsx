@@ -13,6 +13,8 @@ export function Card({ children, padding = 'md', accent = 'none', interactive = 
     borderTop: accents[accent],
     boxShadow: 'var(--shadow-md)',
     padding: pads[padding],
+    minWidth: 0,
+    boxSizing: 'border-box',
     overflow: 'hidden',
     transition: 'transform var(--duration-normal) var(--ease-out), box-shadow var(--duration-normal) var(--ease-out)',
     cursor: interactive ? 'pointer' : 'default',

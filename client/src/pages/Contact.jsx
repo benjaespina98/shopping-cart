@@ -112,7 +112,7 @@ export default function Contact() {
       <div className="grid md:grid-cols-2 gap-12">
         {/* Contact info */}
         <div className="space-y-6">
-          <div className="card p-7 bg-gradient-to-br from-sky-50/50 to-white border-sky-100 space-y-5">
+          <div className="card p-7 bg-gradient-to-br from-primary-50/50 to-white border-primary-100 space-y-5">
             <h2 className="font-bold text-slate-900 text-xl">Información de contacto</h2>
 
             <a href={`https://wa.me/${WHATSAPP_NUMBER}`}
@@ -131,8 +131,8 @@ export default function Contact() {
               </div>
             </a>
 
-            <a href={PHONE_LINK} className="flex items-center gap-4 group p-4 rounded-2xl hover:bg-blue-50 transition-colors">
-              <div className="w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center group-hover:bg-primary-700 transition-colors shrink-0">
+            <a href={PHONE_LINK} className="flex items-center gap-4 group p-4 rounded-2xl hover:bg-primary-50 transition-colors">
+              <div className="w-14 h-14 rounded-xl bg-primary-100 flex items-center justify-center group-hover:bg-primary-700 transition-colors shrink-0">
                 <FiPhone size={24} className="text-primary-700 group-hover:text-white" />
               </div>
               <div>
@@ -143,8 +143,8 @@ export default function Contact() {
               </div>
             </a>
 
-            <a href={`mailto:${CONTACT_EMAIL}`} className="flex items-center gap-4 group p-4 rounded-2xl hover:bg-purple-50 transition-colors">
-              <div className="w-14 h-14 rounded-xl bg-purple-100 flex items-center justify-center group-hover:bg-primary-700 transition-colors shrink-0">
+            <a href={`mailto:${CONTACT_EMAIL}`} className="flex items-center gap-4 group p-4 rounded-2xl hover:bg-accent-50 transition-colors">
+              <div className="w-14 h-14 rounded-xl bg-accent-100 flex items-center justify-center group-hover:bg-accent-600 transition-colors shrink-0">
                 <FiMail size={24} className="text-primary-700 group-hover:text-white" />
               </div>
               <div>
@@ -157,7 +157,7 @@ export default function Contact() {
           </div>
 
           {/* Horario */}
-          <div className="card p-6 bg-gradient-to-br from-blue-50/40 to-white border-blue-100">
+          <div className="card p-6 bg-gradient-to-br from-primary-50/40 to-white border-primary-100">
             <h2 className="font-bold text-slate-900 text-xl mb-5">Horarios de atención</h2>
             <div className="space-y-3 text-base">
               {contactSettings.businessHours.map(({ day, hours }) => (
@@ -189,7 +189,7 @@ export default function Contact() {
         </div>
 
         {/* Form */}
-        <div className="card p-7 sm:p-8 bg-gradient-to-br from-sky-50/50 to-white border-sky-100">
+        <div className="card p-7 sm:p-8 bg-gradient-to-br from-primary-50/50 to-white border-primary-100">
           <div className="mb-6 space-y-2">
             <h2 className="font-bold text-slate-900 text-xl">Envíanos tu consulta</h2>
             <p className="text-base text-slate-600 font-medium">

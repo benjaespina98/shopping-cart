@@ -308,29 +308,29 @@ export default function AdminServices() {
                       <p className="text-xs text-slate-400 mt-1">{s.bullets.join(' · ')}</p>
                     )}
                   </div>
-                  <div className="flex flex-col gap-1 shrink-0">
+                  <div className="flex flex-col gap-2 shrink-0 items-end">
                     <div className="flex gap-1">
-                      <button onClick={() => handleMove(index, -1)} disabled={index === 0}
-                        className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 disabled:opacity-30">
+                      <button onClick={() => handleMove(index, -1)} disabled={index === 0} title="Subir"
+                        className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 disabled:opacity-30 transition-colors">
                         <FiArrowUp size={14} />
                       </button>
-                      <button onClick={() => handleMove(index, 1)} disabled={index === services.length - 1}
-                        className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 disabled:opacity-30">
+                      <button onClick={() => handleMove(index, 1)} disabled={index === services.length - 1} title="Bajar"
+                        className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 disabled:opacity-30 transition-colors">
                         <FiArrowDown size={14} />
                       </button>
-                    </div>
-                    <div className="flex gap-1">
-                      <button onClick={() => toggleActive(s)} title={s.active ? 'Ocultar' : 'Mostrar'}
-                        className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500">
+                      <button onClick={() => toggleActive(s)} title={s.active ? 'Ocultar de la web' : 'Mostrar en la web'}
+                        className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors">
                         {s.active ? <FiEye size={14} /> : <FiEyeOff size={14} />}
                       </button>
-                      <button onClick={() => startEdit(s)} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-primary-700">
-                        <FiEdit2 size={14} />
-                      </button>
-                      <button onClick={() => handleDelete(s._id)} className="p-1.5 rounded-lg hover:bg-red-50 text-slate-500 hover:text-red-500">
+                      <button onClick={() => handleDelete(s._id)} title="Eliminar"
+                        className="p-1.5 rounded-lg hover:bg-red-50 text-slate-500 hover:text-red-500 transition-colors">
                         <FiTrash2 size={14} />
                       </button>
                     </div>
+                    <button onClick={() => startEdit(s)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600 hover:border-primary-700 hover:text-primary-700 hover:bg-primary-50 transition-colors">
+                      <FiEdit2 size={13} /> Editar texto y foto
+                    </button>
                   </div>
                 </div>
               )}

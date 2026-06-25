@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import {
   FiUpload, FiTrash2, FiEdit2, FiCheck, FiX, FiImage,
-  FiStar, FiArrowUp, FiArrowDown,
+  FiStar, FiArrowUp, FiArrowDown, FiHome,
 } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import { projectsAPI } from '../../services/api';
@@ -9,7 +9,7 @@ import { projectsAPI } from '../../services/api';
 const CATEGORIES = ['Obra nueva', 'Reformas', 'Comunidades'];
 const STATUS_OPTIONS = ['Terminada', 'En construcción'];
 
-const emptyForm = { title: '', location: '', category: 'Obra nueva', status: 'Terminada', featured: false };
+const emptyForm = { title: '', location: '', category: 'Obra nueva', status: 'Terminada', featured: false, isHero: false };
 
 export default function AdminSite() {
   const [projects, setProjects] = useState([]);
@@ -65,6 +65,7 @@ export default function AdminSite() {
       fd.append('category', form.category);
       fd.append('status', form.status);
       fd.append('featured', form.featured);
+      fd.append('isHero', form.isHero);
       if (file) fd.append('image', file);
       await projectsAPI.create(fd);
       setForm(emptyForm);
@@ -84,7 +85,10 @@ export default function AdminSite() {
 
   const startEdit = (p) => {
     setEditingId(p._id);
-    setEditForm({ title: p.title, location: p.location, category: p.category, status: p.status || 'Terminada', featured: p.featured });
+    setEditForm({
+      title: p.title, location: p.location, category: p.category,
+      status: p.status || 'Terminada', featured: p.featured, isHero: !!p.isHero,
+    });
     setEditFile(null);
     setEditPreview(null);
   };
@@ -110,13 +114,36 @@ export default function AdminSite() {
       fd.append('category', editForm.category);
       fd.append('status', editForm.status);
       fd.append('featured', editForm.featured);
+      fd.append('isHero', editForm.isHero);
       if (editFile) fd.append('image', editFile);
       const { data } = await projectsAPI.update(id, fd);
-      setProjects((prev) => prev.map((p) => (p._id === id ? data : p)));
+      // isHero es exclusivo: si esta obra ahora es hero, desmarcamos las demás en el estado local.
+      setProjects((prev) => prev.map((p) => {
+        if (p._id === id) return data;
+        return data.isHero ? { ...p, isHero: false } : p;
+      }));
       cancelEdit();
       toast.success('Proyecto actualizado.');
     } catch {
       toast.error('Error al guardar los cambios.');
+    }
+  };
+
+  // ── Quick hero toggle (sin entrar en modo edición) ───────
+
+  const setAsHero = async (p) => {
+    if (p.isHero) return;
+    try {
+      const fd = new FormData();
+      fd.append('isHero', true);
+      const { data } = await projectsAPI.update(p._id, fd);
+      setProjects((prev) => prev.map((item) => {
+        if (item._id === p._id) return data;
+        return { ...item, isHero: false };
+      }));
+      toast.success(`"${p.title}" es ahora la foto principal del hero.`);
+    } catch {
+      toast.error('Error al definir la foto principal.');
     }
   };
 
@@ -155,7 +182,7 @@ export default function AdminSite() {
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-slate-900">Sitio web — Proyectos</h1>
         <p className="text-slate-500 text-sm mt-1">
-          Cargá y organizá los proyectos que aparecen en <strong>/proyectos</strong>. Los marcados con <FiStar size={12} className="inline text-amber-500" /> <strong>"Destacar en la home"</strong> se muestran en el grid de la portada — el primero de la lista (usá las flechas ↑↓ para ordenar) es además la foto principal del hero, arriba de todo.
+          Cargá y organizá los proyectos que aparecen en <strong>/proyectos</strong>. Marcá <FiStar size={12} className="inline text-amber-500" /> <strong>"Destacar en la home"</strong> para que aparezcan en el grid de la portada, y elegí con <FiHome size={12} className="inline text-primary-700" /> <strong>"Foto principal"</strong> cuál va arriba de todo en el hero — son independientes, podés tener varias destacadas y solo una como foto principal.
         </p>
       </div>
 
@@ -202,13 +229,20 @@ export default function AdminSite() {
                   {STATUS_OPTIONS.map(s => <option key={s}>{s}</option>)}
                 </select>
               </div>
-              <div className="flex items-end">
+              <div className="sm:col-span-2 flex flex-wrap gap-5">
                 <label className="flex items-center gap-2 cursor-pointer select-none text-sm font-medium text-slate-700">
                   <input type="checkbox" checked={form.featured}
                     onChange={(e) => setForm(f => ({ ...f, featured: e.target.checked }))}
                     className="w-4 h-4 accent-primary-700" />
                   <FiStar size={14} className="text-amber-500" />
                   Destacar en la home
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer select-none text-sm font-medium text-slate-700">
+                  <input type="checkbox" checked={form.isHero}
+                    onChange={(e) => setForm(f => ({ ...f, isHero: e.target.checked }))}
+                    className="w-4 h-4 accent-primary-700" />
+                  <FiHome size={14} className="text-primary-700" />
+                  Foto principal (hero)
                 </label>
               </div>
             </div>
@@ -238,13 +272,18 @@ export default function AdminSite() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {projects.map((p, index) => (
-            <div key={p._id} className="card overflow-hidden">
+            <div key={p._id} className={`card overflow-hidden ${p.isHero ? 'ring-2 ring-primary-700' : ''}`}>
               {/* Image */}
               <div className="aspect-video relative bg-slate-100">
                 {p.imageUrl
                   ? <img src={p.imageUrl} alt={p.title} className="w-full h-full object-cover" />
                   : <div className="w-full h-full flex items-center justify-center text-slate-300"><FiImage size={32} /></div>}
                 <div className="absolute top-2 left-2 flex flex-col gap-1 items-start">
+                  {p.isHero && (
+                    <span className="bg-primary-700 text-white text-xs font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                      <FiHome size={10} /> Foto principal
+                    </span>
+                  )}
                   {p.featured && (
                     <span className="bg-amber-400 text-amber-900 text-xs font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
                       <FiStar size={10} /> Home
@@ -258,11 +297,11 @@ export default function AdminSite() {
                 </div>
                 <div className="absolute top-2 right-2 flex gap-1">
                   <button onClick={() => handleMove(index, -1)} disabled={index === 0}
-                    className="p-1.5 rounded-lg bg-white/90 hover:bg-white text-slate-600 disabled:opacity-30 shadow-sm">
+                    className="p-1.5 rounded-lg bg-white/90 hover:bg-white text-slate-600 disabled:opacity-30 shadow-sm transition-colors">
                     <FiArrowUp size={14} />
                   </button>
                   <button onClick={() => handleMove(index, 1)} disabled={index === projects.length - 1}
-                    className="p-1.5 rounded-lg bg-white/90 hover:bg-white text-slate-600 disabled:opacity-30 shadow-sm">
+                    className="p-1.5 rounded-lg bg-white/90 hover:bg-white text-slate-600 disabled:opacity-30 shadow-sm transition-colors">
                     <FiArrowDown size={14} />
                   </button>
                 </div>
@@ -297,9 +336,15 @@ export default function AdminSite() {
                       <input type="checkbox" checked={editForm.featured}
                         onChange={(e) => setEditForm(f => ({ ...f, featured: e.target.checked }))}
                         className="w-4 h-4 accent-primary-700" />
-                      Destacar en la home
+                      <FiStar size={13} className="text-amber-500" /> Destacar en la home
                     </label>
-                    <div className="flex gap-2">
+                    <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
+                      <input type="checkbox" checked={editForm.isHero}
+                        onChange={(e) => setEditForm(f => ({ ...f, isHero: e.target.checked }))}
+                        className="w-4 h-4 accent-primary-700" />
+                      <FiHome size={13} className="text-primary-700" /> Foto principal (hero)
+                    </label>
+                    <div className="flex gap-2 mt-1">
                       <button onClick={() => saveEdit(p._id)} className="btn-primary btn-sm flex items-center gap-1">
                         <FiCheck size={14} /> Guardar
                       </button>
@@ -309,16 +354,24 @@ export default function AdminSite() {
                     </div>
                   </div>
                 ) : (
-                  <div className="flex items-start justify-between gap-2">
+                  <div className="flex flex-col gap-2">
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-slate-800 truncate">{p.title}</p>
                       <p className="text-xs text-slate-500">{p.location} · {p.category} · {p.status || 'Terminada'}</p>
                     </div>
-                    <div className="flex gap-1 flex-shrink-0">
-                      <button onClick={() => startEdit(p)} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-primary-700">
-                        <FiEdit2 size={14} />
+                    <div className="flex gap-2">
+                      <button onClick={() => startEdit(p)}
+                        className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600 hover:border-primary-700 hover:text-primary-700 hover:bg-primary-50 transition-colors">
+                        <FiEdit2 size={13} /> Editar
                       </button>
-                      <button onClick={() => handleDelete(p._id)} className="p-1.5 rounded-lg hover:bg-red-50 text-slate-500 hover:text-red-500">
+                      {!p.isHero && (
+                        <button onClick={() => setAsHero(p)} title="Usar como foto principal"
+                          className="px-3 py-2 rounded-lg border border-slate-200 text-slate-500 hover:border-primary-700 hover:text-primary-700 hover:bg-primary-50 transition-colors">
+                          <FiHome size={14} />
+                        </button>
+                      )}
+                      <button onClick={() => handleDelete(p._id)} title="Eliminar"
+                        className="px-3 py-2 rounded-lg border border-slate-200 text-slate-500 hover:border-red-300 hover:text-red-500 hover:bg-red-50 transition-colors">
                         <FiTrash2 size={14} />
                       </button>
                     </div>

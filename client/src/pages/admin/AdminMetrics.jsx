@@ -82,7 +82,7 @@ export default function AdminMetrics() {
           {[
             { label: 'Ventas confirmadas', value: `$${(summary.totalRevenue || 0).toLocaleString('es-AR')}`, color: 'text-green-600' },
             { label: 'Pedidos confirmados', value: summary.confirmedOrders || 0, color: 'text-brand' },
-            { label: 'Ticket promedio', value: `$${Math.round(summary.averageOrderValue || 0).toLocaleString('es-AR')}`, color: 'text-blue-600' },
+            { label: 'Ticket promedio', value: `$${Math.round(summary.averageOrderValue || 0).toLocaleString('es-AR')}`, color: 'text-accent-700' },
             { label: 'Sin stock', value: summary.outOfStock, color: summary.outOfStock > 0 ? 'text-red-500' : 'text-slate-500' },
           ].map(({ label, value, color }) => (
             <div key={label} className="card p-5 text-center">
@@ -102,7 +102,7 @@ export default function AdminMetrics() {
           ) : (
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={ordersTime}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#EEF1F2" />
                 <XAxis dataKey="_id" tick={{ fontSize: 10 }} tickFormatter={(v) => v.slice(5)} />
                 <YAxis tick={{ fontSize: 10 }} />
                 <Tooltip formatter={(v, n) => [v, n === 'count' ? 'Pedidos totales' : 'Pedidos confirmados']} labelFormatter={(l) => `Fecha: ${l}`} />
@@ -121,7 +121,7 @@ export default function AdminMetrics() {
           ) : (
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={ordersTime}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#EEF1F2" />
                 <XAxis dataKey="_id" tick={{ fontSize: 10 }} tickFormatter={(v) => v.slice(5)} />
                 <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
                 <Tooltip formatter={(v) => [`$${v.toLocaleString('es-AR')}`, 'Ventas confirmadas']} />
@@ -139,7 +139,7 @@ export default function AdminMetrics() {
           ) : (
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={topProducts} layout="vertical" margin={{ left: 10 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#EEF1F2" />
                 <XAxis type="number" tick={{ fontSize: 10 }} />
                 <YAxis dataKey="name" type="category" tick={{ fontSize: 10 }} width={120} />
                 <Tooltip formatter={(v) => [v, 'Cantidad']} />

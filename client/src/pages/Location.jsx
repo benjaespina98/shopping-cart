@@ -41,11 +41,11 @@ export default function Location() {
 
           {/* Info */}
           <div className="md:col-span-2 space-y-4">
-            <div className="card p-7 bg-gradient-to-br from-sky-50/50 to-white border-sky-100">
+            <div className="card p-7 bg-gradient-to-br from-primary-50/50 to-white border-primary-100">
               <h2 className="font-bold text-slate-900 text-xl mb-6">Información del local</h2>
 
               <div className="flex items-start gap-4 mb-6">
-                <div className="w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center shrink-0 mt-0.5">
+                <div className="w-14 h-14 rounded-xl bg-primary-100 flex items-center justify-center shrink-0 mt-0.5">
                   <FiMapPin size={22} className="text-primary-700" />
                 </div>
                 <div>
@@ -55,7 +55,7 @@ export default function Location() {
               </div>
 
               <div className="flex items-start gap-4 mb-6">
-                <div className="w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center shrink-0 mt-0.5">
+                <div className="w-14 h-14 rounded-xl bg-primary-100 flex items-center justify-center shrink-0 mt-0.5">
                   <FiClock size={22} className="text-primary-700" />
                 </div>
                 <div>
@@ -69,7 +69,7 @@ export default function Location() {
               </div>
 
               <div className="flex items-start gap-4 mb-6">
-                <div className="w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center shrink-0 mt-0.5">
+                <div className="w-14 h-14 rounded-xl bg-primary-100 flex items-center justify-center shrink-0 mt-0.5">
                   <FiPhone size={22} className="text-primary-700" />
                 </div>
                 <div>

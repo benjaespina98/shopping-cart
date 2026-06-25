@@ -41,10 +41,10 @@ export default function AdminLogin() {
         {/* Brand header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center mb-4">
-            <svg width="58" height="58" viewBox="0 0 64 64">
-              <circle cx="32" cy="22" r="13" fill="none" stroke="#FFC526" strokeWidth="6"/>
-              <path d="M8 42 Q14 37 20 42 Q26 47 32 42 Q38 37 44 42 Q50 47 56 42" stroke="#ffffff" strokeWidth="6" strokeLinecap="round" fill="none"/>
-              <line x1="8" y1="52" x2="56" y2="52" stroke="#ffffff" strokeWidth="6" strokeLinecap="round"/>
+            <svg width="62" height="62" viewBox="0 0 100 100">
+              <circle cx="50" cy="33" r="19" fill="none" stroke="#FFC526" strokeWidth="7"/>
+              <path d="M10 64 Q20 57 30 64 Q40 71 50 64 Q60 57 70 64 Q80 71 90 64" stroke="#ffffff" strokeWidth="7" strokeLinecap="round" fill="none"/>
+              <line x1="10" y1="80" x2="90" y2="80" stroke="#ffffff" strokeWidth="7" strokeLinecap="round"/>
             </svg>
           </div>
           <h1 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: 22,

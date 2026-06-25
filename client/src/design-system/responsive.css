@@ -13,7 +13,7 @@
 /* ── Hero ──────────────────────────────────────────────── */
 .ps-hero-grid {
   display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
   gap: 56px;
   align-items: center;
 }
@@ -81,7 +81,7 @@
 /* ── Services page rows ────────────────────────────────── */
 .ps-service-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 48px;
   align-items: center;
 }
@@ -100,12 +100,12 @@
 /* ── Quote layout ──────────────────────────────────────── */
 .ps-quote-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 40px;
   align-items: start;
 }
 @media (max-width: 767px) {
-  .ps-quote-grid  { grid-template-columns: 1fr; gap: 24px; }
+  .ps-quote-grid  { grid-template-columns: minmax(0, 1fr); gap: 24px; }
   .ps-quote-photo { display: none; }
 }
 
@@ -122,9 +122,9 @@
 /* font sizes use clamp() in inline styles — no overrides needed here */
 
 /* ── Form helpers ───────────────────────────────────────── */
-.ps-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.ps-form-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
 @media (max-width: 767px) {
-  .ps-form-row { grid-template-columns: 1fr; }
+  .ps-form-row { grid-template-columns: minmax(0, 1fr); }
 }
 
 /* ── Products grid (shop) ───────────────────────────────── */
