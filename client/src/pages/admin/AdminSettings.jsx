@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { FiSave, FiPlus, FiTrash2, FiUsers, FiClock, FiMail, FiUserMinus, FiDownload, FiLink, FiDroplet, FiImage, FiUpload } from 'react-icons/fi';
+import { FiSave, FiPlus, FiTrash2, FiUsers, FiClock, FiMail, FiUserMinus, FiDownload, FiLink, FiDroplet, FiImage, FiUpload, FiCheckCircle, FiX } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import QRCode from 'qrcode';
 import { settingsAPI } from '../../services/api';
@@ -14,6 +14,7 @@ const defaultSettings = {
   secondaryContactLabel: 'Ventas y presupuestos',
   secondaryContactWhatsapp: '5493535668994',
   contactPhotoUrl: '',
+  aboutPhotoUrl: '',
   businessHours: [
     { day: 'Lunes a Viernes', hours: '9:00 - 18:00' },
     { day: 'Sábados', hours: '9:00 - 13:00' },
@@ -29,18 +30,48 @@ const THEMES = [
   { value: 'moderno',  label: 'Moderno',  hint: 'Formas redondeadas, sombras más presentes. Más cercano y dinámico.', radius: 24, shadow: '0 8px 20px rgba(18,43,51,0.20)' },
 ];
 
+// Mini mockup de una card real (ícono + título + texto + botón) renderizado con
+// los radios/sombras del tema, para que se entienda cómo se va a ver de verdad.
+function ThemePreviewCard({ t }) {
+  return (
+    <div
+      className="bg-white border border-slate-200"
+      style={{ borderRadius: t.radius, boxShadow: t.shadow, padding: 14, width: '100%' }}
+    >
+      <div
+        className="flex items-center justify-center mb-2"
+        style={{ width: 30, height: 30, borderRadius: t.radius * 0.55, background: '#F1F7F9' }}
+      >
+        <div style={{ width: 12, height: 12, borderRadius: '50%', border: '2px solid #FFC629' }} />
+      </div>
+      <div style={{ height: 8, width: '70%', borderRadius: 3, background: '#244B5A', marginBottom: 6 }} />
+      <div style={{ height: 5, width: '90%', borderRadius: 3, background: '#E0E5E7', marginBottom: 4 }} />
+      <div style={{ height: 5, width: '60%', borderRadius: 3, background: '#E0E5E7', marginBottom: 10 }} />
+      <div
+        className="inline-flex items-center justify-center text-[10px] font-bold"
+        style={{ borderRadius: t.radius * 0.6, background: '#FFC629', color: '#122B33', padding: '5px 12px' }}
+      >
+        Botón
+      </div>
+    </div>
+  );
+}
+
 export default function AdminSettings() {
   const { user } = useAuth();
   const [settings, setSettings] = useState(defaultSettings);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [savedPopup, setSavedPopup] = useState(false);
+  const [uploadingContactPhoto, setUploadingContactPhoto] = useState(false);
+  const [uploadingAboutPhoto, setUploadingAboutPhoto] = useState(false);
   const [creatingUser, setCreatingUser] = useState(false);
   const [newUser, setNewUser] = useState({ name: '', email: '', password: '' });
   const [siteUrl, setSiteUrl] = useState(typeof window !== 'undefined' ? window.location.origin : '');
   const [qrDataUrl, setQrDataUrl] = useState('');
-  const photoInputRef = useRef();
+  const contactPhotoInputRef = useRef();
+  const aboutPhotoInputRef = useRef();
 
   const loadData = async () => {
     setLoading(true);
@@ -61,13 +92,14 @@ export default function AdminSettings() {
         secondaryContactLabel: data.secondaryContactLabel ?? defaultSettings.secondaryContactLabel,
         secondaryContactWhatsapp: data.secondaryContactWhatsapp ?? defaultSettings.secondaryContactWhatsapp,
         contactPhotoUrl: data.contactPhotoUrl || '',
+        aboutPhotoUrl: data.aboutPhotoUrl || '',
         businessHours: Array.isArray(data.businessHours) && data.businessHours.length > 0
           ? data.businessHours
           : defaultSettings.businessHours,
       });
       setUsers(usersRes.data || []);
     } catch {
-      toast.error('No se pudo cargar la configuracion');
+      toast.error('No se pudo cargar la configuración');
     } finally {
       setLoading(false);
     }
@@ -105,18 +137,18 @@ export default function AdminSettings() {
       };
       const { data } = await settingsAPI.updateAdmin(payload);
       setSettings((prev) => ({ ...prev, ...data.settings }));
-      toast.success('Configuración guardada');
+      setSavedPopup(true);
     } catch (error) {
-      toast.error(error?.response?.data?.message || 'No se pudo guardar la configuracion');
+      toast.error(error?.response?.data?.message || 'No se pudo guardar la configuración');
     } finally {
       setSaving(false);
     }
   };
 
-  const handlePhotoChange = async (e) => {
+  const handleContactPhotoChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    setUploadingPhoto(true);
+    setUploadingContactPhoto(true);
     try {
       const fd = new FormData();
       fd.append('image', file);
@@ -126,8 +158,26 @@ export default function AdminSettings() {
     } catch (error) {
       toast.error(error?.response?.data?.message || 'No se pudo subir la foto');
     } finally {
-      setUploadingPhoto(false);
-      if (photoInputRef.current) photoInputRef.current.value = '';
+      setUploadingContactPhoto(false);
+      if (contactPhotoInputRef.current) contactPhotoInputRef.current.value = '';
+    }
+  };
+
+  const handleAboutPhotoChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploadingAboutPhoto(true);
+    try {
+      const fd = new FormData();
+      fd.append('image', file);
+      const { data } = await settingsAPI.uploadAboutPhoto(fd);
+      setSettings((prev) => ({ ...prev, aboutPhotoUrl: data.settings.aboutPhotoUrl }));
+      toast.success('Foto de Nosotros actualizada');
+    } catch (error) {
+      toast.error(error?.response?.data?.message || 'No se pudo subir la foto');
+    } finally {
+      setUploadingAboutPhoto(false);
+      if (aboutPhotoInputRef.current) aboutPhotoInputRef.current.value = '';
     }
   };
 
@@ -213,21 +263,10 @@ export default function AdminSettings() {
                 key={t.value}
                 type="button"
                 onClick={() => setSettings((prev) => ({ ...prev, theme: t.value }))}
-                className={`text-left p-4 rounded-xl border-2 transition-colors ${active ? 'border-primary-700 bg-primary-50/50' : 'border-slate-200 hover:border-slate-300'}`}
+                className={`text-left p-3 rounded-xl border-2 transition-colors ${active ? 'border-primary-700 bg-primary-50/50' : 'border-slate-200 hover:border-slate-300'}`}
               >
-                <div className="flex items-center gap-2 mb-3">
-                  <div
-                    className="w-12 h-9 bg-white border border-slate-200 flex items-center justify-center"
-                    style={{ borderRadius: t.radius, boxShadow: t.shadow }}
-                  >
-                    <div className="w-6 h-2" style={{ borderRadius: t.radius / 2, background: '#FFC629' }} />
-                  </div>
-                  <div
-                    className="px-3 py-1.5 text-xs font-bold"
-                    style={{ borderRadius: t.radius * 0.7, background: '#244B5A', color: '#fff' }}
-                  >
-                    Botón
-                  </div>
+                <div className="mb-3">
+                  <ThemePreviewCard t={t} />
                 </div>
                 <p className="text-sm font-semibold text-slate-800 flex items-center gap-2">
                   {t.label}
@@ -238,6 +277,9 @@ export default function AdminSettings() {
             );
           })}
         </div>
+        <p className="text-xs text-slate-400 mt-3">
+          El tema se aplica al sitio público recién cuando hacés click en <strong>"Guardar configuración"</strong>, al final de esta página.
+        </p>
       </div>
 
       <div className="card p-6">
@@ -304,30 +346,56 @@ export default function AdminSettings() {
       <div className="card p-6">
         <h2 className="font-semibold text-slate-800 mb-1 flex items-center gap-2">
           <FiImage size={16} />
-          Foto de contacto
+          Fotos del sitio
         </h2>
         <p className="text-slate-500 text-sm mb-4">
-          Se muestra en <strong>/contacto</strong> (ej. el local, el showroom o el equipo).
+          Se actualizan al instante, no hace falta tocar "Guardar configuración".
         </p>
-        <div className="flex items-start gap-4 flex-wrap">
-          <label className="flex-shrink-0 cursor-pointer">
-            <div className="w-44 h-32 rounded-xl border-2 border-dashed border-slate-300 hover:border-primary-700 flex flex-col items-center justify-center text-slate-400 hover:text-primary-700 transition-colors overflow-hidden">
-              {settings.contactPhotoUrl
-                ? <img src={settings.contactPhotoUrl} alt="" className="w-full h-full object-cover" />
-                : <><FiImage size={24} /><span className="text-xs mt-1">Elegir foto</span></>}
+        <div className="grid sm:grid-cols-2 gap-5">
+          <div className="flex items-start gap-4">
+            <label className="flex-shrink-0 cursor-pointer">
+              <div className="w-32 h-24 rounded-xl border-2 border-dashed border-slate-300 hover:border-primary-700 flex flex-col items-center justify-center text-slate-400 hover:text-primary-700 transition-colors overflow-hidden">
+                {settings.contactPhotoUrl
+                  ? <img src={settings.contactPhotoUrl} alt="" className="w-full h-full object-cover" />
+                  : <><FiImage size={20} /><span className="text-xs mt-1">Elegir foto</span></>}
+              </div>
+              <input type="file" accept="image/*" className="hidden" ref={contactPhotoInputRef} onChange={handleContactPhotoChange} />
+            </label>
+            <div className="flex flex-col gap-2 min-w-0">
+              <p className="text-sm font-semibold text-slate-700">Foto de Contacto</p>
+              <p className="text-xs text-slate-400">Hoy no se muestra ninguna en <strong>/contacto</strong> — subí una si querés activarla.</p>
+              <button
+                type="button"
+                onClick={() => contactPhotoInputRef.current?.click()}
+                disabled={uploadingContactPhoto}
+                className="btn-secondary inline-flex items-center gap-2 self-start disabled:opacity-50 text-xs"
+              >
+                <FiUpload size={13} /> {uploadingContactPhoto ? 'Subiendo...' : settings.contactPhotoUrl ? 'Cambiar' : 'Subir'}
+              </button>
             </div>
-            <input type="file" accept="image/*" className="hidden" ref={photoInputRef} onChange={handlePhotoChange} />
-          </label>
-          <div className="flex flex-col gap-2">
-            <button
-              type="button"
-              onClick={() => photoInputRef.current?.click()}
-              disabled={uploadingPhoto}
-              className="btn-secondary inline-flex items-center gap-2 disabled:opacity-50"
-            >
-              <FiUpload size={15} /> {uploadingPhoto ? 'Subiendo...' : settings.contactPhotoUrl ? 'Cambiar foto' : 'Subir foto'}
-            </button>
-            <p className="text-xs text-slate-400 max-w-xs">JPG, PNG o WEBP. Se actualiza al instante, no hace falta guardar configuración.</p>
+          </div>
+
+          <div className="flex items-start gap-4">
+            <label className="flex-shrink-0 cursor-pointer">
+              <div className="w-32 h-24 rounded-xl border-2 border-dashed border-slate-300 hover:border-primary-700 flex flex-col items-center justify-center text-slate-400 hover:text-primary-700 transition-colors overflow-hidden">
+                {settings.aboutPhotoUrl
+                  ? <img src={settings.aboutPhotoUrl} alt="" className="w-full h-full object-cover" />
+                  : <><FiImage size={20} /><span className="text-xs mt-1">Elegir foto</span></>}
+              </div>
+              <input type="file" accept="image/*" className="hidden" ref={aboutPhotoInputRef} onChange={handleAboutPhotoChange} />
+            </label>
+            <div className="flex flex-col gap-2 min-w-0">
+              <p className="text-sm font-semibold text-slate-700">Foto de Nosotros</p>
+              <p className="text-xs text-slate-400">Aparece grande en <strong>/nosotros</strong> (ej. una foto familiar o del equipo).</p>
+              <button
+                type="button"
+                onClick={() => aboutPhotoInputRef.current?.click()}
+                disabled={uploadingAboutPhoto}
+                className="btn-secondary inline-flex items-center gap-2 self-start disabled:opacity-50 text-xs"
+              >
+                <FiUpload size={13} /> {uploadingAboutPhoto ? 'Subiendo...' : settings.aboutPhotoUrl ? 'Cambiar' : 'Subir'}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -505,9 +573,26 @@ export default function AdminSettings() {
           className="btn-primary inline-flex items-center gap-2"
         >
           <FiSave size={16} />
-          {saving ? 'Guardando...' : 'Guardar configuracion'}
+          {saving ? 'Guardando...' : 'Guardar configuración'}
         </button>
       </div>
+
+      {/* Popup de confirmación al guardar */}
+      {savedPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(18,43,51,0.45)' }}
+             onClick={() => setSavedPopup(false)}>
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: '#DCF3E8' }}>
+              <FiCheckCircle size={28} style={{ color: '#2E9E6B' }} />
+            </div>
+            <h3 className="text-lg font-bold text-slate-900 mb-1">¡Listo!</h3>
+            <p className="text-sm text-slate-500 mb-5">Los cambios ya se aplicaron al sitio público.</p>
+            <button onClick={() => setSavedPopup(false)} className="btn-primary w-full inline-flex items-center justify-center gap-2">
+              <FiX size={15} /> Cerrar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

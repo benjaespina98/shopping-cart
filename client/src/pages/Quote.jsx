@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiUser, FiPhone, FiMail, FiMapPin, FiSend, FiCheck, FiClock, FiShield, FiMessageSquare } from 'react-icons/fi';
+import { FiUser, FiPhone, FiMail, FiMapPin, FiSend, FiCheck, FiClock, FiShield, FiMessageSquare, FiTag, FiChevronDown } from 'react-icons/fi';
 import { Button } from '../design-system/Button';
 import { Card } from '../design-system/Card';
 import { Badge } from '../design-system/Badge';
@@ -16,7 +16,7 @@ const OTHER_TYPE = 'Otra consulta';
 
 const STEPS = [
   { Icon: FiSend,  text: 'Contanos tu proyecto con el formulario' },
-  { Icon: FiClock, text: 'Te visitamos en Villa María dentro de 48 horas' },
+  { Icon: FiClock, text: 'Nos contactamos con vos dentro de 48 horas' },
   { Icon: FiCheck, text: 'Recibís tu presupuesto sin compromiso' },
 ];
 
@@ -106,10 +106,10 @@ export default function Quote() {
           <h1 style={{ fontSize: 'clamp(22px, 5.5vw, 38px)', lineHeight: 1.1, letterSpacing: '-0.02em',
                        marginBottom: 'var(--space-4)', fontFamily: 'var(--font-display)', color: 'var(--text-strong)',
                        overflowWrap: 'break-word' }}>
-            Cuéntanos tu proyecto
+            Contanos tu proyecto
           </h1>
           <p style={{ fontSize: 16, color: 'var(--text-body)', lineHeight: 1.6, marginBottom: 'var(--space-6)' }}>
-            Completá el formulario y te visitamos en 48 horas. Sin costo y sin compromiso.
+            Completá el formulario y nos contactamos en 48 horas. Sin costo y sin compromiso.
           </p>
 
           <div className="ps-quote-photo" style={{ marginBottom: 'var(--space-6)' }}>
@@ -142,12 +142,12 @@ export default function Quote() {
         {/* Right — form */}
         <Card padding="lg">
           {sent ? (
-            <div style={{ textAlign: 'center', padding: '24px 10px' }}>
-              <img src="/brand/logo-icon.png" alt="" style={{ height: 56, width: 'auto', display: 'block', margin: '0 auto 14px' }} />
-              <h2 style={{ fontSize: 24, marginBottom: 10, fontFamily: 'var(--font-display)',
+            <div style={{ textAlign: 'center', padding: '32px 10px' }}>
+              <img src="/brand/logo-icon.png" alt="" style={{ height: 88, width: 'auto', display: 'block', margin: '0 auto 20px' }} />
+              <h2 style={{ fontSize: 26, marginBottom: 10, fontFamily: 'var(--font-display)',
                            color: 'var(--text-strong)' }}>¡Gracias!</h2>
-              <p style={{ color: 'var(--text-muted)', marginBottom: 24 }}>
-                Hemos recibido tu solicitud. Te llamamos en menos de 48 horas.
+              <p style={{ color: 'var(--text-muted)', marginBottom: 28, fontSize: 15, lineHeight: 1.6 }}>
+                Hemos recibido tu solicitud. Nos contactaremos con vos brevemente.
               </p>
               <Button variant="secondary" onClick={() => { setSent(false); navigate('/'); }}>
                 Volver al inicio
@@ -162,45 +162,45 @@ export default function Quote() {
                     Tus datos de contacto
                   </h2>
                 </div>
-                <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>Usamos esta información únicamente para coordinar tu visita.</p>
+                <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>Usamos esta información únicamente para responder tu consulta.</p>
               </div>
 
               <div>
-                <label style={{ fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 14,
+                <label htmlFor="quote-type" style={{ fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 14,
                                 color: 'var(--text-strong)', display: 'block', marginBottom: 'var(--space-2)' }}>
                   Tipo de proyecto
                 </label>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  {allTypes.map(t => {
-                    const active = tipo === t;
-                    return (
-                      <button type="button" key={t} onClick={() => setTipo(t)} style={{
-                        flex: '0 0 auto', display: 'inline-flex', alignItems: 'center', gap: 6,
-                        padding: '10px 14px', borderRadius: 'var(--radius-pill)',
-                        cursor: 'pointer', fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: 13,
-                        border: active ? '2px solid var(--brand-primary)' : '2px solid var(--border-default)',
-                        background: active ? 'var(--teal-50)' : 'var(--surface-card)',
-                        color: active ? 'var(--brand-primary)' : 'var(--text-muted)',
-                        transition: 'all var(--duration-fast) var(--ease-out)',
-                      }}>
-                        {active && <FiCheck size={13} />}
-                        {t}
-                      </button>
-                    );
-                  })}
+                <div style={{ position: 'relative' }}>
+                  <FiTag size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)',
+                                            color: 'var(--text-muted)', pointerEvents: 'none' }} />
+                  <select
+                    id="quote-type"
+                    value={tipo}
+                    onChange={(e) => setTipo(e.target.value)}
+                    style={{
+                      width: '100%', appearance: 'none', cursor: 'pointer',
+                      padding: '11px 40px', borderRadius: 'var(--radius-md)', border: '2px solid var(--border-default)',
+                      fontFamily: 'var(--font-body)', fontSize: '1rem', color: 'var(--text-strong)',
+                      background: 'var(--surface-card)', minHeight: 44, boxSizing: 'border-box',
+                    }}
+                  >
+                    {allTypes.map(t => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                  <FiChevronDown size={16} style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)',
+                                            color: 'var(--text-muted)', pointerEvents: 'none' }} />
                 </div>
               </div>
 
               <div className="ps-form-row">
-                <Input label="Nombre" placeholder="Tu nombre" required value={form.name} onChange={setField('name')}
+                <Input label="Nombre y apellido" placeholder="Tu nombre completo" required value={form.name} onChange={setField('name')}
                   leading={<FiUser size={16} />} error={fieldErrors.name} />
-                <Input label="Teléfono" placeholder="600 123 456" required value={form.phone} onChange={setField('phone')}
+                <Input label="Teléfono / WhatsApp" placeholder="600 123 456" required value={form.phone} onChange={setField('phone')}
                   leading={<FiPhone size={16} />} error={fieldErrors.phone} />
               </div>
               <Input label="Email" placeholder="hola@ejemplo.com" type="email" required value={form.email} onChange={setField('email')}
                 leading={<FiMail size={16} />} error={fieldErrors.email} />
-              <Input label="Localidad" placeholder="Corrientes 1210, Villa María…" value={form.location} onChange={setField('location')}
-                leading={<FiMapPin size={16} />} />
+              <Input label="Localidad de la obra" placeholder="Corrientes 1210, Villa María…" value={form.location} onChange={setField('location')}
+                leading={<FiMapPin size={16} />} helper="Dónde sería el trabajo (opcional)." />
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 <label htmlFor="quote-message" style={{ fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 14, color: 'var(--text-strong)' }}>

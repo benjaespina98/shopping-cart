@@ -39,7 +39,7 @@ const FALLBACK_SERVICES = [
 
 const stats = [
   { Icon: FiAward,   n: '+30 años', l: 'de trayectoria en Villa María' },
-  { Icon: FiDroplet, n: '+850',    l: 'piscinas construidas' },
+  { Icon: FiDroplet, n: '+500',    l: 'piscinas construidas' },
   { Icon: FiUsers,   n: '100%',    l: 'atención personalizada' },
   { Icon: FiClock,   n: '48h',     l: 'para tu presupuesto' },
 ];
@@ -260,7 +260,7 @@ export default function Landing() {
               <h2 style={{ color: 'var(--text-inverse)', fontSize: 32, marginBottom: 'var(--space-2)',
                            fontFamily: 'var(--font-display)', fontWeight: 600 }}>¿Listo para tu piscina?</h2>
               <p style={{ color: 'var(--text-inverse-muted)', fontSize: 16, maxWidth: 460 }}>
-                Cuéntanos tu idea y te visitamos en 48 horas con un presupuesto sin compromiso.
+                Contanos tu idea y nos contactamos en 48 horas con un presupuesto sin compromiso.
               </p>
             </div>
             <Button variant="primary" size="lg" onClick={() => navigate('/presupuesto')}>Empezar ahora</Button>

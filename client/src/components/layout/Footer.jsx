@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { FiInstagram, FiFacebook } from 'react-icons/fi';
 import { FaWhatsapp, FaTiktok } from 'react-icons/fa';
-import { settingsAPI } from '../../services/api';
+import { settingsAPI, servicesAPI } from '../../services/api';
 
 const defaultContactSettings = {
   whatsappNumber: import.meta.env.VITE_WHATSAPP_NUMBER || '5493534224605',
@@ -10,18 +10,13 @@ const defaultContactSettings = {
   contactEmail: 'piscinas@playaysol.com.ar',
 };
 
+const FALLBACK_SERVICE_NAMES = ['Piscinas de obra', 'Reformas', 'Climatización', 'Cercos y seguridad'];
+
 const empresaLinks = [
   ['/nosotros', 'Nosotros'],
   ['/proyectos', 'Proyectos'],
   ['/ubicacion', 'Ubicación'],
   ['/tienda', 'Tienda'],
-];
-
-const serviciosLinks = [
-  ['/servicios', 'Piscinas de obra'],
-  ['/servicios', 'Reformas'],
-  ['/servicios', 'Climatización'],
-  ['/servicios', 'Cercos y seguridad'],
 ];
 
 const linkHover = (e, on) => { e.currentTarget.style.color = on ? 'var(--text-inverse)' : 'var(--text-inverse-muted)'; };
@@ -32,6 +27,7 @@ const socialHover = (e, on) => {
 
 export default function Footer() {
   const [settings, setSettings] = useState(defaultContactSettings);
+  const [serviceNames, setServiceNames] = useState(FALLBACK_SERVICE_NAMES);
 
   useEffect(() => {
     settingsAPI.getPublic()
@@ -46,6 +42,14 @@ export default function Footer() {
       .catch(() => {
         // Keep fallback defaults if settings are unavailable.
       });
+
+    // Mismos servicios que administrás en /admin/servicios — así el footer
+    // nunca queda desactualizado respecto a lo que realmente se ofrece.
+    servicesAPI.getAll()
+      .then(({ data }) => {
+        if (data?.length > 0) setServiceNames(data.slice(0, 4).map((s) => s.title));
+      })
+      .catch(() => {});
   }, []);
 
   const socialLinks = [
@@ -56,10 +60,10 @@ export default function Footer() {
   ];
 
   const cols = [
-    { title: 'Servicios', items: serviciosLinks },
+    { title: 'Servicios', items: serviceNames.map((name) => ['/servicios', name]) },
     { title: 'Empresa',   items: empresaLinks },
     { title: 'Contacto',  items: [
-      ['/contacto', 'Escribinos'],
+      ['/contacto', 'Escribínos'],
       [settings.phoneNumberLink, settings.phoneNumberDisplay],
       [`https://wa.me/${settings.whatsappNumber}`, 'WhatsApp'],
       [`mailto:${settings.contactEmail}`, settings.contactEmail],

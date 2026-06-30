@@ -6,6 +6,7 @@ import {
   getAdminSettings,
   updateAdminSettings,
   uploadContactPhoto,
+  uploadAboutPhoto,
   getUsers,
   createUser,
   deleteUser,
@@ -18,6 +19,7 @@ router.get('/public', getPublicSettings);
 router.get('/admin', protect, adminOnly, getAdminSettings);
 router.put('/admin', protect, adminOnly, updateAdminSettings);
 router.post('/contact-photo', protect, adminOnly, uploadSettings.single('image'), uploadContactPhoto);
+router.post('/about-photo', protect, adminOnly, uploadSettings.single('image'), uploadAboutPhoto);
 
 router.get('/users', protect, adminOnly, getUsers);
 router.post('/users', protect, adminOnly, createUser);
