@@ -12,8 +12,8 @@ const LOCATION = {
 };
 
 const defaultContactSettings = {
-  phoneNumberDisplay: '3534224607',
-  phoneNumberLink: 'tel:+543534224607',
+  phoneNumberDisplay: '3534224605',
+  phoneNumberLink: 'tel:+543534224605',
   businessHours: [
     { day: 'Lunes a Viernes', hours: '9:00 - 18:00' },
     { day: 'Sábados', hours: '9:00 - 13:00' },
