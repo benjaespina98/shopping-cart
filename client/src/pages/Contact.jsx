@@ -1,20 +1,22 @@
 import { useEffect, useRef, useState } from 'react';
 import { FiMail, FiPhone, FiInstagram, FiFacebook, FiClock, FiSend, FiUser } from 'react-icons/fi';
-import { FaWhatsapp } from 'react-icons/fa';
+import { FaWhatsapp, FaTiktok } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { settingsAPI, quotesAPI } from '../services/api';
 import { Button } from '../design-system/Button';
 import { Card } from '../design-system/Card';
 import { Input } from '../design-system/Input';
+import { Photo } from '../design-system/Photo';
 import { useReveal } from '../hooks/useReveal';
 
-const INQUIRY_TYPES = ['Consulta general', 'Postventa y garantía', 'Proveedores', 'Otro'];
-
 const defaultContactSettings = {
-  whatsappNumber: import.meta.env.VITE_WHATSAPP_NUMBER || '5493534224607',
-  phoneNumberDisplay: '3534224607',
-  phoneNumberLink: 'tel:+543534224607',
-  contactEmail: 'benjaespina98@gmail.com',
+  whatsappNumber: import.meta.env.VITE_WHATSAPP_NUMBER || '5493534224605',
+  phoneNumberDisplay: '3534224605',
+  phoneNumberLink: 'tel:+543534224605',
+  contactEmail: 'piscinas@playaysol.com.ar',
+  secondaryContactLabel: '',
+  secondaryContactWhatsapp: '',
+  contactPhotoUrl: '',
   businessHours: [
     { day: 'Lunes a Viernes', hours: '9:00 - 18:00' },
     { day: 'Sábados', hours: '9:00 - 13:00' },
@@ -22,16 +24,9 @@ const defaultContactSettings = {
   ],
 };
 
-const CHANNELS = [
-  { Icon: FaWhatsapp, label: 'WhatsApp', key: 'whatsapp', getValue: (s) => s.phoneNumberDisplay, getHref: (s) => `https://wa.me/${s.whatsappNumber}` },
-  { Icon: FiPhone,    label: 'Teléfono', key: 'phone',    getValue: (s) => s.phoneNumberDisplay, getHref: (s) => s.phoneNumberLink },
-  { Icon: FiMail,     label: 'Email',    key: 'email',    getValue: (s) => s.contactEmail,        getHref: (s) => `mailto:${s.contactEmail}` },
-];
-
 export default function Contact() {
   const reveal = useReveal();
   const [form, setForm] = useState({ name: '', phone: '', email: '', message: '' });
-  const [inquiryType, setInquiryType] = useState(INQUIRY_TYPES[0]);
   const [sendingChannel, setSendingChannel] = useState('');
   const [contactSettings, setContactSettings] = useState(defaultContactSettings);
   const sentTimeoutRef = useRef(null);
@@ -47,6 +42,9 @@ export default function Contact() {
           phoneNumberDisplay: data?.phoneNumberDisplay || defaultContactSettings.phoneNumberDisplay,
           phoneNumberLink: data?.phoneNumberLink || defaultContactSettings.phoneNumberLink,
           contactEmail: data?.contactEmail || defaultContactSettings.contactEmail,
+          secondaryContactLabel: data?.secondaryContactLabel || '',
+          secondaryContactWhatsapp: data?.secondaryContactWhatsapp || '',
+          contactPhotoUrl: data?.contactPhotoUrl || '',
           businessHours: Array.isArray(data?.businessHours) && data.businessHours.length > 0
             ? data.businessHours
             : defaultContactSettings.businessHours,
@@ -69,7 +67,7 @@ export default function Contact() {
   };
 
   const getTextMessage = () =>
-    `Hola! Soy ${form.name} (${form.phone}${form.email ? `, ${form.email}` : ''}).\nMotivo: ${inquiryType}\n\n${form.message}`;
+    `Hola! Soy ${form.name} (${form.phone}${form.email ? `, ${form.email}` : ''}).\n\n${form.message}`;
 
   const validateForm = () => {
     if (!form.name.trim() || !form.phone.trim() || !form.email.trim() || !form.message.trim()) {
@@ -85,7 +83,7 @@ export default function Contact() {
   const saveInquiry = async () => {
     try {
       await quotesAPI.create({
-        projectType: inquiryType,
+        projectType: 'Consulta general',
         name: form.name,
         phone: form.phone,
         email: form.email,
@@ -118,6 +116,19 @@ export default function Contact() {
     resetFormWithFeedback('email');
   };
 
+  const channels = [
+    { Icon: FaWhatsapp, label: 'WhatsApp', href: `https://wa.me/${WHATSAPP_NUMBER}`, value: contactSettings.phoneNumberDisplay },
+    { Icon: FiMail,     label: 'Email',    href: `mailto:${CONTACT_EMAIL}`,          value: CONTACT_EMAIL },
+  ];
+  if (contactSettings.secondaryContactWhatsapp) {
+    channels.push({
+      Icon: FaWhatsapp,
+      label: contactSettings.secondaryContactLabel || 'Otro contacto',
+      href: `https://wa.me/${contactSettings.secondaryContactWhatsapp}`,
+      value: contactSettings.secondaryContactWhatsapp.replace(/^549/, ''),
+    });
+  }
+
   return (
     <section style={{ background: 'var(--bg-page)', padding: '52px 20px 72px', fontFamily: 'var(--font-body)' }}>
       <div ref={reveal.ref} className={reveal.className}>
@@ -128,20 +139,24 @@ export default function Contact() {
           ¿Tenés una consulta?
         </h1>
         <p style={{ fontSize: 16, color: 'var(--text-body)', lineHeight: 1.6 }}>
-          Elegí el canal que prefieras. Te respondemos directamente, sin intermediarios.
+          Escribinos por WhatsApp o email. Te respondemos directamente, sin intermediarios.
         </p>
       </div>
 
       <div className="ps-quote-grid" style={{ maxWidth: 1000, margin: '0 auto' }}>
         {/* Left — contact info */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
+          {contactSettings.contactPhotoUrl && (
+            <Photo src={contactSettings.contactPhotoUrl} label="Nuestro local" height={180} />
+          )}
+
           <Card padding="lg">
             <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 700, color: 'var(--text-strong)', marginBottom: 'var(--space-4)' }}>
               Información de contacto
             </h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-              {CHANNELS.map(({ Icon, label, key, getValue, getHref }) => (
-                <a key={key} href={getHref(contactSettings)} target={key !== 'phone' ? '_blank' : undefined} rel="noreferrer"
+              {channels.map(({ Icon, label, href, value }) => (
+                <a key={label} href={href} target="_blank" rel="noreferrer"
                   style={{
                     display: 'flex', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-3)',
                     borderRadius: 'var(--radius-md)', textDecoration: 'none',
@@ -158,7 +173,7 @@ export default function Contact() {
                   </span>
                   <span>
                     <span style={{ display: 'block', fontSize: 13, color: 'var(--text-muted)', fontWeight: 600 }}>{label}</span>
-                    <span style={{ display: 'block', fontSize: 15, color: 'var(--text-strong)', fontWeight: 700 }}>{getValue(contactSettings)}</span>
+                    <span style={{ display: 'block', fontSize: 15, color: 'var(--text-strong)', fontWeight: 700 }}>{value}</span>
                   </span>
                 </a>
               ))}
@@ -189,18 +204,24 @@ export default function Contact() {
             <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 'var(--space-4)' }}>
               Mirá nuestras últimas obras terminadas y en construcción.
             </p>
-            <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+            <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
               <a href="https://www.instagram.com/playaysol.piscinas/" target="_blank" rel="noreferrer"
-                style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                style={{ flex: '1 1 100px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                          padding: '12px', borderRadius: 'var(--radius-md)', color: '#fff', fontWeight: 700, fontSize: 14,
                          textDecoration: 'none', background: 'linear-gradient(135deg, #FEDA75, #FA7E1E, #D62976, #962FBF, #4F5BD5)' }}>
                 <FiInstagram size={18} /> Instagram
               </a>
               <a href="https://www.facebook.com/playaysol.piscinas" target="_blank" rel="noreferrer"
-                style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                style={{ flex: '1 1 100px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                          padding: '12px', borderRadius: 'var(--radius-md)', color: '#fff', fontWeight: 700, fontSize: 14,
                          textDecoration: 'none', background: '#1877F2' }}>
                 <FiFacebook size={18} /> Facebook
+              </a>
+              <a href="https://www.tiktok.com/@playaysolpiscinas" target="_blank" rel="noreferrer"
+                style={{ flex: '1 1 100px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                         padding: '12px', borderRadius: 'var(--radius-md)', color: '#fff', fontWeight: 700, fontSize: 14,
+                         textDecoration: 'none', background: '#000000' }}>
+                <FaTiktok size={16} /> TikTok
               </a>
             </div>
           </Card>
@@ -216,27 +237,6 @@ export default function Contact() {
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', marginBottom: 'var(--space-5)' }}>
-            <div>
-              <label style={{ fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 14,
-                              color: 'var(--text-strong)', display: 'block', marginBottom: 'var(--space-2)' }}>
-                Tipo de consulta
-              </label>
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                {INQUIRY_TYPES.map((t) => {
-                  const active = inquiryType === t;
-                  return (
-                    <button type="button" key={t} onClick={() => setInquiryType(t)} style={{
-                      flex: '0 0 auto', padding: '8px 14px', borderRadius: 'var(--radius-pill)',
-                      cursor: 'pointer', fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: 13,
-                      border: active ? '2px solid var(--brand-primary)' : '2px solid var(--border-default)',
-                      background: active ? 'var(--teal-50)' : 'var(--surface-card)',
-                      color: active ? 'var(--brand-primary)' : 'var(--text-muted)',
-                      transition: 'all var(--duration-fast) var(--ease-out)',
-                    }}>{t}</button>
-                  );
-                })}
-              </div>
-            </div>
             <div className="ps-form-row">
               <Input label="Nombre" placeholder="Tu nombre completo" required
                 leading={<FiUser size={16} />}

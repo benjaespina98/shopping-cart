@@ -96,6 +96,8 @@ export const settingsAPI = {
   getPublic: () => api.get('/settings/public'),
   getAdmin: () => api.get('/settings/admin'),
   updateAdmin: (data) => api.put('/settings/admin', data),
+  uploadContactPhoto: (formData) =>
+    api.post('/settings/contact-photo', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
   getUsers: () => api.get('/settings/users'),
   createUser: (data) => api.post('/settings/users', data),
   deleteUser: (id) => api.delete(`/settings/users/${id}`),

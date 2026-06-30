@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { FiSave, FiPlus, FiTrash2, FiUsers, FiClock, FiMail, FiPhone, FiUserMinus, FiDownload, FiLink, FiDroplet } from 'react-icons/fi';
+import { useEffect, useState, useRef } from 'react';
+import { FiSave, FiPlus, FiTrash2, FiUsers, FiClock, FiMail, FiUserMinus, FiDownload, FiLink, FiDroplet, FiImage, FiUpload } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import QRCode from 'qrcode';
 import { settingsAPI } from '../../services/api';
@@ -7,10 +7,13 @@ import { useAuth } from '../../context/AuthContext';
 
 const defaultSettings = {
   theme: 'default',
-  contactEmail: 'benjaespina98@gmail.com',
-  whatsappNumber: '5493534224607',
-  phoneNumberDisplay: '3534224607',
-  phoneNumberLink: 'tel:+543534224607',
+  contactEmail: 'piscinas@playaysol.com.ar',
+  whatsappNumber: '5493534224605',
+  phoneNumberDisplay: '3534224605',
+  phoneNumberLink: 'tel:+543534224605',
+  secondaryContactLabel: 'Ventas y presupuestos',
+  secondaryContactWhatsapp: '5493535668994',
+  contactPhotoUrl: '',
   businessHours: [
     { day: 'Lunes a Viernes', hours: '9:00 - 18:00' },
     { day: 'Sábados', hours: '9:00 - 13:00' },
@@ -32,10 +35,12 @@ export default function AdminSettings() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [creatingUser, setCreatingUser] = useState(false);
   const [newUser, setNewUser] = useState({ name: '', email: '', password: '' });
   const [siteUrl, setSiteUrl] = useState(typeof window !== 'undefined' ? window.location.origin : '');
   const [qrDataUrl, setQrDataUrl] = useState('');
+  const photoInputRef = useRef();
 
   const loadData = async () => {
     setLoading(true);
@@ -53,6 +58,9 @@ export default function AdminSettings() {
         whatsappNumber: data.whatsappNumber || defaultSettings.whatsappNumber,
         phoneNumberDisplay: data.phoneNumberDisplay || defaultSettings.phoneNumberDisplay,
         phoneNumberLink: data.phoneNumberLink || defaultSettings.phoneNumberLink,
+        secondaryContactLabel: data.secondaryContactLabel ?? defaultSettings.secondaryContactLabel,
+        secondaryContactWhatsapp: data.secondaryContactWhatsapp ?? defaultSettings.secondaryContactWhatsapp,
+        contactPhotoUrl: data.contactPhotoUrl || '',
         businessHours: Array.isArray(data.businessHours) && data.businessHours.length > 0
           ? data.businessHours
           : defaultSettings.businessHours,
@@ -96,12 +104,30 @@ export default function AdminSettings() {
         businessHours: settings.businessHours.filter((row) => row.day.trim() && row.hours.trim()),
       };
       const { data } = await settingsAPI.updateAdmin(payload);
-      setSettings(data.settings);
+      setSettings((prev) => ({ ...prev, ...data.settings }));
       toast.success('Configuración guardada');
     } catch (error) {
       toast.error(error?.response?.data?.message || 'No se pudo guardar la configuracion');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handlePhotoChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploadingPhoto(true);
+    try {
+      const fd = new FormData();
+      fd.append('image', file);
+      const { data } = await settingsAPI.uploadContactPhoto(fd);
+      setSettings((prev) => ({ ...prev, contactPhotoUrl: data.settings.contactPhotoUrl }));
+      toast.success('Foto de contacto actualizada');
+    } catch (error) {
+      toast.error(error?.response?.data?.message || 'No se pudo subir la foto');
+    } finally {
+      setUploadingPhoto(false);
+      if (photoInputRef.current) photoInputRef.current.value = '';
     }
   };
 
@@ -189,7 +215,6 @@ export default function AdminSettings() {
                 onClick={() => setSettings((prev) => ({ ...prev, theme: t.value }))}
                 className={`text-left p-4 rounded-xl border-2 transition-colors ${active ? 'border-primary-700 bg-primary-50/50' : 'border-slate-200 hover:border-slate-300'}`}
               >
-                {/* Mini preview: card + button rendered with this theme's radius/shadow */}
                 <div className="flex items-center gap-2 mb-3">
                   <div
                     className="w-12 h-9 bg-white border border-slate-200 flex items-center justify-center"
@@ -230,7 +255,7 @@ export default function AdminSettings() {
             />
           </div>
           <div>
-            <label className="label">Numero de WhatsApp (internacional)</label>
+            <label className="label">Numero de WhatsApp principal (internacional)</label>
             <input
               className="input"
               value={settings.whatsappNumber}
@@ -254,6 +279,55 @@ export default function AdminSettings() {
               onChange={(e) => setSettings((prev) => ({ ...prev, phoneNumberLink: e.target.value }))}
               placeholder="tel:+54..."
             />
+          </div>
+          <div>
+            <label className="label">Etiqueta del contacto secundario (opcional)</label>
+            <input
+              className="input"
+              value={settings.secondaryContactLabel}
+              onChange={(e) => setSettings((prev) => ({ ...prev, secondaryContactLabel: e.target.value }))}
+              placeholder="Ej: Ventas y presupuestos"
+            />
+          </div>
+          <div>
+            <label className="label">WhatsApp del contacto secundario (opcional)</label>
+            <input
+              className="input"
+              value={settings.secondaryContactWhatsapp}
+              onChange={(e) => setSettings((prev) => ({ ...prev, secondaryContactWhatsapp: e.target.value }))}
+              placeholder="549... (dejar vacío para no mostrarlo)"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="card p-6">
+        <h2 className="font-semibold text-slate-800 mb-1 flex items-center gap-2">
+          <FiImage size={16} />
+          Foto de contacto
+        </h2>
+        <p className="text-slate-500 text-sm mb-4">
+          Se muestra en <strong>/contacto</strong> (ej. el local, el showroom o el equipo).
+        </p>
+        <div className="flex items-start gap-4 flex-wrap">
+          <label className="flex-shrink-0 cursor-pointer">
+            <div className="w-44 h-32 rounded-xl border-2 border-dashed border-slate-300 hover:border-primary-700 flex flex-col items-center justify-center text-slate-400 hover:text-primary-700 transition-colors overflow-hidden">
+              {settings.contactPhotoUrl
+                ? <img src={settings.contactPhotoUrl} alt="" className="w-full h-full object-cover" />
+                : <><FiImage size={24} /><span className="text-xs mt-1">Elegir foto</span></>}
+            </div>
+            <input type="file" accept="image/*" className="hidden" ref={photoInputRef} onChange={handlePhotoChange} />
+          </label>
+          <div className="flex flex-col gap-2">
+            <button
+              type="button"
+              onClick={() => photoInputRef.current?.click()}
+              disabled={uploadingPhoto}
+              className="btn-secondary inline-flex items-center gap-2 disabled:opacity-50"
+            >
+              <FiUpload size={15} /> {uploadingPhoto ? 'Subiendo...' : settings.contactPhotoUrl ? 'Cambiar foto' : 'Subir foto'}
+            </button>
+            <p className="text-xs text-slate-400 max-w-xs">JPG, PNG o WEBP. Se actualiza al instante, no hace falta guardar configuración.</p>
           </div>
         </div>
       </div>

@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { FiInstagram, FiFacebook } from 'react-icons/fi';
-import { FaWhatsapp } from 'react-icons/fa';
+import { FaWhatsapp, FaTiktok } from 'react-icons/fa';
 import { settingsAPI } from '../../services/api';
 
 const defaultContactSettings = {
-  whatsappNumber: import.meta.env.VITE_WHATSAPP_NUMBER || '5493534224607',
-  phoneNumberDisplay: '3534224607',
-  phoneNumberLink: 'tel:+543534224607',
+  whatsappNumber: import.meta.env.VITE_WHATSAPP_NUMBER || '5493534224605',
+  phoneNumberDisplay: '3534224605',
+  phoneNumberLink: 'tel:+543534224605',
   contactEmail: 'piscinas@playaysol.com.ar',
 };
 
@@ -51,6 +51,7 @@ export default function Footer() {
   const socialLinks = [
     { href: 'https://www.instagram.com/playaysol.piscinas/', Icon: FiInstagram, label: 'Instagram', bg: 'linear-gradient(135deg, #FEDA75, #FA7E1E, #D62976, #962FBF, #4F5BD5)' },
     { href: 'https://www.facebook.com/playaysol.piscinas', Icon: FiFacebook, label: 'Facebook', bg: '#1877F2' },
+    { href: 'https://www.tiktok.com/@playaysolpiscinas', Icon: FaTiktok, label: 'TikTok', bg: '#000000' },
     { href: `https://wa.me/${settings.whatsappNumber}`, Icon: FaWhatsapp, label: 'WhatsApp', bg: '#25D366' },
   ];
 

@@ -1,6 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import Settings from '../models/Settings.js';
 import User from '../models/User.js';
+import { cloudinary } from '../config/cloudinary.js';
 import { writeAuditLog } from '../utils/auditLogger.js';
 
 const VALID_THEMES = ['default', 'elegante', 'moderno'];
@@ -8,10 +9,12 @@ const VALID_THEMES = ['default', 'elegante', 'moderno'];
 const defaultSettings = {
   singletonKey: 'main',
   theme: 'default',
-  contactEmail: 'benjaespina98@gmail.com',
-  whatsappNumber: '5493534224607',
-  phoneNumberDisplay: '3534224607',
-  phoneNumberLink: 'tel:+543534224607',
+  contactEmail: 'piscinas@playaysol.com.ar',
+  whatsappNumber: '5493534224605',
+  phoneNumberDisplay: '3534224605',
+  phoneNumberLink: 'tel:+543534224605',
+  secondaryContactLabel: 'Ventas y presupuestos',
+  secondaryContactWhatsapp: '5493535668994',
   businessHours: [
     { day: 'Lunes a Viernes', hours: '9:00 - 18:00' },
     { day: 'Sábados', hours: '9:00 - 13:00' },
@@ -47,6 +50,9 @@ const toPublicResponse = (settings) => ({
   whatsappNumber: settings.whatsappNumber,
   phoneNumberDisplay: settings.phoneNumberDisplay,
   phoneNumberLink: settings.phoneNumberLink,
+  secondaryContactLabel: settings.secondaryContactLabel || '',
+  secondaryContactWhatsapp: settings.secondaryContactWhatsapp || '',
+  contactPhotoUrl: settings.contactPhotoUrl || '',
   businessHours: settings.businessHours,
 });
 
@@ -70,6 +76,8 @@ export const updateAdminSettings = asyncHandler(async (req, res) => {
   const whatsappNumber = String(req.body?.whatsappNumber || '').trim();
   const phoneNumberDisplay = String(req.body?.phoneNumberDisplay || '').trim();
   const phoneNumberLink = String(req.body?.phoneNumberLink || '').trim();
+  const secondaryContactLabel = req.body?.secondaryContactLabel;
+  const secondaryContactWhatsapp = req.body?.secondaryContactWhatsapp;
   const theme = String(req.body?.theme || '').trim();
 
   if (theme && VALID_THEMES.includes(theme)) {
@@ -79,6 +87,8 @@ export const updateAdminSettings = asyncHandler(async (req, res) => {
   settings.whatsappNumber = whatsappNumber || settings.whatsappNumber;
   settings.phoneNumberDisplay = phoneNumberDisplay || settings.phoneNumberDisplay;
   settings.phoneNumberLink = phoneNumberLink || settings.phoneNumberLink;
+  if (secondaryContactLabel !== undefined) settings.secondaryContactLabel = String(secondaryContactLabel).trim();
+  if (secondaryContactWhatsapp !== undefined) settings.secondaryContactWhatsapp = String(secondaryContactWhatsapp).trim();
   settings.businessHours = sanitizeBusinessHours(req.body?.businessHours);
 
   await settings.save();
@@ -95,6 +105,34 @@ export const updateAdminSettings = asyncHandler(async (req, res) => {
     message: 'Configuracion actualizada correctamente',
     settings: toPublicResponse(settings),
   });
+});
+
+// POST /api/settings/contact-photo — admin
+export const uploadContactPhoto = asyncHandler(async (req, res) => {
+  if (!req.file) {
+    res.status(400);
+    throw new Error('No se recibió ninguna imagen');
+  }
+
+  const settings = await getOrCreateSettings();
+
+  if (settings.contactPhotoPublicId) {
+    await cloudinary.uploader.destroy(settings.contactPhotoPublicId).catch(() => {});
+  }
+
+  settings.contactPhotoUrl = req.file.path;
+  settings.contactPhotoPublicId = req.file.filename;
+  await settings.save();
+
+  await writeAuditLog({
+    req,
+    action: 'SETTINGS_UPDATED',
+    entity: 'settings',
+    entityId: settings._id,
+    message: 'Foto de contacto actualizada',
+  });
+
+  res.json({ settings: toPublicResponse(settings) });
 });
 
 // GET /api/settings/users

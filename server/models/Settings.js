@@ -12,10 +12,14 @@ const settingsSchema = new mongoose.Schema(
   {
     singletonKey: { type: String, unique: true, default: 'main' },
     theme: { type: String, enum: ['default', 'elegante', 'moderno'], default: 'default' },
-    contactEmail: { type: String, trim: true, default: 'benjaespina98@gmail.com' },
-    whatsappNumber: { type: String, trim: true, default: '5493534224607' },
-    phoneNumberDisplay: { type: String, trim: true, default: '3534224607' },
-    phoneNumberLink: { type: String, trim: true, default: 'tel:+543534224607' },
+    contactEmail: { type: String, trim: true, default: 'piscinas@playaysol.com.ar' },
+    whatsappNumber: { type: String, trim: true, default: '5493534224605' },
+    phoneNumberDisplay: { type: String, trim: true, default: '3534224605' },
+    phoneNumberLink: { type: String, trim: true, default: 'tel:+543534224605' },
+    secondaryContactLabel: { type: String, trim: true, default: 'Ventas y presupuestos' },
+    secondaryContactWhatsapp: { type: String, trim: true, default: '5493535668994' },
+    contactPhotoUrl: { type: String, default: '' },
+    contactPhotoPublicId: { type: String, default: '' },
     businessHours: {
       type: [businessHourSchema],
       default: [

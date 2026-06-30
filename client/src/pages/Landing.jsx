@@ -113,14 +113,14 @@ export default function Landing() {
           </div>
           <div className="ps-hero-photo">
             <div style={{
-              borderRadius: 'var(--radius-xl)', padding: 6,
+              borderRadius: 'var(--radius-xl)', padding: 3,
               background: 'var(--surface-on-dark)',
               border: '1px solid var(--border-on-dark-subtle)',
               boxShadow: 'var(--shadow-lg)',
             }}>
               <Photo
                 label={heroProject ? `${heroProject.title} · ${heroProject.location}` : 'Piscina infinity · Villa María'}
-                height={360}
+                height={460}
                 radius="var(--radius-lg)"
                 src={heroProject?.imageUrl || undefined}
               />
