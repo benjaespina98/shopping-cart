@@ -9,8 +9,8 @@ const SOCIAL_LINKS = [
 
 const cols = [
   { title: 'Servicios', items: [['/servicios', 'Piscinas de obra'], ['/servicios', 'Reformas'], ['/servicios', 'Climatización'], ['/servicios', 'Cercos y seguridad']] },
-  { title: 'Empresa',   items: [['/proyectos', 'Proyectos'], ['/servicios', 'Servicios'], ['/tienda', 'Tienda'], ['/admin/login', 'Portal admin']] },
-  { title: 'Contacto',  items: [['tel:+543534224607', '353 422-4607'], ['https://wa.me/5493534224607', 'WhatsApp'], ['mailto:piscinas@playaysol.com.ar', 'piscinas@playaysol.com.ar'], ['#', 'Villa María, Córdoba']] },
+  { title: 'Empresa',   items: [['/nosotros', 'Nosotros'], ['/proyectos', 'Proyectos'], ['/tienda', 'Tienda'], ['/admin/login', 'Portal admin']] },
+  { title: 'Contacto',  items: [['/contacto', 'Escribinos'], ['tel:+543534224607', '353 422-4607'], ['https://wa.me/5493534224607', 'WhatsApp'], ['mailto:piscinas@playaysol.com.ar', 'piscinas@playaysol.com.ar']] },
 ];
 
 const linkHover = (e, on) => { e.currentTarget.style.color = on ? 'var(--text-inverse)' : 'var(--text-inverse-muted)'; };
@@ -27,15 +27,11 @@ export default function Footer() {
 
         {/* Brand */}
         <div>
-          <div style={{
-            display: 'inline-flex', alignItems: 'center', marginBottom: 14,
-            background: 'var(--surface-card)', borderRadius: 'var(--radius-md)',
-            padding: '10px 16px',
-          }}>
-            <img src="/brand/logo-horizontal.png" alt="Playa & Sol" style={{ height: 26, width: 'auto', display: 'block' }} />
+          <div style={{ marginBottom: 14 }}>
+            <img src="/brand/logo-horizontal.png" alt="Playa & Sol" style={{ height: 30, width: 'auto', display: 'block' }} />
           </div>
           <p style={{ fontSize: 14, lineHeight: 1.6, maxWidth: 240, marginBottom: 18 }}>
-            Diseño, construcción y mantenimiento de piscinas en Villa María y la región desde 2004.
+            Diseño, construcción y mantenimiento de piscinas en Villa María y la región, con más de 30 años de trayectoria.
           </p>
           <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase',
                       color: 'var(--text-inverse-faint)', marginBottom: 10 }}>

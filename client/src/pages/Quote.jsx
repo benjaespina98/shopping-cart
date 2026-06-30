@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiUser, FiPhone, FiMail, FiMapPin, FiSend, FiCheck, FiClock, FiShield } from 'react-icons/fi';
+import { FiUser, FiPhone, FiMail, FiMapPin, FiSend, FiCheck, FiClock, FiShield, FiMessageSquare } from 'react-icons/fi';
 import { Button } from '../design-system/Button';
 import { Card } from '../design-system/Card';
 import { Badge } from '../design-system/Badge';
@@ -9,6 +9,7 @@ import { Checkbox } from '../design-system/Checkbox';
 import { Photo } from '../design-system/Photo';
 import { useReveal } from '../hooks/useReveal';
 import { servicesAPI, quotesAPI } from '../services/api';
+import { trackEvent } from '../utils/analytics';
 
 const FALLBACK_TYPES = ['Piscina nueva', 'Reforma', 'Cerco / Seguridad'];
 const OTHER_TYPE = 'Otra consulta';
@@ -31,7 +32,7 @@ export default function Quote() {
   const [fieldErrors, setFieldErrors] = useState({});
   const [types, setTypes] = useState(FALLBACK_TYPES);
   const [tipo, setTipo] = useState('');
-  const [form, setForm] = useState({ name: '', phone: '', email: '', location: '' });
+  const [form, setForm] = useState({ name: '', phone: '', email: '', location: '', message: '' });
   const [acceptedPrivacy, setAcceptedPrivacy] = useState(true);
 
   useEffect(() => {
@@ -83,7 +84,9 @@ export default function Quote() {
         phone: form.phone,
         email: form.email,
         location: form.location,
+        message: form.message,
       });
+      trackEvent('generate_lead', { project_type: tipo });
       setSent(true);
     } catch (err) {
       setFormError(err.response?.data?.message || 'No pudimos enviar tu solicitud. Probá de nuevo.');
@@ -198,6 +201,28 @@ export default function Quote() {
                 leading={<FiMail size={16} />} error={fieldErrors.email} />
               <Input label="Localidad" placeholder="Corrientes 1210, Villa María…" value={form.location} onChange={setField('location')}
                 leading={<FiMapPin size={16} />} />
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <label htmlFor="quote-message" style={{ fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 14, color: 'var(--text-strong)' }}>
+                  Contanos tu consulta <span style={{ fontWeight: 400, color: 'var(--text-muted)' }}>(opcional)</span>
+                </label>
+                <div style={{ display: 'flex', gap: 8, padding: '11px 14px', borderRadius: 'var(--radius-md)',
+                              border: '2px solid var(--border-default)', background: 'var(--surface-card)' }}>
+                  <FiMessageSquare size={16} style={{ color: 'var(--text-muted)', marginTop: 2, flexShrink: 0 }} />
+                  <textarea
+                    id="quote-message"
+                    rows={3}
+                    placeholder="Medidas aproximadas, plazos, algo puntual que quieras contarnos..."
+                    value={form.message}
+                    onChange={setField('message')}
+                    style={{
+                      flex: 1, border: 'none', outline: 'none', resize: 'vertical', minHeight: 64,
+                      fontFamily: 'var(--font-body)', fontSize: '1rem', color: 'var(--text-strong)', background: 'transparent',
+                    }}
+                  />
+                </div>
+              </div>
+
               <Checkbox label="Acepto la política de privacidad" checked={acceptedPrivacy}
                 onChange={(e) => setAcceptedPrivacy(e.target.checked)} />
               {formError && (

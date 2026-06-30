@@ -6,6 +6,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 
 const Landing = lazy(() => import('./pages/Landing'));
 const Shop = lazy(() => import('./pages/Shop'));
+const About = lazy(() => import('./pages/About'));
 const Contact = lazy(() => import('./pages/Contact'));
 const Location = lazy(() => import('./pages/Location'));
 const Services = lazy(() => import('./pages/Services'));
@@ -53,6 +54,7 @@ export default function App() {
         <Route element={<PublicLayout />}>
           <Route path="/" element={<Suspense fallback={<PublicFallback />}><Landing /></Suspense>} />
           <Route path="/tienda" element={<Suspense fallback={<PublicFallback />}><Shop /></Suspense>} />
+          <Route path="/nosotros" element={<Suspense fallback={<PublicFallback />}><About /></Suspense>} />
           <Route path="/contacto" element={<Suspense fallback={<PublicFallback />}><Contact /></Suspense>} />
           <Route path="/ubicacion" element={<Suspense fallback={<PublicFallback />}><Location /></Suspense>} />
           <Route path="/servicios" element={<Suspense fallback={<PublicFallback />}><Services /></Suspense>} />

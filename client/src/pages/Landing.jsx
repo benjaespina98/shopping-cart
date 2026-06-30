@@ -7,17 +7,38 @@ import { useCart } from '../context/CartContext';
 import { useReveal } from '../hooks/useReveal';
 import { Button } from '../design-system/Button';
 import { Card } from '../design-system/Card';
+import { Badge } from '../design-system/Badge';
 import { Photo } from '../design-system/Photo';
 
 const FALLBACK_SERVICES = [
-  { title: 'Piscinas de obra',   description: 'Diseño y construcción a medida, de hormigón gunitado.',          tone: 'sun' },
-  { title: 'Reformas',           description: 'Renovamos vaso, coronación y depuración.',                        tone: 'teal' },
-  { title: 'Climatización',      description: 'Bombas de calor y cubiertas para nadar más meses.',                tone: 'sun' },
-  { title: 'Cercos y seguridad', description: 'Cercos removibles y fijos para proteger a niños y mascotas.',      tone: 'teal' },
+  {
+    title: 'Piscinas de obra', tag: 'Diseño y obra', tone: 'sun', variant: 'solid',
+    description: 'Relevamos el terreno, proyectamos la forma y construimos en hormigón gunitado: la técnica que más años de vida le da a una pileta.',
+    bullets: ['Proyecto 3D antes de iniciar la obra', 'Hormigón gunitado, sin uniones ni filtraciones', 'Garantía escrita de 10 años en el vaso'],
+    cta: 'Quiero mi piscina',
+  },
+  {
+    title: 'Reformas', tag: 'Puesta a punto', tone: 'teal', variant: 'soft',
+    description: 'Una pileta envejecida pierde agua, color y seguridad. Recuperamos el vaso, la coronación y la depuración con materiales actuales.',
+    bullets: ['Diagnóstico real antes de presupuestar', 'Cambio de revestimiento sin demoler el vaso', 'Filtros y bombas al día con la normativa'],
+    cta: 'Solicitar presupuesto',
+  },
+  {
+    title: 'Climatización', tag: 'Más temporada', tone: 'sun', variant: 'solid',
+    description: 'Con la bomba de calor correcta y una cubierta bien elegida, el agua se mantiene a temperatura semanas antes y después de la temporada.',
+    bullets: ['Bombas de calor de bajo consumo eléctrico', 'Cubiertas automáticas que cortan la evaporación', 'Hasta dos meses más de baño al año'],
+    cta: 'Asesorarme',
+  },
+  {
+    title: 'Cercos y seguridad', tag: 'Tranquilidad en casa', tone: 'teal', variant: 'soft',
+    description: 'Instalamos barreras físicas certificadas, pensadas para frenar a los más chicos sin tapar la vista de la pileta.',
+    bullets: ['Barreras removibles o fijas, según el espacio', 'Resistentes a impacto y a la intemperie', 'Instalación con cierre de seguridad certificado'],
+    cta: 'Hablar con un especialista',
+  },
 ];
 
 const stats = [
-  { Icon: FiAward,   n: '20 años', l: 'de trayectoria en Villa María' },
+  { Icon: FiAward,   n: '+30 años', l: 'de trayectoria en Villa María' },
   { Icon: FiDroplet, n: '+850',    l: 'piscinas construidas' },
   { Icon: FiUsers,   n: '100%',    l: 'atención personalizada' },
   { Icon: FiClock,   n: '48h',     l: 'para tu presupuesto' },
@@ -140,12 +161,29 @@ export default function Landing() {
           </div>
           <div className="ps-services-grid">
             {services.map(s => (
-              <Card key={s._id || s.title} accent={s.tone} interactive padding="lg" onClick={() => navigate('/servicios')}>
+              <Card key={s._id || s.title} accent={s.tone} interactive padding="lg"
+                style={{ display: 'flex', flexDirection: 'column' }}
+                onClick={() => navigate('/servicios')}>
+                {s.tag && (
+                  <Badge tone={s.tone} variant={s.variant || 'soft'} size="sm" style={{ marginBottom: 'var(--space-3)', alignSelf: 'flex-start' }}>
+                    {s.tag}
+                  </Badge>
+                )}
                 <h3 style={{ fontSize: 18, marginBottom: 'var(--space-2)', fontWeight: 600, fontFamily: 'var(--font-display)',
                              color: 'var(--text-strong)' }}>{s.title}</h3>
-                <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.6 }}>{s.description}</p>
+                <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 'var(--space-3)' }}>{s.description}</p>
+                {s.bullets?.length > 0 && (
+                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}>
+                    {s.bullets.slice(0, 3).map((b) => (
+                      <li key={b} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 13, color: 'var(--text-body)', lineHeight: 1.4 }}>
+                        <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'var(--brand-primary)', marginTop: 7, flexShrink: 0 }} />
+                        {b}
+                      </li>
+                    ))}
+                  </ul>
+                )}
                 <div style={{ marginTop: 'var(--space-4)', color: 'var(--text-link)', fontWeight: 700, fontSize: 14 }}>
-                  Saber más →
+                  {s.cta || 'Saber más'} →
                 </div>
               </Card>
             ))}

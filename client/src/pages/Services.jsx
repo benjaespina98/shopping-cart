@@ -7,24 +7,28 @@ import { servicesAPI } from '../services/api';
 
 const FALLBACK_ROWS = [
   {
-    title: 'Piscinas de obra', tag: 'Construcción', tone: 'sun', variant: 'solid',
-    description: 'Proyecto a medida en hormigón gunitado: del estudio del terreno al revestimiento final. Formas libres, infinity, desbordante o skimmer.',
-    bullets: ['Estudio y diseño 3D', 'Hormigón gunitado', 'Revestimiento gresite o microcemento'],
+    title: 'Piscinas de obra', tag: 'Diseño y obra', tone: 'sun', variant: 'solid',
+    description: 'Relevamos el terreno, proyectamos la forma y construimos en hormigón gunitado: la técnica que más años de vida le da a una pileta. Cada decisión, pensada para que dure generaciones.',
+    bullets: ['Proyecto 3D antes de iniciar la obra', 'Hormigón gunitado, sin uniones ni filtraciones', 'Garantía escrita de 10 años en el vaso'],
+    cta: 'Quiero mi piscina',
   },
   {
-    title: 'Reformas', tag: 'Renovación', tone: 'teal', variant: 'soft',
-    description: 'Devolvemos la vida a tu piscina: cambio de vaso, coronación, iluminación LED y modernización de la depuración.',
-    bullets: ['Nuevo revestimiento', 'Iluminación LED', 'Depuración eficiente'],
+    title: 'Reformas', tag: 'Puesta a punto', tone: 'teal', variant: 'soft',
+    description: 'Una pileta envejecida pierde agua, color y seguridad. Recuperamos el vaso, la coronación y la depuración con materiales actuales, sin romper más de lo necesario.',
+    bullets: ['Diagnóstico real antes de presupuestar', 'Cambio de revestimiento sin demoler el vaso', 'Filtros y bombas al día con la normativa'],
+    cta: 'Solicitar presupuesto',
   },
   {
-    title: 'Climatización', tag: 'Confort', tone: 'sun', variant: 'solid',
-    description: 'Bombas de calor, cubiertas y cobertores para disfrutar de tu piscina muchos más meses al año, con bajo consumo.',
-    bullets: ['Bomba de calor inverter', 'Cubierta automática', 'Manta térmica'],
+    title: 'Climatización', tag: 'Más temporada', tone: 'sun', variant: 'solid',
+    description: 'Octubre a abril ya no alcanza. Con la bomba de calor correcta y una cubierta bien elegida, el agua se mantiene a temperatura semanas antes y después de la temporada.',
+    bullets: ['Bombas de calor de bajo consumo eléctrico', 'Cubiertas automáticas que cortan la evaporación', 'Hasta dos meses más de baño al año'],
+    cta: 'Asesorarme',
   },
   {
-    title: 'Cercos y seguridad', tag: 'Seguridad', tone: 'teal', variant: 'soft',
-    description: 'Protegemos lo que más querés: cercos removibles y fijos alrededor de tu piscina para mayor tranquilidad con niños y mascotas.',
-    bullets: ['Cercos removibles y fijos', 'Materiales de alta resistencia', 'Instalación profesional'],
+    title: 'Cercos y seguridad', tag: 'Tranquilidad en casa', tone: 'teal', variant: 'soft',
+    description: 'Un descuido de segundos puede ser grave. Instalamos barreras físicas certificadas, pensadas para frenar a los más chicos sin tapar la vista de la pileta.',
+    bullets: ['Barreras removibles o fijas, según el espacio', 'Resistentes a impacto y a la intemperie', 'Instalación con cierre de seguridad certificado'],
+    cta: 'Hablar con un especialista',
   },
 ];
 
@@ -94,7 +98,7 @@ export default function Services() {
                       ))}
                     </ul>
                   )}
-                  <Button variant="primary" onClick={() => navigate('/presupuesto')}>Pedir presupuesto</Button>
+                  <Button variant="primary" onClick={() => navigate('/presupuesto')}>{r.cta || 'Solicitar presupuesto'}</Button>
                 </div>
               </div>
             ))}

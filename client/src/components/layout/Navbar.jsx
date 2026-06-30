@@ -8,7 +8,9 @@ const navLinks = [
   { to: '/',          label: 'Inicio',    end: true },
   { to: '/servicios', label: 'Servicios', end: false },
   { to: '/proyectos', label: 'Proyectos', end: false },
+  { to: '/nosotros',  label: 'Nosotros',  end: false },
   { to: '/tienda',    label: 'Tienda',    end: false },
+  { to: '/contacto',  label: 'Contacto',  end: false },
 ];
 
 function NavItem({ to, label, end, onClick, mobile = false }) {
@@ -65,8 +67,8 @@ export default function Navbar() {
           <img src="/brand/logo-horizontal.png" alt="Playa & Sol" style={{ height: 34, width: 'auto', display: 'block' }} />
         </button>
 
-        {/* Desktop nav — hidden on mobile via className */}
-        <nav className="hidden md:flex" style={{ alignItems: 'center', gap: 'var(--space-7)' }}>
+        {/* Desktop nav — hidden below lg to avoid cramming 6 links on tablet widths */}
+        <nav className="hidden lg:flex" style={{ alignItems: 'center', gap: 'var(--space-6)' }}>
           {navLinks.map((link) => <NavItem key={link.to} {...link} />)}
         </nav>
 
@@ -93,15 +95,15 @@ export default function Navbar() {
             </button>
           )}
 
-          {/* Desktop CTA — hidden on mobile */}
-          <div className="hidden md:block">
+          {/* Desktop CTA — hidden below lg */}
+          <div className="hidden lg:block">
             <Button variant="primary" size="sm" onClick={() => handleNav('/presupuesto')}>
               Pide presupuesto
             </Button>
           </div>
 
           {/* Mobile hamburger — hidden on desktop */}
-          <button className="md:hidden"
+          <button className="lg:hidden"
             onMouseEnter={() => setMenuHover(true)}
             onMouseLeave={() => setMenuHover(false)}
             style={{ padding: 8, borderRadius: 12, background: menuHover ? 'var(--grey-50)' : 'transparent',

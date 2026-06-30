@@ -9,7 +9,7 @@ import { servicesAPI } from '../../services/api';
 const TONES = ['teal', 'sun'];
 const VARIANTS = ['soft', 'solid'];
 
-const emptyForm = { title: '', tag: '', description: '', bullets: '', tone: 'teal', variant: 'soft', active: true };
+const emptyForm = { title: '', tag: '', description: '', bullets: '', tone: 'teal', variant: 'soft', cta: '', active: true };
 
 export default function AdminServices() {
   const [services, setServices] = useState([]);
@@ -61,6 +61,7 @@ export default function AdminServices() {
       fd.append('description', form.description);
       fd.append('tone', form.tone);
       fd.append('variant', form.variant);
+      fd.append('cta', form.cta || 'Solicitar presupuesto');
       fd.append('active', form.active);
       const bulletList = form.bullets.split(',').map((b) => b.trim()).filter(Boolean);
       fd.append('bullets', JSON.stringify(bulletList));
@@ -83,7 +84,8 @@ export default function AdminServices() {
     setEditingId(s._id);
     setEditForm({
       title: s.title, tag: s.tag, description: s.description,
-      bullets: (s.bullets || []).join(', '), tone: s.tone, variant: s.variant, active: s.active,
+      bullets: (s.bullets || []).join(', '), tone: s.tone, variant: s.variant,
+      cta: s.cta || '', active: s.active,
     });
     setEditFile(null);
     setEditPreview(null);
@@ -114,6 +116,7 @@ export default function AdminServices() {
       fd.append('description', editForm.description);
       fd.append('tone', editForm.tone);
       fd.append('variant', editForm.variant);
+      fd.append('cta', editForm.cta || 'Solicitar presupuesto');
       fd.append('active', String(editForm.active));
       const bulletList = editForm.bullets.split(',').map((b) => b.trim()).filter(Boolean);
       fd.append('bullets', JSON.stringify(bulletList));
@@ -213,6 +216,11 @@ export default function AdminServices() {
                 <input className="input" placeholder="Estudio y diseño 3D, Hormigón gunitado" value={form.bullets}
                   onChange={(e) => setForm(f => ({ ...f, bullets: e.target.value }))} />
               </div>
+              <div className="sm:col-span-2">
+                <label className="label">Texto del botón (CTA)</label>
+                <input className="input" placeholder="Solicitar presupuesto" value={form.cta}
+                  onChange={(e) => setForm(f => ({ ...f, cta: e.target.value }))} />
+              </div>
               <div>
                 <label className="label">Color de acento</label>
                 <select className="input" value={form.tone} onChange={(e) => setForm(f => ({ ...f, tone: e.target.value }))}>
@@ -272,6 +280,8 @@ export default function AdminServices() {
                         onChange={(e) => setEditForm(f => ({ ...f, description: e.target.value }))} />
                       <input className="input text-sm sm:col-span-2" value={editForm.bullets} placeholder="Viñetas separadas por coma"
                         onChange={(e) => setEditForm(f => ({ ...f, bullets: e.target.value }))} />
+                      <input className="input text-sm sm:col-span-2" value={editForm.cta} placeholder="Texto del botón (CTA)"
+                        onChange={(e) => setEditForm(f => ({ ...f, cta: e.target.value }))} />
                       <select className="input text-sm" value={editForm.tone}
                         onChange={(e) => setEditForm(f => ({ ...f, tone: e.target.value }))}>
                         {TONES.map(t => <option key={t} value={t}>{t === 'teal' ? 'Teal' : 'Sol (amarillo)'}</option>)}
