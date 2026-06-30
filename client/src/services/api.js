@@ -129,4 +129,11 @@ export const servicesAPI = {
   delete: (id) => api.delete(`/services/${id}`),
 };
 
+// ─── Quotes (presupuesto) ────────────────────────────────
+export const quotesAPI = {
+  create: (data) => api.post('/quotes', data),
+  getAll: () => api.get('/quotes'),
+  updateStatus: (id, status) => api.patch(`/quotes/${id}/status`, { status }),
+};
+
 export default api;

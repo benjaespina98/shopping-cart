@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { FaWhatsapp } from 'react-icons/fa';
 import { settingsAPI } from '../../services/api';
 
-const DEFAULT_WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '5493534224605';
+const DEFAULT_WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '5493534224607';
 
 export default function WhatsAppFloat() {
   const [whatsappNumber, setWhatsappNumber] = useState(DEFAULT_WHATSAPP_NUMBER);

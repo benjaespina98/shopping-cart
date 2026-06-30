@@ -12,10 +12,10 @@ export const getProjects = asyncHandler(async (req, res) => {
 
 // POST /api/projects — admin
 export const createProject = asyncHandler(async (req, res) => {
-  const { title, location, category, status, featured, isHero } = req.body;
-  if (!title || !location || !category) {
+  const { title, location, featured, isHero } = req.body;
+  if (!title || !location) {
     res.status(400);
-    throw new Error('title, location y category son requeridos');
+    throw new Error('title y location son requeridos');
   }
   const count = await Project.countDocuments();
   const wantsHero = isHero === 'true' || isHero === true;
@@ -25,8 +25,6 @@ export const createProject = asyncHandler(async (req, res) => {
   const project = await Project.create({
     title,
     location,
-    category,
-    status: status || 'Terminada',
     featured: featured === 'true' || featured === true,
     isHero: wantsHero,
     imageUrl: req.file?.path || '',
@@ -44,11 +42,9 @@ export const updateProject = asyncHandler(async (req, res) => {
     throw new Error('Proyecto no encontrado');
   }
 
-  const { title, location, category, status, featured, isHero } = req.body;
+  const { title, location, featured, isHero } = req.body;
   if (title !== undefined)    project.title    = title;
   if (location !== undefined) project.location = location;
-  if (category !== undefined) project.category = category;
-  if (status !== undefined)   project.status   = status;
   if (featured !== undefined) project.featured = featured === 'true' || featured === true;
   if (isHero !== undefined) {
     const wantsHero = isHero === 'true' || isHero === true;

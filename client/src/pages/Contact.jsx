@@ -5,9 +5,9 @@ import { toast } from 'react-toastify';
 import { settingsAPI } from '../services/api';
 
 const defaultContactSettings = {
-  whatsappNumber: import.meta.env.VITE_WHATSAPP_NUMBER || '5493534224605',
-  phoneNumberDisplay: '3534224605',
-  phoneNumberLink: 'tel:+543534224605',
+  whatsappNumber: import.meta.env.VITE_WHATSAPP_NUMBER || '5493534224607',
+  phoneNumberDisplay: '3534224607',
+  phoneNumberLink: 'tel:+543534224607',
   contactEmail: 'benjaespina98@gmail.com',
   businessHours: [
     { day: 'Lunes a Viernes', hours: '9:00 - 18:00' },

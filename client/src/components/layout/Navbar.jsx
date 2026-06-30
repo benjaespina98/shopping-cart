@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { FiShoppingCart, FiMenu, FiX } from 'react-icons/fi';
 import { useCart } from '../../context/CartContext';
 import { Button } from '../../design-system/Button';
@@ -24,11 +24,12 @@ function NavItem({ to, label, end, onClick, mobile = false }) {
       style={({ isActive }) => ({
         border: 'none', cursor: 'pointer',
         fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: 15,
-        padding: mobile ? '10px 14px' : '8px 14px', borderRadius: 'var(--radius-sm)',
+        padding: mobile ? '10px 14px' : '8px 4px', borderRadius: mobile ? 'var(--radius-sm)' : 0,
         textDecoration: 'none', display: 'block',
         color: isActive ? 'var(--brand-primary)' : hovered ? 'var(--teal-600)' : 'var(--text-body)',
-        background: isActive ? 'var(--teal-50)' : hovered ? 'var(--grey-50)' : 'transparent',
-        transition: 'color var(--duration-fast) var(--ease-out), background var(--duration-fast) var(--ease-out)',
+        background: mobile ? (isActive ? 'var(--teal-50)' : hovered ? 'var(--grey-50)' : 'transparent') : 'transparent',
+        boxShadow: !mobile && isActive ? 'inset 0 -2px 0 0 var(--brand-accent)' : 'inset 0 -2px 0 0 transparent',
+        transition: 'color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out), background var(--duration-fast) var(--ease-out)',
       })}
     >
       {label}
@@ -42,17 +43,19 @@ export default function Navbar() {
   const [cartHover, setCartHover] = useState(false);
   const [menuHover, setMenuHover] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const showCart = location.pathname.startsWith('/tienda');
 
   const handleNav = (to) => { navigate(to); setMenuOpen(false); };
 
   return (
     <header style={{
       position: 'sticky', top: 0, zIndex: 40,
-      background: 'rgba(255,255,255,0.92)',
+      background: 'var(--surface-glass)',
       backdropFilter: 'blur(10px)',
       borderBottom: '1px solid var(--border-subtle)',
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 40px' }}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 'var(--space-4) var(--space-8)' }}
            className="px-5 sm:px-10">
 
         {/* Logo */}
@@ -69,30 +72,32 @@ export default function Navbar() {
         </button>
 
         {/* Desktop nav — hidden on mobile via className */}
-        <nav className="hidden md:flex" style={{ alignItems: 'center', gap: 4 }}>
+        <nav className="hidden md:flex" style={{ alignItems: 'center', gap: 'var(--space-7)' }}>
           {navLinks.map((link) => <NavItem key={link.to} {...link} />)}
         </nav>
 
         {/* Right actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          {/* Cart */}
-          <button onClick={toggleCart}
-            onMouseEnter={() => setCartHover(true)}
-            onMouseLeave={() => setCartHover(false)}
-            style={{ position: 'relative', padding: 8, borderRadius: 12,
-                     background: cartHover ? 'var(--grey-50)' : 'transparent', border: 'none', cursor: 'pointer',
-                     color: cartHover ? 'var(--brand-primary)' : 'var(--text-body)',
-                     transition: 'background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out)' }}
-            aria-label="Carrito">
-            <FiShoppingCart size={22} />
-            {totalItems > 0 && (
-              <span style={{ position: 'absolute', top: -4, right: -4, background: 'var(--red-500)',
-                             color: '#fff', fontSize: 11, fontWeight: 700, borderRadius: '50%',
-                             width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                {totalItems > 99 ? '99+' : totalItems}
-              </span>
-            )}
-          </button>
+          {/* Cart — only on /tienda, the rest of the site has no shopping context */}
+          {showCart && (
+            <button onClick={toggleCart}
+              onMouseEnter={() => setCartHover(true)}
+              onMouseLeave={() => setCartHover(false)}
+              style={{ position: 'relative', padding: 8, borderRadius: 12,
+                       background: cartHover ? 'var(--grey-50)' : 'transparent', border: 'none', cursor: 'pointer',
+                       color: cartHover ? 'var(--brand-primary)' : 'var(--text-body)',
+                       transition: 'background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out)' }}
+              aria-label="Carrito">
+              <FiShoppingCart size={22} />
+              {totalItems > 0 && (
+                <span style={{ position: 'absolute', top: -4, right: -4, background: 'var(--red-500)',
+                               color: 'var(--text-inverse)', fontSize: 11, fontWeight: 700, borderRadius: '50%',
+                               width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {totalItems > 99 ? '99+' : totalItems}
+                </span>
+              )}
+            </button>
+          )}
 
           {/* Desktop CTA — hidden on mobile */}
           <div className="hidden md:block">
@@ -116,7 +121,7 @@ export default function Navbar() {
 
       {/* Mobile dropdown */}
       {menuOpen && (
-        <div style={{ borderTop: '1px solid var(--border-subtle)', background: '#fff',
+        <div style={{ borderTop: '1px solid var(--border-subtle)', background: 'var(--surface-card)',
                       padding: '12px 20px 16px', boxShadow: 'var(--shadow-md)' }}>
           <nav style={{ display: 'flex', flexDirection: 'column', gap: 2, marginBottom: 12 }}>
             {navLinks.map((link) => (

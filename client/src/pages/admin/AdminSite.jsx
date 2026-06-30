@@ -6,10 +6,7 @@ import {
 import { toast } from 'react-toastify';
 import { projectsAPI } from '../../services/api';
 
-const CATEGORIES = ['Obra nueva', 'Reformas', 'Comunidades'];
-const STATUS_OPTIONS = ['Terminada', 'En construcción'];
-
-const emptyForm = { title: '', location: '', category: 'Obra nueva', status: 'Terminada', featured: false, isHero: false };
+const emptyForm = { title: '', location: '', featured: false, isHero: false };
 
 export default function AdminSite() {
   const [projects, setProjects] = useState([]);
@@ -62,8 +59,6 @@ export default function AdminSite() {
       const fd = new FormData();
       fd.append('title', form.title);
       fd.append('location', form.location);
-      fd.append('category', form.category);
-      fd.append('status', form.status);
       fd.append('featured', form.featured);
       fd.append('isHero', form.isHero);
       if (file) fd.append('image', file);
@@ -86,8 +81,7 @@ export default function AdminSite() {
   const startEdit = (p) => {
     setEditingId(p._id);
     setEditForm({
-      title: p.title, location: p.location, category: p.category,
-      status: p.status || 'Terminada', featured: p.featured, isHero: !!p.isHero,
+      title: p.title, location: p.location, featured: p.featured, isHero: !!p.isHero,
     });
     setEditFile(null);
     setEditPreview(null);
@@ -107,12 +101,14 @@ export default function AdminSite() {
   };
 
   const saveEdit = async (id) => {
+    if (!editForm.title || !editForm.location) {
+      toast.error('Completá título y localidad.');
+      return;
+    }
     try {
       const fd = new FormData();
       fd.append('title', editForm.title);
       fd.append('location', editForm.location);
-      fd.append('category', editForm.category);
-      fd.append('status', editForm.status);
       fd.append('featured', editForm.featured);
       fd.append('isHero', editForm.isHero);
       if (editFile) fd.append('image', editFile);
@@ -124,8 +120,8 @@ export default function AdminSite() {
       }));
       cancelEdit();
       toast.success('Proyecto actualizado.');
-    } catch {
-      toast.error('Error al guardar los cambios.');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Error al guardar los cambios.');
     }
   };
 
@@ -215,20 +211,6 @@ export default function AdminSite() {
                 <input className="input" placeholder="Villa Nueva" value={form.location}
                   onChange={(e) => setForm(f => ({ ...f, location: e.target.value }))} />
               </div>
-              <div>
-                <label className="label">Categoría</label>
-                <select className="input" value={form.category}
-                  onChange={(e) => setForm(f => ({ ...f, category: e.target.value }))}>
-                  {CATEGORIES.map(c => <option key={c}>{c}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="label">Estado de la obra</label>
-                <select className="input" value={form.status}
-                  onChange={(e) => setForm(f => ({ ...f, status: e.target.value }))}>
-                  {STATUS_OPTIONS.map(s => <option key={s}>{s}</option>)}
-                </select>
-              </div>
               <div className="sm:col-span-2 flex flex-wrap gap-5">
                 <label className="flex items-center gap-2 cursor-pointer select-none text-sm font-medium text-slate-700">
                   <input type="checkbox" checked={form.featured}
@@ -289,11 +271,6 @@ export default function AdminSite() {
                       <FiStar size={10} /> Home
                     </span>
                   )}
-                  <span className="text-xs font-bold px-2 py-0.5 rounded-full"
-                        style={{ background: p.status === 'En construcción' ? '#FFF4D2' : '#DCF3E8',
-                                 color: p.status === 'En construcción' ? '#946A0B' : '#2E9E6B' }}>
-                    {p.status || 'Terminada'}
-                  </span>
                 </div>
                 <div className="absolute top-2 right-2 flex gap-1">
                   <button onClick={() => handleMove(index, -1)} disabled={index === 0}
@@ -324,14 +301,6 @@ export default function AdminSite() {
                       onChange={(e) => setEditForm(f => ({ ...f, title: e.target.value }))} placeholder="Título" />
                     <input className="input text-sm" value={editForm.location}
                       onChange={(e) => setEditForm(f => ({ ...f, location: e.target.value }))} placeholder="Localidad" />
-                    <select className="input text-sm" value={editForm.category}
-                      onChange={(e) => setEditForm(f => ({ ...f, category: e.target.value }))}>
-                      {CATEGORIES.map(c => <option key={c}>{c}</option>)}
-                    </select>
-                    <select className="input text-sm" value={editForm.status}
-                      onChange={(e) => setEditForm(f => ({ ...f, status: e.target.value }))}>
-                      {STATUS_OPTIONS.map(s => <option key={s}>{s}</option>)}
-                    </select>
                     <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
                       <input type="checkbox" checked={editForm.featured}
                         onChange={(e) => setEditForm(f => ({ ...f, featured: e.target.checked }))}
@@ -357,7 +326,7 @@ export default function AdminSite() {
                   <div className="flex flex-col gap-2">
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-slate-800 truncate">{p.title}</p>
-                      <p className="text-xs text-slate-500">{p.location} · {p.category} · {p.status || 'Terminada'}</p>
+                      <p className="text-xs text-slate-500">{p.location}</p>
                     </div>
                     <div className="flex gap-2">
                       <button onClick={() => startEdit(p)}

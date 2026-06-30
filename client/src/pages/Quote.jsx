@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../design-system/Button';
 import { Card } from '../design-system/Card';
@@ -6,17 +6,66 @@ import { Badge } from '../design-system/Badge';
 import { Input } from '../design-system/Input';
 import { Checkbox } from '../design-system/Checkbox';
 import { Photo } from '../design-system/Photo';
+import { servicesAPI, quotesAPI } from '../services/api';
 
-const tipos = [
-  { id: 'obra',   label: 'Piscina nueva' },
-  { id: 'reforma', label: 'Reforma' },
-  { id: 'cerco',  label: 'Cerco / Seguridad' },
-];
+const FALLBACK_TYPES = ['Piscina nueva', 'Reforma', 'Cerco / Seguridad'];
+const OTHER_TYPE = 'Otra consulta';
 
 export default function Quote() {
   const navigate = useNavigate();
   const [sent, setSent] = useState(false);
-  const [tipo, setTipo] = useState('obra');
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState('');
+  const [types, setTypes] = useState(FALLBACK_TYPES);
+  const [tipo, setTipo] = useState('');
+  const [form, setForm] = useState({ name: '', phone: '', email: '', location: '' });
+  const [acceptedPrivacy, setAcceptedPrivacy] = useState(true);
+
+  useEffect(() => {
+    servicesAPI.getAll()
+      .then(({ data }) => {
+        if (data?.length > 0) {
+          const fromServices = data.map((s) => s.title);
+          setTypes(fromServices);
+          setTipo(fromServices[0]);
+        } else {
+          setTipo(FALLBACK_TYPES[0]);
+        }
+      })
+      .catch(() => setTipo(FALLBACK_TYPES[0]));
+  }, []);
+
+  const allTypes = [...types, OTHER_TYPE];
+
+  const setField = (field) => (e) => setForm((f) => ({ ...f, [field]: e.target.value }));
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!tipo || !form.name || !form.phone || !form.email) {
+      setError('Completá tipo de proyecto, nombre, teléfono y email.');
+      return;
+    }
+    if (!acceptedPrivacy) {
+      setError('Tenés que aceptar la política de privacidad.');
+      return;
+    }
+    setError('');
+    setSending(true);
+    try {
+      await quotesAPI.create({
+        projectType: tipo,
+        name: form.name,
+        phone: form.phone,
+        email: form.email,
+        location: form.location,
+      });
+      setSent(true);
+    } catch (err) {
+      setError(err.response?.data?.message || 'No pudimos enviar tu solicitud. Probá de nuevo.');
+    } finally {
+      setSending(false);
+    }
+  };
 
   return (
     <section style={{ background: 'var(--bg-page)', padding: '52px 20px 72px', fontFamily: 'var(--font-body)' }}>
@@ -63,36 +112,39 @@ export default function Quote() {
               </Button>
             </div>
           ) : (
-            <form onSubmit={(e) => { e.preventDefault(); setSent(true); }}
-              style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div>
                 <label style={{ fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 14,
                                 color: 'var(--text-strong)', display: 'block', marginBottom: 8 }}>
                   Tipo de proyecto
                 </label>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  {tipos.map(t => (
-                    <button type="button" key={t.id} onClick={() => setTipo(t.id)} style={{
+                  {allTypes.map(t => (
+                    <button type="button" key={t} onClick={() => setTipo(t)} style={{
                       flex: '0 0 auto', padding: '10px 14px', borderRadius: 'var(--radius-sm)',
                       cursor: 'pointer', fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: 13,
-                      border: tipo === t.id ? '2px solid var(--brand-primary)' : '2px solid var(--border-default)',
-                      background: tipo === t.id ? 'var(--teal-50)' : '#fff',
-                      color: tipo === t.id ? 'var(--brand-primary)' : 'var(--text-muted)',
+                      border: tipo === t ? '2px solid var(--brand-primary)' : '2px solid var(--border-default)',
+                      background: tipo === t ? 'var(--teal-50)' : 'var(--surface-card)',
+                      color: tipo === t ? 'var(--brand-primary)' : 'var(--text-muted)',
                       transition: 'all var(--duration-fast) var(--ease-out)',
-                    }}>{t.label}</button>
+                    }}>{t}</button>
                   ))}
                 </div>
               </div>
 
               <div className="ps-form-row">
-                <Input label="Nombre" placeholder="Tu nombre" required />
-                <Input label="Teléfono" placeholder="600 123 456" required />
+                <Input label="Nombre" placeholder="Tu nombre" required value={form.name} onChange={setField('name')} />
+                <Input label="Teléfono" placeholder="600 123 456" required value={form.phone} onChange={setField('phone')} />
               </div>
-              <Input label="Email" placeholder="hola@ejemplo.com" type="email" required />
-              <Input label="Localidad" placeholder="Corrientes 1210, Villa María…" />
-              <Checkbox label="Acepto la política de privacidad" defaultChecked />
-              <Button type="submit" variant="primary" size="lg" fullWidth>
-                Solicitar presupuesto
+              <Input label="Email" placeholder="hola@ejemplo.com" type="email" required value={form.email} onChange={setField('email')} />
+              <Input label="Localidad" placeholder="Corrientes 1210, Villa María…" value={form.location} onChange={setField('location')} />
+              <Checkbox label="Acepto la política de privacidad" checked={acceptedPrivacy}
+                onChange={(e) => setAcceptedPrivacy(e.target.checked)} />
+              {error && (
+                <p style={{ color: 'var(--red-500)', fontSize: 14, fontFamily: 'var(--font-body)' }}>{error}</p>
+              )}
+              <Button type="submit" variant="primary" size="lg" fullWidth disabled={sending}>
+                {sending ? 'Enviando...' : 'Solicitar presupuesto'}
               </Button>
             </form>
           )}
