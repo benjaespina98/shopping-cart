@@ -98,7 +98,7 @@ export default function Navbar() {
           {/* Desktop CTA — hidden below lg */}
           <div className="hidden lg:block">
             <Button variant="primary" size="sm" onClick={() => handleNav('/presupuesto')}>
-              Pide presupuesto
+              Solicitar presupuesto
             </Button>
           </div>
 
@@ -125,7 +125,7 @@ export default function Navbar() {
             ))}
           </nav>
           <Button variant="primary" fullWidth onClick={() => handleNav('/presupuesto')}>
-            Pide presupuesto
+            Solicitar presupuesto
           </Button>
         </div>
       )}

@@ -22,36 +22,69 @@ const defaultSettings = {
   ],
 };
 
-// Las 3 opciones de tema. Solo varían radios y sombras del sitio público —
-// el color de marca (teal/sol), la tipografía y el logo son siempre los mismos.
 const THEMES = [
-  { value: 'default',  label: 'Default',  hint: 'El estilo actual del sitio.', radius: 16, shadow: '0 4px 12px rgba(18,43,51,0.14)' },
-  { value: 'elegante', label: 'Elegante', hint: 'Líneas más rectas, sombras discretas. Más serio y premium.', radius: 9, shadow: '0 2px 6px rgba(18,43,51,0.10)' },
-  { value: 'moderno',  label: 'Moderno',  hint: 'Formas redondeadas, sombras más presentes. Más cercano y dinámico.', radius: 24, shadow: '0 8px 20px rgba(18,43,51,0.20)' },
+  {
+    value: 'default',
+    label: 'Default',
+    hint: 'Arena cálida · bordes medios · sensación acogedora.',
+    bgPage: '#FBF9F5',
+    bgCard: '#FFFFFF',
+    radius: 14,
+    pilRadius: 999,
+    shadow: '0 4px 12px rgba(18,43,51,0.13)',
+  },
+  {
+    value: 'elegante',
+    label: 'Elegante',
+    hint: 'Fondo blanco puro · líneas rectas · aire premium/corporativo.',
+    bgPage: '#FFFFFF',
+    bgCard: '#FAFBFC',
+    radius: 7,
+    pilRadius: 4,
+    shadow: '0 1px 5px rgba(18,43,51,0.07)',
+  },
+  {
+    value: 'moderno',
+    label: 'Moderno',
+    hint: 'Fondo azul-agua suave · formas muy redondeadas · sensación fresca.',
+    bgPage: '#EEF5F7',
+    bgCard: '#FFFFFF',
+    radius: 20,
+    pilRadius: 999,
+    shadow: '0 8px 22px rgba(18,43,51,0.14)',
+  },
 ];
 
-// Mini mockup de una card real (ícono + título + texto + botón) renderizado con
-// los radios/sombras del tema, para que se entienda cómo se va a ver de verdad.
+// Miniatura fiel del sitio: barra de header (teal fijo de marca), fondo de página
+// con el color del tema, y una card+botón con el radio y sombra correspondiente.
 function ThemePreviewCard({ t }) {
   return (
-    <div
-      className="bg-white border border-slate-200"
-      style={{ borderRadius: t.radius, boxShadow: t.shadow, padding: 14, width: '100%' }}
-    >
-      <div
-        className="flex items-center justify-center mb-2"
-        style={{ width: 30, height: 30, borderRadius: t.radius * 0.55, background: '#F1F7F9' }}
-      >
-        <div style={{ width: 12, height: 12, borderRadius: '50%', border: '2px solid #FFC629' }} />
+    <div style={{ borderRadius: 10, overflow: 'hidden', border: '1px solid #E0E5E7', width: '100%' }}>
+      {/* Mini header — siempre teal institucional */}
+      <div style={{ background: '#244B5A', padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 4 }}>
+        <div style={{ width: 40, height: 6, borderRadius: 3, background: 'rgba(255,198,41,0.85)' }} />
+        <div style={{ flex: 1 }} />
+        <div style={{ width: 22, height: 6, borderRadius: 10, background: '#FFC629' }} />
       </div>
-      <div style={{ height: 8, width: '70%', borderRadius: 3, background: '#244B5A', marginBottom: 6 }} />
-      <div style={{ height: 5, width: '90%', borderRadius: 3, background: '#E0E5E7', marginBottom: 4 }} />
-      <div style={{ height: 5, width: '60%', borderRadius: 3, background: '#E0E5E7', marginBottom: 10 }} />
-      <div
-        className="inline-flex items-center justify-center text-[10px] font-bold"
-        style={{ borderRadius: t.radius * 0.6, background: '#FFC629', color: '#122B33', padding: '5px 12px' }}
-      >
-        Botón
+      {/* Mini página */}
+      <div style={{ background: t.bgPage, padding: '10px 10px 12px' }}>
+        {/* Texto de sección */}
+        <div style={{ height: 5, width: '50%', borderRadius: 2, background: '#946A0B', marginBottom: 5 }} />
+        <div style={{ height: 8, width: '80%', borderRadius: 2, background: '#244B5A', marginBottom: 4 }} />
+        <div style={{ height: 4, width: '90%', borderRadius: 2, background: '#C7CFD2', marginBottom: 2 }} />
+        <div style={{ height: 4, width: '65%', borderRadius: 2, background: '#C7CFD2', marginBottom: 10 }} />
+        {/* Card */}
+        <div style={{ background: t.bgCard, borderRadius: t.radius, boxShadow: t.shadow,
+                      border: '1px solid #E0E5E7', padding: '8px 9px', marginBottom: 8 }}>
+          <div style={{ height: 6, width: '55%', borderRadius: 2, background: '#244B5A', marginBottom: 4 }} />
+          <div style={{ height: 4, width: '85%', borderRadius: 2, background: '#C7CFD2', marginBottom: 3 }} />
+          <div style={{ height: 4, width: '60%', borderRadius: 2, background: '#C7CFD2' }} />
+        </div>
+        {/* Botón */}
+        <div style={{ display: 'inline-block', background: '#FFC629', color: '#122B33',
+                      fontSize: 8, fontWeight: 700, padding: '4px 10px', borderRadius: t.pilRadius }}>
+          Solicitar presupuesto
+        </div>
       </div>
     </div>
   );

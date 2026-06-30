@@ -6,7 +6,6 @@ import { Card } from '../design-system/Card';
 import { Badge } from '../design-system/Badge';
 import { Input } from '../design-system/Input';
 import { Checkbox } from '../design-system/Checkbox';
-import { Photo } from '../design-system/Photo';
 import { useReveal } from '../hooks/useReveal';
 import { servicesAPI, quotesAPI } from '../services/api';
 import { trackEvent } from '../utils/analytics';
@@ -111,10 +110,6 @@ export default function Quote() {
           <p style={{ fontSize: 16, color: 'var(--text-body)', lineHeight: 1.6, marginBottom: 'var(--space-6)' }}>
             Completá el formulario y nos contactamos en 48 horas. Sin costo y sin compromiso.
           </p>
-
-          <div className="ps-quote-photo" style={{ marginBottom: 'var(--space-6)' }}>
-            <Photo label="Visita técnica" height={200} />
-          </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', marginBottom: 'var(--space-6)' }}>
             {STEPS.map(({ Icon, text }, i) => (

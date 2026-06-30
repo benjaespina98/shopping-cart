@@ -107,7 +107,7 @@ export default function Landing() {
               Diseñamos, construimos y mantenemos piscinas a medida. Del primer plano al primer baño, sin complicaciones.
             </p>
             <div className="ps-hero-btns" style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
-              <Button variant="primary" size="lg" onClick={() => navigate('/presupuesto')}>Pide presupuesto</Button>
+              <Button variant="primary" size="lg" onClick={() => navigate('/presupuesto')}>Solicitar presupuesto</Button>
               <Button variant="outline" inverse size="lg" onClick={() => navigate('/proyectos')}>Ver proyectos</Button>
             </div>
           </div>

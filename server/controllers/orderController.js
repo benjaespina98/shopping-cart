@@ -187,3 +187,24 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
 
   res.json(order);
 });
+
+// DELETE /api/orders/:id — admin
+export const deleteOrder = asyncHandler(async (req, res) => {
+  const order = await Order.findById(req.params.id);
+  if (!order) {
+    res.status(404);
+    throw new Error('Orden no encontrada');
+  }
+
+  await order.deleteOne();
+
+  await writeAuditLog({
+    req,
+    action: 'ORDER_DELETED',
+    entity: 'order',
+    entityId: order._id,
+    message: `Pedido eliminado (estado previo: ${order.status})`,
+  });
+
+  res.json({ message: 'Pedido eliminado' });
+});
