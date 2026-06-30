@@ -1,8 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
-import { FiMail, FiPhone, FiInstagram, FiFacebook } from 'react-icons/fi';
+import { FiMail, FiPhone, FiInstagram, FiFacebook, FiClock, FiSend } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { settingsAPI } from '../services/api';
+import { Button } from '../design-system/Button';
+import { Card } from '../design-system/Card';
+import { Input } from '../design-system/Input';
+import { useReveal } from '../hooks/useReveal';
 
 const defaultContactSettings = {
   whatsappNumber: import.meta.env.VITE_WHATSAPP_NUMBER || '5493534224607',
@@ -16,15 +20,20 @@ const defaultContactSettings = {
   ],
 };
 
+const CHANNELS = [
+  { Icon: FaWhatsapp, label: 'WhatsApp', key: 'whatsapp', getValue: (s) => s.phoneNumberDisplay, getHref: (s) => `https://wa.me/${s.whatsappNumber}` },
+  { Icon: FiPhone,    label: 'Teléfono', key: 'phone',    getValue: (s) => s.phoneNumberDisplay, getHref: (s) => s.phoneNumberLink },
+  { Icon: FiMail,     label: 'Email',    key: 'email',    getValue: (s) => s.contactEmail,        getHref: (s) => `mailto:${s.contactEmail}` },
+];
+
 export default function Contact() {
+  const reveal = useReveal();
   const [form, setForm] = useState({ name: '', email: '', message: '' });
   const [sendingChannel, setSendingChannel] = useState('');
   const [contactSettings, setContactSettings] = useState(defaultContactSettings);
   const sentTimeoutRef = useRef(null);
 
   const WHATSAPP_NUMBER = contactSettings.whatsappNumber;
-  const PHONE_DISPLAY = contactSettings.phoneNumberDisplay;
-  const PHONE_LINK = contactSettings.phoneNumberLink;
   const CONTACT_EMAIL = contactSettings.contactEmail;
 
   useEffect(() => {
@@ -45,9 +54,7 @@ export default function Contact() {
       });
 
     return () => {
-      if (sentTimeoutRef.current) {
-        clearTimeout(sentTimeoutRef.current);
-      }
+      if (sentTimeoutRef.current) clearTimeout(sentTimeoutRef.current);
     };
   }, []);
 
@@ -71,23 +78,16 @@ export default function Contact() {
 
   const handleWhatsApp = () => {
     if (!validateForm()) return;
-
     const text = getTextMessage();
     const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
     const popup = window.open('', '_blank', 'noopener,noreferrer');
-
-    if (popup && !popup.closed) {
-      popup.location.href = whatsappUrl;
-    } else {
-      window.location.href = whatsappUrl;
-    }
-
+    if (popup && !popup.closed) popup.location.href = whatsappUrl;
+    else window.location.href = whatsappUrl;
     resetFormWithFeedback('whatsapp');
   };
 
   const handleEmail = () => {
     if (!validateForm()) return;
-
     const subject = `Consulta desde web - ${form.name}`;
     const body = getTextMessage();
     const mailtoUrl = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
@@ -96,161 +96,137 @@ export default function Contact() {
   };
 
   return (
-    <div className="bg-slate-100 min-h-screen">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
-        <div className="text-center space-y-3 max-w-2xl mx-auto">
-          <span className="section-eyebrow">Hablemos</span>
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 leading-tight">¿Tenés una consulta?</h1>
-          <p className="text-slate-700 text-xl font-semibold max-w-2xl mx-auto">
-            Nuestro equipo experto está listo para ayudarte. Elige tu canal preferido.
-          </p>
-        </div>
+    <section style={{ background: 'var(--bg-page)', padding: '52px 20px 72px', fontFamily: 'var(--font-body)' }}>
+      <div ref={reveal.ref} className={reveal.className}>
+      <div style={{ textAlign: 'center', maxWidth: 640, margin: '0 auto var(--space-8)' }}>
+        <div className="ps-eyebrow" style={{ marginBottom: 'var(--space-3)' }}>Hablemos</div>
+        <h1 style={{ fontSize: 'clamp(22px, 5.5vw, 38px)', lineHeight: 1.1, letterSpacing: '-0.02em',
+                     marginBottom: 'var(--space-3)', fontFamily: 'var(--font-display)', color: 'var(--text-strong)' }}>
+          ¿Tenés una consulta?
+        </h1>
+        <p style={{ fontSize: 16, color: 'var(--text-body)', lineHeight: 1.6 }}>
+          Elegí el canal que prefieras. Te respondemos directamente, sin intermediarios.
+        </p>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+      <div className="ps-quote-grid" style={{ maxWidth: 1000, margin: '0 auto' }}>
+        {/* Left — contact info */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
+          <Card padding="lg">
+            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 700, color: 'var(--text-strong)', marginBottom: 'var(--space-4)' }}>
+              Información de contacto
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+              {CHANNELS.map(({ Icon, label, key, getValue, getHref }) => (
+                <a key={key} href={getHref(contactSettings)} target={key !== 'phone' ? '_blank' : undefined} rel="noreferrer"
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-3)',
+                    borderRadius: 'var(--radius-md)', textDecoration: 'none',
+                    transition: 'background var(--duration-fast) var(--ease-out)',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--surface-sunken)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}>
+                  <span style={{
+                    width: 44, height: 44, borderRadius: 'var(--radius-md)', flexShrink: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: 'var(--teal-50)', color: 'var(--brand-primary)',
+                  }}>
+                    <Icon size={20} />
+                  </span>
+                  <span>
+                    <span style={{ display: 'block', fontSize: 13, color: 'var(--text-muted)', fontWeight: 600 }}>{label}</span>
+                    <span style={{ display: 'block', fontSize: 15, color: 'var(--text-strong)', fontWeight: 700 }}>{getValue(contactSettings)}</span>
+                  </span>
+                </a>
+              ))}
+            </div>
+          </Card>
 
-      <div className="grid md:grid-cols-2 gap-12">
-        {/* Contact info */}
-        <div className="space-y-6">
-          <div className="card p-7 bg-gradient-to-br from-primary-50/50 to-white border-primary-100 space-y-5">
-            <h2 className="font-bold text-slate-900 text-xl">Información de contacto</h2>
-
-            <a href={`https://wa.me/${WHATSAPP_NUMBER}`}
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center gap-4 group p-4 rounded-2xl hover:bg-green-50 transition-colors"
-            >
-              <div className="w-14 h-14 rounded-xl bg-green-100 flex items-center justify-center group-hover:bg-green-500 transition-colors shrink-0">
-                <FaWhatsapp size={24} className="text-green-600 group-hover:text-white" />
-              </div>
-              <div>
-                <p className="text-base text-slate-400 font-semibold">WhatsApp</p>
-                <p className="text-lg font-bold text-slate-800 group-hover:text-green-600 transition-colors">
-                  {PHONE_DISPLAY}
-                </p>
-              </div>
-            </a>
-
-            <a href={PHONE_LINK} className="flex items-center gap-4 group p-4 rounded-2xl hover:bg-primary-50 transition-colors">
-              <div className="w-14 h-14 rounded-xl bg-primary-100 flex items-center justify-center group-hover:bg-primary-700 transition-colors shrink-0">
-                <FiPhone size={24} className="text-primary-700 group-hover:text-white" />
-              </div>
-              <div>
-                <p className="text-base text-slate-400 font-semibold">Teléfono</p>
-                <p className="text-lg font-bold text-slate-800 group-hover:text-primary-700 transition-colors">
-                  {PHONE_DISPLAY}
-                </p>
-              </div>
-            </a>
-
-            <a href={`mailto:${CONTACT_EMAIL}`} className="flex items-center gap-4 group p-4 rounded-2xl hover:bg-accent-50 transition-colors">
-              <div className="w-14 h-14 rounded-xl bg-accent-100 flex items-center justify-center group-hover:bg-accent-600 transition-colors shrink-0">
-                <FiMail size={24} className="text-primary-700 group-hover:text-white" />
-              </div>
-              <div>
-                <p className="text-base text-slate-400 font-semibold">Email</p>
-                <p className="text-lg font-bold text-slate-800 group-hover:text-primary-700 transition-colors">
-                  {CONTACT_EMAIL}
-                </p>
-              </div>
-            </a>
-          </div>
-
-          {/* Horario */}
-          <div className="card p-6 bg-gradient-to-br from-primary-50/40 to-white border-primary-100">
-            <h2 className="font-bold text-slate-900 text-xl mb-5">Horarios de atención</h2>
-            <div className="space-y-3 text-base">
+          <Card padding="lg">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 'var(--space-4)' }}>
+              <FiClock size={16} style={{ color: 'var(--brand-accent-press)' }} />
+              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 700, color: 'var(--text-strong)' }}>
+                Horarios de atención
+              </h2>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
               {contactSettings.businessHours.map(({ day, hours }) => (
-                <div key={`${day}-${hours}`} className="flex justify-between text-slate-700">
-                  <span className="font-bold">{day}</span>
-                  <span className={hours.toLowerCase() === 'cerrado' ? 'text-slate-400 font-medium' : 'text-primary-700 font-bold'}>{hours}</span>
+                <div key={`${day}-${hours}`} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14 }}>
+                  <span style={{ color: 'var(--text-body)', fontWeight: 600 }}>{day}</span>
+                  <span style={{ color: hours.toLowerCase() === 'cerrado' ? 'var(--text-faint)' : 'var(--brand-primary)', fontWeight: 700 }}>{hours}</span>
                 </div>
               ))}
             </div>
-          </div>
+          </Card>
 
-          {/* Social */}
-          <div className="card p-6 bg-gradient-to-br from-amber-50/40 to-white border-amber-100">
-            <h2 className="font-bold text-slate-900 text-xl mb-1">Seguinos en redes</h2>
-            <p className="text-sm text-slate-500 mb-5">Mirá nuestras últimas obras terminadas y en construcción.</p>
-            <div className="flex gap-3">
+          <Card padding="lg">
+            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 700, color: 'var(--text-strong)', marginBottom: 'var(--space-1)' }}>
+              Seguinos en redes
+            </h2>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 'var(--space-4)' }}>
+              Mirá nuestras últimas obras terminadas y en construcción.
+            </p>
+            <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
               <a href="https://www.instagram.com/playaysol.piscinas/" target="_blank" rel="noreferrer"
-                className="flex-1 flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl text-white text-base font-bold transition-transform hover:-translate-y-0.5 active:scale-95 shadow-md"
-                style={{ background: 'linear-gradient(135deg, #FEDA75, #FA7E1E, #D62976, #962FBF, #4F5BD5)' }}>
-                <FiInstagram size={20} /> Instagram
+                style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                         padding: '12px', borderRadius: 'var(--radius-md)', color: '#fff', fontWeight: 700, fontSize: 14,
+                         textDecoration: 'none', background: 'linear-gradient(135deg, #FEDA75, #FA7E1E, #D62976, #962FBF, #4F5BD5)' }}>
+                <FiInstagram size={18} /> Instagram
               </a>
               <a href="https://www.facebook.com/playaysol.piscinas" target="_blank" rel="noreferrer"
-                className="flex-1 flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl text-white text-base font-bold transition-transform hover:-translate-y-0.5 active:scale-95 shadow-md"
-                style={{ background: '#1877F2' }}>
-                <FiFacebook size={20} /> Facebook
+                style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                         padding: '12px', borderRadius: 'var(--radius-md)', color: '#fff', fontWeight: 700, fontSize: 14,
+                         textDecoration: 'none', background: '#1877F2' }}>
+                <FiFacebook size={18} /> Facebook
               </a>
             </div>
-          </div>
+          </Card>
         </div>
 
-        {/* Form */}
-        <div className="card p-7 sm:p-8 bg-gradient-to-br from-primary-50/50 to-white border-primary-100">
-          <div className="mb-6 space-y-2">
-            <h2 className="font-bold text-slate-900 text-xl">Envíanos tu consulta</h2>
-            <p className="text-base text-slate-600 font-medium">
-              Elegí el canal que prefieras. Preparamos el mensaje automáticamente con tus datos.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-5">
-            <button
-              type="button"
-              onClick={handleWhatsApp}
-              className="w-full flex items-center justify-center gap-2.5 bg-green-500 hover:bg-green-600 text-white font-semibold text-sm sm:text-base whitespace-nowrap py-3 rounded-xl transition-colors active:scale-95"
-            >
-              <FaWhatsapp size={18} />
-              {sendingChannel === 'whatsapp' ? '¡Listo! Abriendo WhatsApp...' : 'Enviar por WhatsApp'}
-            </button>
-            <button
-              type="button"
-              onClick={handleEmail}
-              className="w-full flex items-center justify-center gap-2.5 bg-primary-700 text-white font-semibold text-sm sm:text-base whitespace-nowrap py-3 rounded-xl hover:bg-primary-800 transition-colors active:scale-95"
-            >
-              <FiMail size={18} />
-              {sendingChannel === 'email' ? '¡Listo! Abriendo email...' : 'Enviar por Email'}
-            </button>
-          </div>
+        {/* Right — form */}
+        <Card padding="lg">
+          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 700, color: 'var(--text-strong)', marginBottom: 'var(--space-1)' }}>
+            Envianos tu consulta
+          </h2>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 'var(--space-5)' }}>
+            Armamos el mensaje automáticamente con tus datos.
+          </p>
 
-          <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
-            <div>
-              <label className="label">Nombre *</label>
-              <input
-                className="input"
-                placeholder="Tu nombre completo"
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                required
-              />
-            </div>
-            <div>
-              <label className="label">Email (opcional)</label>
-              <input
-                type="email"
-                className="input"
-                placeholder="tu@email.com"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-              />
-            </div>
-            <div>
-              <label className="label">Mensaje *</label>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', marginBottom: 'var(--space-5)' }}>
+            <Input label="Nombre" placeholder="Tu nombre completo" required
+              value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+            <Input label="Email (opcional)" type="email" placeholder="tu@email.com"
+              value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <label htmlFor="contact-message" style={{ fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 14, color: 'var(--text-strong)' }}>
+                Mensaje
+              </label>
               <textarea
-                className="input resize-none"
-                rows={5}
+                id="contact-message"
+                rows={4}
                 placeholder="¿En qué te podemos ayudar?"
                 value={form.message}
                 onChange={(e) => setForm({ ...form, message: e.target.value })}
-                required
+                style={{
+                  padding: '11px 14px', borderRadius: 'var(--radius-md)', border: '2px solid var(--border-default)',
+                  fontFamily: 'var(--font-body)', fontSize: '1rem', color: 'var(--text-strong)', resize: 'vertical',
+                  background: 'var(--surface-card)',
+                }}
               />
             </div>
-          </form>
-        </div>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+            <Button variant="primary" size="lg" fullWidth onClick={handleWhatsApp} iconLeft={<FaWhatsapp size={17} />}>
+              {sendingChannel === 'whatsapp' ? '¡Listo! Abriendo WhatsApp...' : 'Enviar por WhatsApp'}
+            </Button>
+            <Button variant="outline" size="lg" fullWidth onClick={handleEmail} iconLeft={<FiSend size={16} />}>
+              {sendingChannel === 'email' ? '¡Listo! Abriendo email...' : 'Enviar por email'}
+            </Button>
+          </div>
+        </Card>
       </div>
-    </div>
-    </div>
+      </div>
+    </section>
   );
 }

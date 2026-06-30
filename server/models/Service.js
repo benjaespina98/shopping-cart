@@ -6,6 +6,7 @@ const serviceSchema = new Schema(
     tag:         { type: String, required: true, trim: true },
     description: { type: String, required: true, trim: true },
     bullets:     { type: [String], default: [] },
+    cta:         { type: String, trim: true, default: 'Solicitar presupuesto' },
     tone:        { type: String, enum: ['sun', 'teal'], default: 'teal' },
     variant:     { type: String, enum: ['solid', 'soft'], default: 'soft' },
     imageUrl:    { type: String, default: '' },

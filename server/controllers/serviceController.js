@@ -16,7 +16,7 @@ export const getServicesAdmin = asyncHandler(async (req, res) => {
 
 // POST /api/services — admin
 export const createService = asyncHandler(async (req, res) => {
-  const { title, tag, description, bullets, tone, variant, active } = req.body;
+  const { title, tag, description, bullets, tone, variant, active, cta } = req.body;
   if (!title || !tag || !description) {
     res.status(400);
     throw new Error('title, tag y description son requeridos');
@@ -37,6 +37,7 @@ export const createService = asyncHandler(async (req, res) => {
     bullets: parsedBullets,
     tone: tone || 'teal',
     variant: variant || 'soft',
+    cta: cta || 'Solicitar presupuesto',
     active: active === 'true' || active === true || active === undefined,
     imageUrl: req.file?.path || '',
     publicId: req.file?.filename || '',
@@ -53,12 +54,13 @@ export const updateService = asyncHandler(async (req, res) => {
     throw new Error('Servicio no encontrado');
   }
 
-  const { title, tag, description, bullets, tone, variant, active } = req.body;
+  const { title, tag, description, bullets, tone, variant, active, cta } = req.body;
   if (title !== undefined)       service.title       = title;
   if (tag !== undefined)         service.tag         = tag;
   if (description !== undefined) service.description = description;
   if (tone !== undefined)        service.tone        = tone;
   if (variant !== undefined)     service.variant     = variant;
+  if (cta !== undefined)         service.cta         = cta;
   if (active !== undefined)      service.active      = active === 'true' || active === true;
   if (bullets !== undefined) {
     try {
