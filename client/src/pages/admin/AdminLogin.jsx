@@ -40,17 +40,10 @@ export default function AdminLogin() {
 
         {/* Brand header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center mb-4">
-            <svg width="62" height="62" viewBox="0 0 100 100">
-              <circle cx="50" cy="33" r="19" fill="none" stroke="#FFC629" strokeWidth="7"/>
-              <path d="M10 64 Q20 57 30 64 Q40 71 50 64 Q60 57 70 64 Q80 71 90 64" stroke="#ffffff" strokeWidth="7" strokeLinecap="round" fill="none"/>
-              <line x1="10" y1="80" x2="90" y2="80" stroke="#ffffff" strokeWidth="7" strokeLinecap="round"/>
-            </svg>
+          <div className="inline-flex items-center justify-center mb-4"
+               style={{ background: '#fff', borderRadius: 12, padding: '14px 22px' }}>
+            <img src="/brand/logo-stacked.png" alt="Playa & Sol" style={{ height: 64, width: 'auto', display: 'block' }} />
           </div>
-          <h1 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: 22,
-                       color: '#fff', letterSpacing: '-0.01em', marginBottom: 4 }}>
-            Playa &amp; Sol
-          </h1>
           <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, fontFamily: 'Mulish, sans-serif' }}>
             Panel de administración
           </p>
