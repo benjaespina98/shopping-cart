@@ -27,15 +27,18 @@
   .ps-hero-btns > *   { width: 100%; justify-content: center; }
 }
 
-/* ── Stats band ────────────────────────────────────────── */
+/* ── Trust strip (stats) ───────────────────────────────── */
 .ps-stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
+  gap: 32px;
 }
+.ps-stat-item { border-left: 1px solid var(--divider); }
+.ps-stat-item:first-child { border-left: none; }
 @media (max-width: 767px) {
-  .ps-stats-section { padding: 18px 20px !important; }
-  .ps-stats-grid    { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .ps-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 28px 14px; }
+  .ps-stat-item  { border-left: none; border-top: 1px solid var(--divider); padding-top: 20px !important; }
+  .ps-stat-item:nth-child(1), .ps-stat-item:nth-child(2) { border-top: none; padding-top: 0 !important; }
 }
 
 /* ── Services cards (home) ─────────────────────────────── */
@@ -51,16 +54,16 @@
 .ps-projects-grid {
   display: grid;
   grid-template-columns: 1.6fr 1fr 1fr;
-  grid-template-rows: 180px 180px;
+  grid-template-rows: 220px 220px;
   gap: 16px;
 }
 @media (max-width: 767px) {
   .ps-projects-grid                    { grid-template-columns: 1fr 1fr;
-                                         grid-template-rows: repeat(3, 150px); }
+                                         grid-template-rows: repeat(3, 170px); }
   .ps-projects-grid > div:first-child  { grid-row: auto !important; }
 }
 @media (max-width: 480px) {
-  .ps-projects-grid { grid-template-columns: 1fr; grid-template-rows: repeat(5, 180px); }
+  .ps-projects-grid { grid-template-columns: 1fr; grid-template-rows: repeat(5, 200px); }
 }
 
 /* ── CTA block ─────────────────────────────────────────── */

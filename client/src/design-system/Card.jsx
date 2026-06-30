@@ -2,8 +2,8 @@ export function Card({ children, padding = 'md', accent = 'none', interactive = 
   const pads = { none: '0', sm: 'var(--space-4)', md: 'var(--space-5)', lg: 'var(--space-7)' };
   const accents = {
     none: '1px solid var(--border-subtle)',
-    sun:  '4px solid var(--brand-accent)',
-    teal: '4px solid var(--brand-primary)',
+    sun:  '3px solid var(--brand-accent)',
+    teal: '3px solid var(--brand-primary)',
   };
 
   const base = {
@@ -23,7 +23,7 @@ export function Card({ children, padding = 'md', accent = 'none', interactive = 
 
   const hoverHandlers = interactive ? {
     onMouseEnter: (e) => {
-      e.currentTarget.style.transform = 'translateY(-4px)';
+      e.currentTarget.style.transform = 'translateY(-2px)';
       e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
     },
     onMouseLeave: (e) => {

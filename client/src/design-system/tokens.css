@@ -71,20 +71,28 @@
   --surface-soft:   var(--teal-50);
 
   /* Text */
-  --text-strong:    var(--teal-900);
-  --text-body:      var(--grey-700);
-  --text-muted:     var(--grey-500);
-  --text-faint:     var(--grey-400);
-  --text-inverse:   var(--grey-0);
-  --text-on-accent: var(--teal-900);
-  --text-link:      var(--teal-600);
+  --text-strong:        var(--teal-900);
+  --text-body:          var(--grey-700);
+  --text-muted:         var(--grey-500);
+  --text-faint:         var(--grey-400);
+  --text-inverse:       var(--grey-0);
+  --text-inverse-muted: rgba(255, 255, 255, 0.78);
+  --text-inverse-faint: rgba(255, 255, 255, 0.55);
+  --text-on-accent:     var(--teal-900);
+  --text-link:          var(--teal-600);
 
   /* Borders */
   --border-subtle:  var(--grey-200);
   --border-default: var(--grey-300);
   --border-strong:  var(--teal-700);
+  --border-on-dark:  rgba(255, 255, 255, 0.4);
+  --border-on-dark-subtle: rgba(255, 255, 255, 0.14);
+  --surface-on-dark: rgba(255, 255, 255, 0.08);
   --divider:        var(--grey-100);
   --focus-ring:     var(--sun-500);
+
+  /* Glass surface (sticky header) */
+  --surface-glass: rgba(255, 255, 255, 0.92);
 
   /* Fonts */
   --font-display: 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -132,4 +140,18 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--brand-accent-press);
+}
+
+/* Scroll reveal — fade + slight rise, plays once */
+.ps-reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity var(--duration-normal) var(--ease-out), transform var(--duration-normal) var(--ease-out);
+}
+.ps-reveal.ps-reveal-visible {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ps-reveal { opacity: 1; transform: none; transition: none; }
 }

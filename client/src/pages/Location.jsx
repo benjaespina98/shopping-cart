@@ -74,8 +74,8 @@ export default function Location() {
                 </div>
                 <div>
                   <p className="text-base text-slate-500 font-bold mb-1">Teléfono</p>
-                  <a href="tel:+543534224605" className="text-lg font-bold text-primary-700 hover:underline">
-                    3534224605
+                  <a href="tel:+543534224607" className="text-lg font-bold text-primary-700 hover:underline">
+                    3534224607
                   </a>
                 </div>
               </div>

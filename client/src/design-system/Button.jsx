@@ -3,6 +3,7 @@ export function Button({
   variant = 'primary',
   size = 'md',
   shape = 'soft',
+  inverse = false,
   iconLeft,
   iconRight,
   fullWidth = false,
@@ -45,6 +46,22 @@ export function Button({
     },
   };
 
+  // On dark backgrounds (hero, CTA blocks), outline/ghost flip to a light-on-teal treatment
+  // instead of callers hardcoding `color:'#fff'` / rgba borders per-section.
+  const inverseOverrides = {
+    outline: {
+      color: 'var(--text-inverse)',
+      border: '2px solid var(--border-on-dark)',
+    },
+    ghost: {
+      color: 'var(--text-inverse)',
+      border: '2px solid transparent',
+    },
+  };
+  if (inverse && inverseOverrides[variant]) {
+    Object.assign(variants[variant], inverseOverrides[variant]);
+  }
+
   const base = {
     display: fullWidth ? 'flex' : 'inline-flex',
     width: fullWidth ? '100%' : 'auto',
@@ -71,6 +88,7 @@ export function Button({
     onMouseEnter: (e) => {
       if (variant === 'primary') e.currentTarget.style.background = 'var(--brand-accent-hover)';
       else if (variant === 'secondary') e.currentTarget.style.background = 'var(--brand-primary-hover)';
+      else if (inverse) e.currentTarget.style.background = 'rgba(255, 255, 255, 0.12)';
       else e.currentTarget.style.background = 'var(--brand-primary-soft)';
     },
     onMouseLeave: (e) => { e.currentTarget.style.background = variants[variant].background; },

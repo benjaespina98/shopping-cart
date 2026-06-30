@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import {
   FiGrid, FiPackage, FiShoppingBag, FiBarChart2,
-  FiLogOut, FiMenu, FiX, FiUser, FiSettings, FiImage, FiActivity, FiLayout, FiTool,
+  FiLogOut, FiMenu, FiX, FiUser, FiSettings, FiImage, FiActivity, FiLayout, FiTool, FiMail,
 } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 
@@ -12,6 +12,7 @@ const navItems = [
   { to: '/admin/servicios',     label: 'Servicios',      Icon: FiTool },
   { to: '/admin/productos',     label: 'Productos',      Icon: FiPackage },
   { to: '/admin/pedidos',       label: 'Pedidos',        Icon: FiShoppingBag },
+  { to: '/admin/presupuestos',  label: 'Presupuestos',   Icon: FiMail },
   { to: '/admin/metricas',      label: 'Métricas',       Icon: FiBarChart2 },
   { to: '/admin/logs',          label: 'Logs',           Icon: FiActivity },
   { to: '/admin/galeria',       label: 'Galería',        Icon: FiImage },

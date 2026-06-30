@@ -103,6 +103,10 @@ export default function AdminServices() {
   };
 
   const saveEdit = async (id) => {
+    if (!editForm.title || !editForm.tag || !editForm.description) {
+      toast.error('Completá título, etiqueta y descripción.');
+      return;
+    }
     try {
       const fd = new FormData();
       fd.append('title', editForm.title);
@@ -110,7 +114,7 @@ export default function AdminServices() {
       fd.append('description', editForm.description);
       fd.append('tone', editForm.tone);
       fd.append('variant', editForm.variant);
-      fd.append('active', editForm.active);
+      fd.append('active', String(editForm.active));
       const bulletList = editForm.bullets.split(',').map((b) => b.trim()).filter(Boolean);
       fd.append('bullets', JSON.stringify(bulletList));
       if (editFile) fd.append('image', editFile);
@@ -118,8 +122,8 @@ export default function AdminServices() {
       setServices((prev) => prev.map((s) => (s._id === id ? data : s)));
       cancelEdit();
       toast.success('Servicio actualizado.');
-    } catch {
-      toast.error('Error al guardar los cambios.');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Error al guardar los cambios.');
     }
   };
 

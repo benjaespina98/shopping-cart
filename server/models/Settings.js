@@ -12,9 +12,9 @@ const settingsSchema = new mongoose.Schema(
   {
     singletonKey: { type: String, unique: true, default: 'main' },
     contactEmail: { type: String, trim: true, default: 'benjaespina98@gmail.com' },
-    whatsappNumber: { type: String, trim: true, default: '5493534224605' },
-    phoneNumberDisplay: { type: String, trim: true, default: '3534224605' },
-    phoneNumberLink: { type: String, trim: true, default: 'tel:+543534224605' },
+    whatsappNumber: { type: String, trim: true, default: '5493534224607' },
+    phoneNumberDisplay: { type: String, trim: true, default: '3534224607' },
+    phoneNumberLink: { type: String, trim: true, default: 'tel:+543534224607' },
     businessHours: {
       type: [businessHourSchema],
       default: [
