@@ -1,6 +1,7 @@
+import { useEffect, useState } from 'react';
 import { FiMapPin, FiClock, FiNavigation, FiPhone } from 'react-icons/fi';
+import { settingsAPI } from '../services/api';
 
-// Replace with your actual coordinates and address
 const LOCATION = {
   address: 'Corrientes 1210, Villa María, Córdoba',
   lat: -32.4119579,
@@ -10,7 +11,35 @@ const LOCATION = {
     'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d210.51818044720216!2d-63.24136445912394!3d-32.41136540202374!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95cc42e708785177%3A0x7029a4a01828b49f!2sPlaya%20y%20Sol%20S.A.S.!5e0!3m2!1ses-419!2sar!4v1771459205088!5m2!1ses-419!2sar',
 };
 
+const defaultContactSettings = {
+  phoneNumberDisplay: '3534224607',
+  phoneNumberLink: 'tel:+543534224607',
+  businessHours: [
+    { day: 'Lunes a Viernes', hours: '9:00 - 18:00' },
+    { day: 'Sábados', hours: '9:00 - 13:00' },
+    { day: 'Domingos', hours: 'Cerrado' },
+  ],
+};
+
 export default function Location() {
+  const [contactSettings, setContactSettings] = useState(defaultContactSettings);
+
+  useEffect(() => {
+    settingsAPI.getPublic()
+      .then(({ data }) => {
+        setContactSettings({
+          phoneNumberDisplay: data?.phoneNumberDisplay || defaultContactSettings.phoneNumberDisplay,
+          phoneNumberLink: data?.phoneNumberLink || defaultContactSettings.phoneNumberLink,
+          businessHours: Array.isArray(data?.businessHours) && data.businessHours.length > 0
+            ? data.businessHours
+            : defaultContactSettings.businessHours,
+        });
+      })
+      .catch(() => {
+        // Keep fallback defaults if settings are unavailable.
+      });
+  }, []);
+
   return (
     <div className="bg-slate-100 min-h-screen">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
@@ -61,9 +90,11 @@ export default function Location() {
                 <div>
                   <p className="text-base text-slate-500 font-bold mb-2">Horarios</p>
                   <div className="space-y-1.5 text-base text-slate-700 font-medium">
-                    <p><span className="font-bold">Lun – Vie:</span> 9:00 – 18:00</p>
-                    <p><span className="font-bold">Sábados:</span> 9:00 – 13:00</p>
-                    <p className="text-slate-500"><span className="font-bold">Domingos:</span> Cerrado</p>
+                    {contactSettings.businessHours.map(({ day, hours }) => (
+                      <p key={`${day}-${hours}`} className={hours.toLowerCase() === 'cerrado' ? 'text-slate-500' : ''}>
+                        <span className="font-bold">{day}:</span> {hours}
+                      </p>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -74,8 +105,8 @@ export default function Location() {
                 </div>
                 <div>
                   <p className="text-base text-slate-500 font-bold mb-1">Teléfono</p>
-                  <a href="tel:+543534224607" className="text-lg font-bold text-primary-700 hover:underline">
-                    3534224607
+                  <a href={contactSettings.phoneNumberLink} className="text-lg font-bold text-primary-700 hover:underline">
+                    {contactSettings.phoneNumberDisplay}
                   </a>
                 </div>
               </div>

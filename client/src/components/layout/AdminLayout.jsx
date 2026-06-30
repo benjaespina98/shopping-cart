@@ -75,9 +75,7 @@ export default function AdminLayout() {
         <div className="flex items-center justify-between px-5 py-4"
              style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
           <div className="flex flex-col gap-1.5">
-            <div style={{ background: '#fff', borderRadius: 8, padding: '6px 10px', display: 'inline-flex', width: 'fit-content' }}>
-              <img src="/brand/logo-horizontal.png" alt="Playa y Sol" style={{ height: 20, width: 'auto', display: 'block' }} />
-            </div>
+            <img src="/brand/logo-horizontal.png" alt="Playa y Sol" style={{ height: 22, width: 'auto', display: 'block' }} />
             <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase',
                           color: '#FFC629', marginLeft: 2 }}>
               Panel admin

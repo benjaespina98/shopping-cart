@@ -40,9 +40,8 @@ export default function AdminLogin() {
 
         {/* Brand header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center mb-4"
-               style={{ background: '#fff', borderRadius: 12, padding: '14px 22px' }}>
-            <img src="/brand/logo-stacked.png" alt="Playa y Sol" style={{ height: 64, width: 'auto', display: 'block' }} />
+          <div className="inline-flex items-center justify-center mb-4">
+            <img src="/brand/logo-stacked.png" alt="Playa y Sol" style={{ height: 76, width: 'auto', display: 'block' }} />
           </div>
           <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, fontFamily: 'Mulish, sans-serif' }}>
             Panel de administración

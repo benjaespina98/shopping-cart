@@ -132,6 +132,48 @@
   --duration-normal: 240ms;
 }
 
+/* ============================================================
+   Temas — variantes de PRESENTACIÓN únicamente (radios, sombras,
+   tracking de títulos). Los colores de marca (--teal-*, --sun-*),
+   la tipografía (--font-display, --font-body) y el logo NUNCA
+   cambian entre temas: eso es lo que mantiene la identidad.
+   Se activan poniendo data-theme="..." en <html> (ver PublicLayout).
+   ============================================================ */
+
+/* "elegante" — líneas más rectas, sombras más discretas, sensación
+   más seria/premium. Pensado para reforzar "empresa consolidada". */
+:root[data-theme="elegante"] {
+  --radius-xs:  3px;
+  --radius-sm:  6px;
+  --radius-md:  8px;
+  --radius-lg:  10px;
+  --radius-xl:  14px;
+  --radius-2xl: 18px;
+
+  --shadow-xs: 0 1px 2px rgba(18, 43, 51, 0.05);
+  --shadow-sm: 0 1px 2px rgba(18, 43, 51, 0.06), 0 1px 1px rgba(18, 43, 51, 0.04);
+  --shadow-md: 0 2px 8px rgba(18, 43, 51, 0.07), 0 1px 3px rgba(18, 43, 51, 0.04);
+  --shadow-lg: 0 8px 20px rgba(18, 43, 51, 0.10), 0 2px 6px rgba(18, 43, 51, 0.05);
+  --shadow-accent: 0 4px 14px rgba(255, 197, 38, 0.24);
+}
+
+/* "moderno" — formas más redondeadas, sombras más presentes,
+   sensación más cercana/dinámica sin perder los colores de marca. */
+:root[data-theme="moderno"] {
+  --radius-xs:  6px;
+  --radius-sm:  10px;
+  --radius-md:  16px;
+  --radius-lg:  22px;
+  --radius-xl:  30px;
+  --radius-2xl: 40px;
+
+  --shadow-xs: 0 2px 4px rgba(18, 43, 51, 0.07);
+  --shadow-sm: 0 2px 6px rgba(18, 43, 51, 0.10), 0 1px 3px rgba(18, 43, 51, 0.07);
+  --shadow-md: 0 6px 18px rgba(18, 43, 51, 0.12), 0 3px 6px rgba(18, 43, 51, 0.07);
+  --shadow-lg: 0 16px 36px rgba(18, 43, 51, 0.16), 0 6px 12px rgba(18, 43, 51, 0.08);
+  --shadow-accent: 0 10px 28px rgba(255, 197, 38, 0.38);
+}
+
 /* Eyebrow helper */
 .ps-eyebrow {
   font-family: var(--font-display);

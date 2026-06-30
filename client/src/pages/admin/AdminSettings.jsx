@@ -1,21 +1,30 @@
 import { useEffect, useState } from 'react';
-import { FiSave, FiPlus, FiTrash2, FiUsers, FiClock, FiMail, FiPhone, FiUserMinus, FiDownload, FiLink } from 'react-icons/fi';
+import { FiSave, FiPlus, FiTrash2, FiUsers, FiClock, FiMail, FiPhone, FiUserMinus, FiDownload, FiLink, FiDroplet } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import QRCode from 'qrcode';
 import { settingsAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 
 const defaultSettings = {
+  theme: 'default',
   contactEmail: 'benjaespina98@gmail.com',
   whatsappNumber: '5493534224607',
   phoneNumberDisplay: '3534224607',
   phoneNumberLink: 'tel:+543534224607',
   businessHours: [
     { day: 'Lunes a Viernes', hours: '9:00 - 18:00' },
-    { day: 'Sabados', hours: '9:00 - 13:00' },
+    { day: 'Sábados', hours: '9:00 - 13:00' },
     { day: 'Domingos', hours: 'Cerrado' },
   ],
 };
+
+// Las 3 opciones de tema. Solo varían radios y sombras del sitio público —
+// el color de marca (teal/sol), la tipografía y el logo son siempre los mismos.
+const THEMES = [
+  { value: 'default',  label: 'Default',  hint: 'El estilo actual del sitio.', radius: 16, shadow: '0 4px 12px rgba(18,43,51,0.14)' },
+  { value: 'elegante', label: 'Elegante', hint: 'Líneas más rectas, sombras discretas. Más serio y premium.', radius: 9, shadow: '0 2px 6px rgba(18,43,51,0.10)' },
+  { value: 'moderno',  label: 'Moderno',  hint: 'Formas redondeadas, sombras más presentes. Más cercano y dinámico.', radius: 24, shadow: '0 8px 20px rgba(18,43,51,0.20)' },
+];
 
 export default function AdminSettings() {
   const { user } = useAuth();
@@ -39,6 +48,7 @@ export default function AdminSettings() {
       const data = settingsRes.data || {};
 
       setSettings({
+        theme: THEMES.some((t) => t.value === data.theme) ? data.theme : defaultSettings.theme,
         contactEmail: data.contactEmail || defaultSettings.contactEmail,
         whatsappNumber: data.whatsappNumber || defaultSettings.whatsappNumber,
         phoneNumberDisplay: data.phoneNumberDisplay || defaultSettings.phoneNumberDisplay,
@@ -162,6 +172,50 @@ export default function AdminSettings() {
       </div>
 
       <div className="card p-6">
+        <h2 className="font-semibold text-slate-800 mb-1 flex items-center gap-2">
+          <FiDroplet size={16} />
+          Personalización
+        </h2>
+        <p className="text-slate-500 text-sm mb-4">
+          Elegí cómo se ven las formas y sombras del sitio público. Los colores de marca, la tipografía y el logo no cambian en ninguna opción.
+        </p>
+        <div className="grid sm:grid-cols-3 gap-3">
+          {THEMES.map((t) => {
+            const active = settings.theme === t.value;
+            return (
+              <button
+                key={t.value}
+                type="button"
+                onClick={() => setSettings((prev) => ({ ...prev, theme: t.value }))}
+                className={`text-left p-4 rounded-xl border-2 transition-colors ${active ? 'border-primary-700 bg-primary-50/50' : 'border-slate-200 hover:border-slate-300'}`}
+              >
+                {/* Mini preview: card + button rendered with this theme's radius/shadow */}
+                <div className="flex items-center gap-2 mb-3">
+                  <div
+                    className="w-12 h-9 bg-white border border-slate-200 flex items-center justify-center"
+                    style={{ borderRadius: t.radius, boxShadow: t.shadow }}
+                  >
+                    <div className="w-6 h-2" style={{ borderRadius: t.radius / 2, background: '#FFC629' }} />
+                  </div>
+                  <div
+                    className="px-3 py-1.5 text-xs font-bold"
+                    style={{ borderRadius: t.radius * 0.7, background: '#244B5A', color: '#fff' }}
+                  >
+                    Botón
+                  </div>
+                </div>
+                <p className="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                  {t.label}
+                  {active && <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-primary-700 text-white">Activo</span>}
+                </p>
+                <p className="text-xs text-slate-500 mt-1">{t.hint}</p>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="card p-6">
         <h2 className="font-semibold text-slate-800 mb-4 flex items-center gap-2">
           <FiMail size={16} />
           Datos de contacto
@@ -281,6 +335,53 @@ export default function AdminSettings() {
             </div>
           ))}
         </div>
+
+        <form onSubmit={handleCreateUser} className="border-t border-slate-100 pt-4 grid sm:grid-cols-3 gap-3 items-end">
+          <div>
+            <label className="label">Nombre</label>
+            <input
+              className="input"
+              required
+              value={newUser.name}
+              onChange={(e) => setNewUser((prev) => ({ ...prev, name: e.target.value }))}
+              placeholder="Nombre y apellido"
+            />
+          </div>
+          <div>
+            <label className="label">Email</label>
+            <input
+              className="input"
+              type="email"
+              required
+              value={newUser.email}
+              onChange={(e) => setNewUser((prev) => ({ ...prev, email: e.target.value }))}
+              placeholder="nombre@playaysol.com.ar"
+            />
+          </div>
+          <div className="flex gap-2">
+            <div className="flex-1">
+              <label className="label">Contraseña</label>
+              <input
+                className="input"
+                type="password"
+                required
+                minLength={6}
+                value={newUser.password}
+                onChange={(e) => setNewUser((prev) => ({ ...prev, password: e.target.value }))}
+                placeholder="Mínimo 6 caracteres"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={creatingUser}
+              className="btn-primary inline-flex items-center gap-2 shrink-0 disabled:opacity-50"
+              style={{ marginBottom: 1 }}
+            >
+              <FiPlus size={16} />
+              {creatingUser ? 'Creando...' : 'Agregar'}
+            </button>
+          </div>
+        </form>
       </div>
 
       <div className="card p-6">
