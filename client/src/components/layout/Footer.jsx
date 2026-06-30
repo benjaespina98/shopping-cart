@@ -1,16 +1,27 @@
+import { useEffect, useState } from 'react';
 import { FiInstagram, FiFacebook } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
+import { settingsAPI } from '../../services/api';
 
-const SOCIAL_LINKS = [
-  { href: 'https://www.instagram.com/playaysol.piscinas/', Icon: FiInstagram, label: 'Instagram', bg: 'linear-gradient(135deg, #FEDA75, #FA7E1E, #D62976, #962FBF, #4F5BD5)' },
-  { href: 'https://www.facebook.com/playaysol.piscinas', Icon: FiFacebook, label: 'Facebook', bg: '#1877F2' },
-  { href: 'https://wa.me/5493534224607', Icon: FaWhatsapp, label: 'WhatsApp', bg: '#25D366' },
+const defaultContactSettings = {
+  whatsappNumber: import.meta.env.VITE_WHATSAPP_NUMBER || '5493534224607',
+  phoneNumberDisplay: '3534224607',
+  phoneNumberLink: 'tel:+543534224607',
+  contactEmail: 'piscinas@playaysol.com.ar',
+};
+
+const empresaLinks = [
+  ['/nosotros', 'Nosotros'],
+  ['/proyectos', 'Proyectos'],
+  ['/ubicacion', 'Ubicación'],
+  ['/tienda', 'Tienda'],
 ];
 
-const cols = [
-  { title: 'Servicios', items: [['/servicios', 'Piscinas de obra'], ['/servicios', 'Reformas'], ['/servicios', 'Climatización'], ['/servicios', 'Cercos y seguridad']] },
-  { title: 'Empresa',   items: [['/nosotros', 'Nosotros'], ['/proyectos', 'Proyectos'], ['/tienda', 'Tienda'], ['/admin/login', 'Portal admin']] },
-  { title: 'Contacto',  items: [['/contacto', 'Escribinos'], ['tel:+543534224607', '353 422-4607'], ['https://wa.me/5493534224607', 'WhatsApp'], ['mailto:piscinas@playaysol.com.ar', 'piscinas@playaysol.com.ar']] },
+const serviciosLinks = [
+  ['/servicios', 'Piscinas de obra'],
+  ['/servicios', 'Reformas'],
+  ['/servicios', 'Climatización'],
+  ['/servicios', 'Cercos y seguridad'],
 ];
 
 const linkHover = (e, on) => { e.currentTarget.style.color = on ? 'var(--text-inverse)' : 'var(--text-inverse-muted)'; };
@@ -20,6 +31,40 @@ const socialHover = (e, on) => {
 };
 
 export default function Footer() {
+  const [settings, setSettings] = useState(defaultContactSettings);
+
+  useEffect(() => {
+    settingsAPI.getPublic()
+      .then(({ data }) => {
+        setSettings({
+          whatsappNumber: data?.whatsappNumber || defaultContactSettings.whatsappNumber,
+          phoneNumberDisplay: data?.phoneNumberDisplay || defaultContactSettings.phoneNumberDisplay,
+          phoneNumberLink: data?.phoneNumberLink || defaultContactSettings.phoneNumberLink,
+          contactEmail: data?.contactEmail || defaultContactSettings.contactEmail,
+        });
+      })
+      .catch(() => {
+        // Keep fallback defaults if settings are unavailable.
+      });
+  }, []);
+
+  const socialLinks = [
+    { href: 'https://www.instagram.com/playaysol.piscinas/', Icon: FiInstagram, label: 'Instagram', bg: 'linear-gradient(135deg, #FEDA75, #FA7E1E, #D62976, #962FBF, #4F5BD5)' },
+    { href: 'https://www.facebook.com/playaysol.piscinas', Icon: FiFacebook, label: 'Facebook', bg: '#1877F2' },
+    { href: `https://wa.me/${settings.whatsappNumber}`, Icon: FaWhatsapp, label: 'WhatsApp', bg: '#25D366' },
+  ];
+
+  const cols = [
+    { title: 'Servicios', items: serviciosLinks },
+    { title: 'Empresa',   items: empresaLinks },
+    { title: 'Contacto',  items: [
+      ['/contacto', 'Escribinos'],
+      [settings.phoneNumberLink, settings.phoneNumberDisplay],
+      [`https://wa.me/${settings.whatsappNumber}`, 'WhatsApp'],
+      [`mailto:${settings.contactEmail}`, settings.contactEmail],
+    ] },
+  ];
+
   return (
     <footer style={{ background: 'var(--teal-800)', color: 'var(--text-inverse-muted)', padding: '48px 40px 28px', fontFamily: 'var(--font-body)' }}
             className="ps-section">
@@ -38,7 +83,7 @@ export default function Footer() {
             Seguinos
           </p>
           <div style={{ display: 'flex', gap: 12 }}>
-            {SOCIAL_LINKS.map(({ href, Icon, label, bg }) => (
+            {socialLinks.map(({ href, Icon, label, bg }) => (
               <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={label}
                 style={{ width: 42, height: 42, borderRadius: 12, background: bg,
                          color: 'var(--text-inverse)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',

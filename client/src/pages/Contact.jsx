@@ -17,7 +17,7 @@ const defaultContactSettings = {
   contactEmail: 'benjaespina98@gmail.com',
   businessHours: [
     { day: 'Lunes a Viernes', hours: '9:00 - 18:00' },
-    { day: 'Sabados', hours: '9:00 - 13:00' },
+    { day: 'Sábados', hours: '9:00 - 13:00' },
     { day: 'Domingos', hours: 'Cerrado' },
   ],
 };

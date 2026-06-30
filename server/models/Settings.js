@@ -11,6 +11,7 @@ const businessHourSchema = new mongoose.Schema(
 const settingsSchema = new mongoose.Schema(
   {
     singletonKey: { type: String, unique: true, default: 'main' },
+    theme: { type: String, enum: ['default', 'elegante', 'moderno'], default: 'default' },
     contactEmail: { type: String, trim: true, default: 'benjaespina98@gmail.com' },
     whatsappNumber: { type: String, trim: true, default: '5493534224607' },
     phoneNumberDisplay: { type: String, trim: true, default: '3534224607' },
@@ -19,7 +20,7 @@ const settingsSchema = new mongoose.Schema(
       type: [businessHourSchema],
       default: [
         { day: 'Lunes a Viernes', hours: '9:00 - 18:00' },
-        { day: 'Sabados', hours: '9:00 - 13:00' },
+        { day: 'Sábados', hours: '9:00 - 13:00' },
         { day: 'Domingos', hours: 'Cerrado' },
       ],
     },

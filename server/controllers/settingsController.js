@@ -3,15 +3,18 @@ import Settings from '../models/Settings.js';
 import User from '../models/User.js';
 import { writeAuditLog } from '../utils/auditLogger.js';
 
+const VALID_THEMES = ['default', 'elegante', 'moderno'];
+
 const defaultSettings = {
   singletonKey: 'main',
+  theme: 'default',
   contactEmail: 'benjaespina98@gmail.com',
   whatsappNumber: '5493534224607',
   phoneNumberDisplay: '3534224607',
   phoneNumberLink: 'tel:+543534224607',
   businessHours: [
     { day: 'Lunes a Viernes', hours: '9:00 - 18:00' },
-    { day: 'Sabados', hours: '9:00 - 13:00' },
+    { day: 'Sábados', hours: '9:00 - 13:00' },
     { day: 'Domingos', hours: 'Cerrado' },
   ],
 };
@@ -39,6 +42,7 @@ const sanitizeBusinessHours = (hours) => {
 };
 
 const toPublicResponse = (settings) => ({
+  theme: settings.theme || 'default',
   contactEmail: settings.contactEmail,
   whatsappNumber: settings.whatsappNumber,
   phoneNumberDisplay: settings.phoneNumberDisplay,
@@ -66,7 +70,11 @@ export const updateAdminSettings = asyncHandler(async (req, res) => {
   const whatsappNumber = String(req.body?.whatsappNumber || '').trim();
   const phoneNumberDisplay = String(req.body?.phoneNumberDisplay || '').trim();
   const phoneNumberLink = String(req.body?.phoneNumberLink || '').trim();
+  const theme = String(req.body?.theme || '').trim();
 
+  if (theme && VALID_THEMES.includes(theme)) {
+    settings.theme = theme;
+  }
   settings.contactEmail = contactEmail || settings.contactEmail;
   settings.whatsappNumber = whatsappNumber || settings.whatsappNumber;
   settings.phoneNumberDisplay = phoneNumberDisplay || settings.phoneNumberDisplay;
