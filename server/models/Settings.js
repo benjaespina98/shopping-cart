@@ -20,6 +20,8 @@ const settingsSchema = new mongoose.Schema(
     secondaryContactWhatsapp: { type: String, trim: true, default: '5493535668994' },
     contactPhotoUrl: { type: String, default: '' },
     contactPhotoPublicId: { type: String, default: '' },
+    aboutPhotoUrl: { type: String, default: '' },
+    aboutPhotoPublicId: { type: String, default: '' },
     businessHours: {
       type: [businessHourSchema],
       default: [

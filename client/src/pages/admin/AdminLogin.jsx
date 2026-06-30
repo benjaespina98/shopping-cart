@@ -63,7 +63,7 @@ export default function AdminLogin() {
             Ingresá a tu cuenta
           </h2>
 
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <form onSubmit={handleSubmit} autoComplete="off" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {/* Email */}
             <div>
               <label style={{ display: 'block', fontSize: 12, fontWeight: 600, fontFamily: 'Poppins, sans-serif',
@@ -79,6 +79,8 @@ export default function AdminLogin() {
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   required
+                  autoComplete="off"
+                  name="admin-email-field"
                   style={{ width: '100%', paddingLeft: 38, paddingRight: 14, height: 42,
                            background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)',
                            borderRadius: 10, color: '#fff', fontSize: 14, fontFamily: 'Mulish, sans-serif',
@@ -105,6 +107,8 @@ export default function AdminLogin() {
                   value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
                   required
+                  autoComplete="new-password"
+                  name="admin-password-field"
                   style={{ width: '100%', paddingLeft: 38, paddingRight: 40, height: 42,
                            background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)',
                            borderRadius: 10, color: '#fff', fontSize: 14, fontFamily: 'Mulish, sans-serif',

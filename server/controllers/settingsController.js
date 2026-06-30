@@ -53,6 +53,7 @@ const toPublicResponse = (settings) => ({
   secondaryContactLabel: settings.secondaryContactLabel || '',
   secondaryContactWhatsapp: settings.secondaryContactWhatsapp || '',
   contactPhotoUrl: settings.contactPhotoUrl || '',
+  aboutPhotoUrl: settings.aboutPhotoUrl || '',
   businessHours: settings.businessHours,
 });
 
@@ -107,21 +108,26 @@ export const updateAdminSettings = asyncHandler(async (req, res) => {
   });
 });
 
-// POST /api/settings/contact-photo — admin
-export const uploadContactPhoto = asyncHandler(async (req, res) => {
+const PHOTO_FIELDS = {
+  contact: { url: 'contactPhotoUrl', publicId: 'contactPhotoPublicId' },
+  about: { url: 'aboutPhotoUrl', publicId: 'aboutPhotoPublicId' },
+};
+
+const uploadPhoto = (target) => asyncHandler(async (req, res) => {
   if (!req.file) {
     res.status(400);
     throw new Error('No se recibió ninguna imagen');
   }
 
+  const { url, publicId } = PHOTO_FIELDS[target];
   const settings = await getOrCreateSettings();
 
-  if (settings.contactPhotoPublicId) {
-    await cloudinary.uploader.destroy(settings.contactPhotoPublicId).catch(() => {});
+  if (settings[publicId]) {
+    await cloudinary.uploader.destroy(settings[publicId]).catch(() => {});
   }
 
-  settings.contactPhotoUrl = req.file.path;
-  settings.contactPhotoPublicId = req.file.filename;
+  settings[url] = req.file.path;
+  settings[publicId] = req.file.filename;
   await settings.save();
 
   await writeAuditLog({
@@ -129,11 +135,17 @@ export const uploadContactPhoto = asyncHandler(async (req, res) => {
     action: 'SETTINGS_UPDATED',
     entity: 'settings',
     entityId: settings._id,
-    message: 'Foto de contacto actualizada',
+    message: `Foto de ${target === 'contact' ? 'contacto' : 'nosotros'} actualizada`,
   });
 
   res.json({ settings: toPublicResponse(settings) });
 });
+
+// POST /api/settings/contact-photo — admin
+export const uploadContactPhoto = uploadPhoto('contact');
+
+// POST /api/settings/about-photo — admin
+export const uploadAboutPhoto = uploadPhoto('about');
 
 // GET /api/settings/users
 export const getUsers = asyncHandler(async (req, res) => {

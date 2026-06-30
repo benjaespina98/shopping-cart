@@ -1,13 +1,15 @@
 import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { FiAward, FiDroplet, FiUsers, FiClock, FiCheckCircle, FiPenTool, FiShield, FiHeart } from 'react-icons/fi';
 import { Button } from '../design-system/Button';
 import { Card } from '../design-system/Card';
 import { Photo } from '../design-system/Photo';
 import { useReveal } from '../hooks/useReveal';
+import { settingsAPI } from '../services/api';
 
 const stats = [
   { Icon: FiAward,   n: '+30 años', l: 'de trayectoria en Villa María' },
-  { Icon: FiDroplet, n: '+850',     l: 'piscinas construidas' },
+  { Icon: FiDroplet, n: '+500',     l: 'piscinas construidas' },
   { Icon: FiUsers,   n: '100%',     l: 'atención personalizada' },
   { Icon: FiClock,   n: '48h',      l: 'para tu presupuesto' },
 ];
@@ -40,6 +42,13 @@ export default function About() {
   const reveal = useReveal();
   const valuesReveal = useReveal();
   const ctaReveal = useReveal();
+  const [aboutPhotoUrl, setAboutPhotoUrl] = useState('');
+
+  useEffect(() => {
+    settingsAPI.getPublic()
+      .then(({ data }) => setAboutPhotoUrl(data?.aboutPhotoUrl || ''))
+      .catch(() => {});
+  }, []);
 
   return (
     <div style={{ fontFamily: 'var(--font-body)' }}>
@@ -65,12 +74,12 @@ export default function About() {
           </div>
           <div className="ps-hero-photo">
             <div style={{
-              borderRadius: 'var(--radius-xl)', padding: 6,
+              borderRadius: 'var(--radius-xl)', padding: 3,
               background: 'var(--surface-on-dark)',
               border: '1px solid var(--border-on-dark-subtle)',
               boxShadow: 'var(--shadow-lg)',
             }}>
-              <Photo label="Nuestro equipo en obra" height={360} radius="var(--radius-lg)" />
+              <Photo label="Equipo" src={aboutPhotoUrl || undefined} height={480} radius="var(--radius-lg)" />
             </div>
           </div>
         </div>
