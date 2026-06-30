@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FiMail, FiCheck, FiPhone, FiMapPin, FiTag } from 'react-icons/fi';
+import { FiMail, FiCheck, FiPhone, FiMapPin, FiTag, FiMessageSquare } from 'react-icons/fi';
 import { quotesAPI } from '../../services/api';
 import { toast } from 'react-toastify';
 
@@ -7,6 +7,11 @@ const STATUS_LABELS = {
   new: { label: 'Nueva', color: 'bg-primary-50 text-primary-700' },
   contacted: { label: 'Contactado', color: 'bg-amber-50 text-amber-700' },
   closed: { label: 'Cerrada', color: 'bg-green-50 text-green-700' },
+};
+
+const SOURCE_LABELS = {
+  quote: { label: '/presupuesto', color: 'bg-violet-50 text-violet-700' },
+  contact: { label: '/contacto', color: 'bg-sky-50 text-sky-700' },
 };
 
 export default function AdminQuotes() {
@@ -20,7 +25,7 @@ export default function AdminQuotes() {
       const { data } = await quotesAPI.getAll();
       setQuotes(data);
     } catch {
-      toast.error('Error al cargar las solicitudes de presupuesto.');
+      toast.error('Error al cargar las consultas.');
     } finally {
       setLoading(false);
     }
@@ -49,9 +54,9 @@ export default function AdminQuotes() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-900">Presupuestos</h1>
+        <h1 className="text-2xl font-bold text-slate-900">Consultas</h1>
         <p className="text-slate-500 text-sm mt-0.5">
-          Solicitudes recibidas desde <strong>/presupuesto</strong>. {quotes.filter((q) => q.status === 'new').length} sin contactar.
+          Solicitudes de presupuesto (<strong>/presupuesto</strong>) y consultas generales (<strong>/contacto</strong>). {quotes.filter((q) => q.status === 'new').length} sin contactar.
         </p>
       </div>
 
@@ -78,18 +83,21 @@ export default function AdminQuotes() {
       ) : filtered.length === 0 ? (
         <div className="card p-12 text-center">
           <FiMail size={40} className="mx-auto text-slate-300 mb-3" />
-          <p className="text-slate-500 font-medium">No hay solicitudes {statusFilter ? 'con este estado' : 'todavía'}</p>
+          <p className="text-slate-500 font-medium">No hay consultas {statusFilter ? 'con este estado' : 'todavía'}</p>
         </div>
       ) : (
         <div className="flex flex-col gap-3">
           {filtered.map((q) => (
             <div key={q._id} className="card p-4">
               <div className="flex flex-wrap items-start justify-between gap-3">
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap mb-1.5">
                     <span className="font-semibold text-slate-800">{q.name}</span>
                     <span className={`badge ${STATUS_LABELS[q.status]?.color}`}>
                       {STATUS_LABELS[q.status]?.label || q.status}
+                    </span>
+                    <span className={`badge ${SOURCE_LABELS[q.source || 'quote']?.color}`}>
+                      {SOURCE_LABELS[q.source || 'quote']?.label}
                     </span>
                     {!q.emailSent && (
                       <span className="badge bg-slate-100 text-slate-500" title="El email de notificación no se pudo enviar (SMTP sin configurar)">
@@ -103,6 +111,12 @@ export default function AdminQuotes() {
                     <a href={`mailto:${q.email}`} className="flex items-center gap-1.5 hover:text-primary-700"><FiMail size={13} /> {q.email}</a>
                     {q.location && <span className="flex items-center gap-1.5"><FiMapPin size={13} /> {q.location}</span>}
                   </div>
+                  {q.message && (
+                    <p className="text-sm text-slate-600 mt-2 flex items-start gap-1.5 bg-slate-50 rounded-lg p-2.5">
+                      <FiMessageSquare size={13} className="mt-0.5 shrink-0 text-slate-400" />
+                      <span>{q.message}</span>
+                    </p>
+                  )}
                   <p className="text-xs text-slate-400 mt-1.5">
                     {new Date(q.createdAt).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' })}
                   </p>

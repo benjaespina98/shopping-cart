@@ -107,7 +107,7 @@ export default function About() {
             Un mismo equipo, de la visita técnica al último detalle
           </h2>
           <p style={{ fontSize: 16, color: 'var(--text-body)', lineHeight: 1.75, textAlign: 'center' }}>
-            En Playa &amp; Sol no tercerizamos cuadrillas para cada obra. El mismo equipo que te visita y proyecta tu piscina es el que después la construye, la repara o la pone a punto cuando hace falta. Eso significa una sola persona de contacto, sin intermediarios y sin pases de responsabilidad cuando algo necesita ajustarse.
+            En Playa y Sol no tercerizamos cuadrillas para cada obra. El mismo equipo que te visita y proyecta tu piscina es el que después la construye, la repara o la pone a punto cuando hace falta. Eso significa una sola persona de contacto, sin intermediarios y sin pases de responsabilidad cuando algo necesita ajustarse.
           </p>
         </div>
       </section>

@@ -1,4 +1,4 @@
-# Playa & Sol — Sitio institucional + E-commerce (MERN)
+# Playa y Sol — Sitio institucional + E-commerce (MERN)
 
 Plataforma full-stack para un negocio real de construcción y mantenimiento de piscinas: landing institucional, catálogo de productos con checkout vía WhatsApp, gestión de proyectos/servicios y un panel de administración completo con métricas y auditoría.
 
@@ -123,4 +123,4 @@ Despliegue full-stack en Vercel (frontend estático + funciones serverless para 
 
 ## Estado
 
-Proyecto activo en producción para un negocio real (Playa & Sol Piscinas, Villa María, Argentina), con foco en simplicidad, rendimiento y casos de uso reales antes que en complejidad técnica innecesaria.
+Proyecto activo en producción para un negocio real (Playa y Sol Piscinas, Villa María, Argentina), con foco en simplicidad, rendimiento y casos de uso reales antes que en complejidad técnica innecesaria.

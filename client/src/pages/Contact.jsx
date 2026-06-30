@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
-import { FiMail, FiPhone, FiInstagram, FiFacebook, FiClock, FiSend } from 'react-icons/fi';
+import { FiMail, FiPhone, FiInstagram, FiFacebook, FiClock, FiSend, FiUser } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import { toast } from 'react-toastify';
-import { settingsAPI } from '../services/api';
+import { settingsAPI, quotesAPI } from '../services/api';
 import { Button } from '../design-system/Button';
 import { Card } from '../design-system/Card';
 import { Input } from '../design-system/Input';
 import { useReveal } from '../hooks/useReveal';
+
+const INQUIRY_TYPES = ['Consulta general', 'Postventa y garantía', 'Proveedores', 'Otro'];
 
 const defaultContactSettings = {
   whatsappNumber: import.meta.env.VITE_WHATSAPP_NUMBER || '5493534224607',
@@ -28,7 +30,8 @@ const CHANNELS = [
 
 export default function Contact() {
   const reveal = useReveal();
-  const [form, setForm] = useState({ name: '', email: '', message: '' });
+  const [form, setForm] = useState({ name: '', phone: '', email: '', message: '' });
+  const [inquiryType, setInquiryType] = useState(INQUIRY_TYPES[0]);
   const [sendingChannel, setSendingChannel] = useState('');
   const [contactSettings, setContactSettings] = useState(defaultContactSettings);
   const sentTimeoutRef = useRef(null);
@@ -62,22 +65,41 @@ export default function Contact() {
     setSendingChannel(channel);
     if (sentTimeoutRef.current) clearTimeout(sentTimeoutRef.current);
     sentTimeoutRef.current = setTimeout(() => setSendingChannel(''), 3500);
-    setForm({ name: '', email: '', message: '' });
+    setForm({ name: '', phone: '', email: '', message: '' });
   };
 
   const getTextMessage = () =>
-    `Hola! Soy ${form.name}${form.email ? ` (${form.email})` : ''}.\n\n${form.message}`;
+    `Hola! Soy ${form.name} (${form.phone}${form.email ? `, ${form.email}` : ''}).\nMotivo: ${inquiryType}\n\n${form.message}`;
 
   const validateForm = () => {
-    if (!form.name.trim() || !form.message.trim()) {
-      toast.error('Completá nombre y mensaje para continuar.');
+    if (!form.name.trim() || !form.phone.trim() || !form.email.trim() || !form.message.trim()) {
+      toast.error('Completá nombre, teléfono, email y mensaje para continuar.');
       return false;
     }
     return true;
   };
 
-  const handleWhatsApp = () => {
+  // Guarda la consulta en el servidor (queda en el admin y dispara el email de notificación)
+  // antes de abrir el canal elegido — así no se pierde el contacto aunque el visitante
+  // no termine de enviar el WhatsApp o el mail desde su propio dispositivo.
+  const saveInquiry = async () => {
+    try {
+      await quotesAPI.create({
+        projectType: inquiryType,
+        name: form.name,
+        phone: form.phone,
+        email: form.email,
+        message: form.message,
+        source: 'contact',
+      });
+    } catch {
+      // No bloqueamos el envío por WhatsApp/email si el guardado falla.
+    }
+  };
+
+  const handleWhatsApp = async () => {
     if (!validateForm()) return;
+    await saveInquiry();
     const text = getTextMessage();
     const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
     const popup = window.open('', '_blank', 'noopener,noreferrer');
@@ -86,8 +108,9 @@ export default function Contact() {
     resetFormWithFeedback('whatsapp');
   };
 
-  const handleEmail = () => {
+  const handleEmail = async () => {
     if (!validateForm()) return;
+    await saveInquiry();
     const subject = `Consulta desde web - ${form.name}`;
     const body = getTextMessage();
     const mailtoUrl = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
@@ -193,9 +216,37 @@ export default function Contact() {
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', marginBottom: 'var(--space-5)' }}>
-            <Input label="Nombre" placeholder="Tu nombre completo" required
-              value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-            <Input label="Email (opcional)" type="email" placeholder="tu@email.com"
+            <div>
+              <label style={{ fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 14,
+                              color: 'var(--text-strong)', display: 'block', marginBottom: 'var(--space-2)' }}>
+                Tipo de consulta
+              </label>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                {INQUIRY_TYPES.map((t) => {
+                  const active = inquiryType === t;
+                  return (
+                    <button type="button" key={t} onClick={() => setInquiryType(t)} style={{
+                      flex: '0 0 auto', padding: '8px 14px', borderRadius: 'var(--radius-pill)',
+                      cursor: 'pointer', fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: 13,
+                      border: active ? '2px solid var(--brand-primary)' : '2px solid var(--border-default)',
+                      background: active ? 'var(--teal-50)' : 'var(--surface-card)',
+                      color: active ? 'var(--brand-primary)' : 'var(--text-muted)',
+                      transition: 'all var(--duration-fast) var(--ease-out)',
+                    }}>{t}</button>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="ps-form-row">
+              <Input label="Nombre" placeholder="Tu nombre completo" required
+                leading={<FiUser size={16} />}
+                value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+              <Input label="Teléfono" placeholder="600 123 456" required
+                leading={<FiPhone size={16} />}
+                value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+            </div>
+            <Input label="Email" type="email" placeholder="tu@email.com" required
+              leading={<FiMail size={16} />}
               value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               <label htmlFor="contact-message" style={{ fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 14, color: 'var(--text-strong)' }}>

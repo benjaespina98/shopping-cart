@@ -28,7 +28,7 @@ export default function Footer() {
         {/* Brand */}
         <div>
           <div style={{ marginBottom: 14 }}>
-            <img src="/brand/logo-horizontal.png" alt="Playa & Sol" style={{ height: 30, width: 'auto', display: 'block' }} />
+            <img src="/brand/logo-horizontal.png" alt="Playa y Sol" style={{ height: 30, width: 'auto', display: 'block' }} />
           </div>
           <p style={{ fontSize: 14, lineHeight: 1.6, maxWidth: 240, marginBottom: 18 }}>
             Diseño, construcción y mantenimiento de piscinas en Villa María y la región, con más de 30 años de trayectoria.
@@ -80,7 +80,7 @@ export default function Footer() {
                     display: 'flex', justifyContent: 'space-between',
                     flexWrap: 'wrap', gap: 8, fontSize: 13 }}
            className="ps-section">
-        <span>© {new Date().getFullYear()} Playa &amp; Sol Piscinas</span>
+        <span>© {new Date().getFullYear()} Playa y Sol Piscinas</span>
         <span style={{ opacity: 0.6 }}>Aviso legal · Privacidad · Cookies</span>
       </div>
     </footer>
