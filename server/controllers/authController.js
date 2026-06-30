@@ -49,25 +49,3 @@ export const getMe = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id).select('-password');
   res.json(user);
 });
-
-// PUT /api/auth/change-password
-export const changePassword = asyncHandler(async (req, res) => {
-  const { currentPassword, newPassword } = req.body;
-  const user = await User.findById(req.user._id);
-
-  if (!(await user.matchPassword(currentPassword))) {
-    res.status(400);
-    throw new Error('Contraseña actual incorrecta');
-  }
-
-  user.password = newPassword;
-  await user.save();
-  await writeAuditLog({
-    req,
-    action: 'PASSWORD_CHANGED',
-    entity: 'user',
-    entityId: user._id,
-    message: 'Contrasena actualizada por el usuario',
-  });
-  res.json({ message: 'Contraseña actualizada correctamente' });
-});
