@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { FiSave, FiPlus, FiTrash2, FiUsers, FiClock, FiMail, FiUserMinus, FiDownload, FiLink, FiDroplet, FiImage, FiUpload, FiCheckCircle, FiX } from 'react-icons/fi';
+import { FiSave, FiPlus, FiTrash2, FiUsers, FiClock, FiMail, FiUserMinus, FiDownload, FiLink, FiDroplet, FiImage, FiUpload, FiCheckCircle, FiX, FiEye, FiEyeOff, FiCheck, FiExternalLink } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import QRCode from 'qrcode';
 import { settingsAPI } from '../../services/api';
@@ -55,35 +55,40 @@ const THEMES = [
   },
 ];
 
-// Miniatura fiel del sitio: barra de header (teal fijo de marca), fondo de página
-// con el color del tema, y una card+botón con el radio y sombra correspondiente.
+// Miniatura fiel del sitio con diferencias de tema claramente visibles
 function ThemePreviewCard({ t }) {
   return (
     <div style={{ borderRadius: 10, overflow: 'hidden', border: '1px solid #E0E5E7', width: '100%' }}>
-      {/* Mini header — siempre teal institucional */}
-      <div style={{ background: '#244B5A', padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 4 }}>
-        <div style={{ width: 40, height: 6, borderRadius: 3, background: 'rgba(255,198,41,0.85)' }} />
+      {/* Mini header */}
+      <div style={{ background: '#244B5A', padding: '7px 10px', display: 'flex', alignItems: 'center', gap: 6 }}>
+        <div style={{ width: 44, height: 7, borderRadius: 3, background: 'rgba(255,198,41,0.9)' }} />
         <div style={{ flex: 1 }} />
-        <div style={{ width: 22, height: 6, borderRadius: 10, background: '#FFC629' }} />
+        <div style={{ width: 26, height: 7, borderRadius: t.pilRadius > 10 ? 99 : 3, background: '#FFC629' }} />
+      </div>
+      {/* Mini hero */}
+      <div style={{ background: '#1C3D49', padding: '10px', display: 'flex', flexDirection: 'column', gap: 5 }}>
+        <div style={{ height: 7, width: '70%', borderRadius: 2, background: 'rgba(255,255,255,0.85)' }} />
+        <div style={{ height: 5, width: '90%', borderRadius: 2, background: 'rgba(255,255,255,0.35)' }} />
+        <div style={{ height: 5, width: '75%', borderRadius: 2, background: 'rgba(255,255,255,0.35)', marginBottom: 3 }} />
+        <div style={{ display: 'inline-block', alignSelf: 'flex-start', background: '#FFC629', color: '#122B33',
+                      fontSize: 7, fontWeight: 700, padding: '3px 9px', borderRadius: t.pilRadius > 10 ? 99 : 3 }}>
+          Solicitar presupuesto
+        </div>
       </div>
       {/* Mini página */}
       <div style={{ background: t.bgPage, padding: '10px 10px 12px' }}>
-        {/* Texto de sección */}
-        <div style={{ height: 5, width: '50%', borderRadius: 2, background: '#946A0B', marginBottom: 5 }} />
-        <div style={{ height: 8, width: '80%', borderRadius: 2, background: '#244B5A', marginBottom: 4 }} />
-        <div style={{ height: 4, width: '90%', borderRadius: 2, background: '#C7CFD2', marginBottom: 2 }} />
-        <div style={{ height: 4, width: '65%', borderRadius: 2, background: '#C7CFD2', marginBottom: 10 }} />
-        {/* Card */}
-        <div style={{ background: t.bgCard, borderRadius: t.radius, boxShadow: t.shadow,
-                      border: '1px solid #E0E5E7', padding: '8px 9px', marginBottom: 8 }}>
-          <div style={{ height: 6, width: '55%', borderRadius: 2, background: '#244B5A', marginBottom: 4 }} />
-          <div style={{ height: 4, width: '85%', borderRadius: 2, background: '#C7CFD2', marginBottom: 3 }} />
-          <div style={{ height: 4, width: '60%', borderRadius: 2, background: '#C7CFD2' }} />
-        </div>
-        {/* Botón */}
-        <div style={{ display: 'inline-block', background: '#FFC629', color: '#122B33',
-                      fontSize: 8, fontWeight: 700, padding: '4px 10px', borderRadius: t.pilRadius }}>
-          Solicitar presupuesto
+        <div style={{ height: 5, width: '45%', borderRadius: 2, background: '#946A0B', marginBottom: 6 }} />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 8 }}>
+          {[1, 2].map((i) => (
+            <div key={i} style={{ background: t.bgCard, borderRadius: t.radius, boxShadow: t.shadow,
+                                  border: '1px solid #E0E5E7', padding: '7px 8px' }}>
+              <div style={{ height: 5, width: '60%', borderRadius: 2, background: '#244B5A', marginBottom: 3 }} />
+              <div style={{ height: 3, width: '85%', borderRadius: 2, background: '#C7CFD2', marginBottom: 2 }} />
+              <div style={{ height: 3, width: '65%', borderRadius: 2, background: '#C7CFD2', marginBottom: 6 }} />
+              <div style={{ height: 3, width: 36, borderRadius: t.pilRadius > 10 ? 99 : 2,
+                            background: 'rgba(36,75,90,0.2)', border: '1px solid #244B5A' }} />
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -101,6 +106,7 @@ export default function AdminSettings() {
   const [uploadingAboutPhoto, setUploadingAboutPhoto] = useState(false);
   const [creatingUser, setCreatingUser] = useState(false);
   const [newUser, setNewUser] = useState({ name: '', email: '', password: '' });
+  const [showPassword, setShowPassword] = useState(false);
   const [siteUrl, setSiteUrl] = useState(typeof window !== 'undefined' ? window.location.origin : '');
   const [qrDataUrl, setQrDataUrl] = useState('');
   const contactPhotoInputRef = useRef();
@@ -281,12 +287,22 @@ export default function AdminSettings() {
       </div>
 
       <div className="card p-6">
-        <h2 className="font-semibold text-slate-800 mb-1 flex items-center gap-2">
-          <FiDroplet size={16} />
-          Personalización
-        </h2>
+        <div className="flex items-start justify-between gap-4 mb-1">
+          <h2 className="font-semibold text-slate-800 flex items-center gap-2">
+            <FiDroplet size={16} />
+            Personalización
+          </h2>
+          <a
+            href="/"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-200 text-slate-500 hover:border-primary-700 hover:text-primary-700 transition-colors flex-shrink-0"
+          >
+            <FiExternalLink size={12} /> Ver sitio
+          </a>
+        </div>
         <p className="text-slate-500 text-sm mb-4">
-          Elegí cómo se ven las formas y sombras del sitio público. Los colores de marca, la tipografía y el logo no cambian en ninguna opción.
+          Elegí el estilo del sitio público. Los colores de marca y la tipografía no cambian. Guardá para aplicar el cambio.
         </p>
         <div className="grid sm:grid-cols-3 gap-3">
           {THEMES.map((t) => {
@@ -296,14 +312,18 @@ export default function AdminSettings() {
                 key={t.value}
                 type="button"
                 onClick={() => setSettings((prev) => ({ ...prev, theme: t.value }))}
-                className={`text-left p-3 rounded-xl border-2 transition-colors ${active ? 'border-primary-700 bg-primary-50/50' : 'border-slate-200 hover:border-slate-300'}`}
+                className={`text-left p-3 rounded-xl border-2 transition-all ${active ? 'border-primary-700 bg-primary-50/40 shadow-sm' : 'border-slate-200 hover:border-primary-300 hover:shadow-sm'}`}
               >
                 <div className="mb-3">
                   <ThemePreviewCard t={t} />
                 </div>
                 <p className="text-sm font-semibold text-slate-800 flex items-center gap-2">
                   {t.label}
-                  {active && <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-primary-700 text-white">Activo</span>}
+                  {active && (
+                    <span className="inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full bg-primary-700 text-white">
+                      <FiCheck size={10} /> Activo
+                    </span>
+                  )}
                 </p>
                 <p className="text-xs text-slate-500 mt-1">{t.hint}</p>
               </button>
@@ -311,7 +331,7 @@ export default function AdminSettings() {
           })}
         </div>
         <p className="text-xs text-slate-400 mt-3">
-          El tema se aplica al sitio público recién cuando hacés click en <strong>"Guardar configuración"</strong>, al final de esta página.
+          Hacé click en <strong>"Guardar configuración"</strong> al final para aplicar el cambio en el sitio, luego abrí <strong>"Ver sitio"</strong> arriba para comprobarlo.
         </p>
       </div>
 
@@ -536,15 +556,26 @@ export default function AdminSettings() {
           <div className="flex gap-2">
             <div className="flex-1">
               <label className="label">Contraseña</label>
-              <input
-                className="input"
-                type="password"
-                required
-                minLength={6}
-                value={newUser.password}
-                onChange={(e) => setNewUser((prev) => ({ ...prev, password: e.target.value }))}
-                placeholder="Mínimo 6 caracteres"
-              />
+              <div className="relative">
+                <input
+                  className="input pr-10"
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  minLength={6}
+                  value={newUser.password}
+                  onChange={(e) => setNewUser((prev) => ({ ...prev, password: e.target.value }))}
+                  placeholder="Mínimo 6 caracteres"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                  tabIndex={-1}
+                  title={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                >
+                  {showPassword ? <FiEyeOff size={15} /> : <FiEye size={15} />}
+                </button>
+              </div>
             </div>
             <button
               type="submit"
