@@ -31,15 +31,16 @@ export async function sendQuoteNotification(quote) {
     return false;
   }
 
-  const storeName = process.env.STORE_NAME || 'Playa & Sol Piscinas';
+  const storeName = process.env.STORE_NAME || 'Playa y Sol Piscinas';
 
   await t.sendMail({
     from: `"${storeName}" <${process.env.SMTP_USER}>`,
     to,
     replyTo: quote.email || undefined,
-    subject: `Nueva solicitud de presupuesto — ${quote.projectType}`,
+    subject: `${quote.source === 'contact' ? 'Nueva consulta' : 'Nueva solicitud de presupuesto'} — ${quote.projectType}`,
     text: [
-      `Tipo de proyecto: ${quote.projectType}`,
+      `Origen: ${quote.source === 'contact' ? 'Formulario de contacto (/contacto)' : 'Formulario de presupuesto (/presupuesto)'}`,
+      `Tipo: ${quote.projectType}`,
       `Nombre: ${quote.name}`,
       `Teléfono: ${quote.phone}`,
       `Email: ${quote.email}`,

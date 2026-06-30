@@ -64,7 +64,7 @@ export default function Navbar() {
         <button onClick={() => handleNav('/')}
           style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0,
                    display: 'flex', alignItems: 'center' }}>
-          <img src="/brand/logo-horizontal.png" alt="Playa & Sol" style={{ height: 34, width: 'auto', display: 'block' }} />
+          <img src="/brand/logo-horizontal.png" alt="Playa y Sol" style={{ height: 34, width: 'auto', display: 'block' }} />
         </button>
 
         {/* Desktop nav — hidden below lg to avoid cramming 6 links on tablet widths */}

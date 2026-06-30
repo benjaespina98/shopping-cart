@@ -12,7 +12,7 @@ const navItems = [
   { to: '/admin/servicios',     label: 'Servicios',      Icon: FiTool },
   { to: '/admin/productos',     label: 'Productos',      Icon: FiPackage },
   { to: '/admin/pedidos',       label: 'Pedidos',        Icon: FiShoppingBag },
-  { to: '/admin/presupuestos',  label: 'Presupuestos',   Icon: FiMail },
+  { to: '/admin/presupuestos',  label: 'Consultas',      Icon: FiMail },
   { to: '/admin/metricas',      label: 'Métricas',       Icon: FiBarChart2 },
   { to: '/admin/logs',          label: 'Logs',           Icon: FiActivity },
   { to: '/admin/galeria',       label: 'Galería',        Icon: FiImage },
@@ -76,7 +76,7 @@ export default function AdminLayout() {
              style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
           <div className="flex flex-col gap-1.5">
             <div style={{ background: '#fff', borderRadius: 8, padding: '6px 10px', display: 'inline-flex', width: 'fit-content' }}>
-              <img src="/brand/logo-horizontal.png" alt="Playa & Sol" style={{ height: 20, width: 'auto', display: 'block' }} />
+              <img src="/brand/logo-horizontal.png" alt="Playa y Sol" style={{ height: 20, width: 'auto', display: 'block' }} />
             </div>
             <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase',
                           color: '#FFC629', marginLeft: 2 }}>

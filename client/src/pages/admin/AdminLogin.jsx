@@ -42,7 +42,7 @@ export default function AdminLogin() {
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center mb-4"
                style={{ background: '#fff', borderRadius: 12, padding: '14px 22px' }}>
-            <img src="/brand/logo-stacked.png" alt="Playa & Sol" style={{ height: 64, width: 'auto', display: 'block' }} />
+            <img src="/brand/logo-stacked.png" alt="Playa y Sol" style={{ height: 64, width: 'auto', display: 'block' }} />
           </div>
           <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, fontFamily: 'Mulish, sans-serif' }}>
             Panel de administración
@@ -145,7 +145,7 @@ export default function AdminLogin() {
 
         <p style={{ textAlign: 'center', marginTop: 20, fontSize: 12,
                     color: 'rgba(255,255,255,0.3)', fontFamily: 'Mulish, sans-serif' }}>
-          © {new Date().getFullYear()} Playa &amp; Sol Piscinas
+          © {new Date().getFullYear()} Playa y Sol Piscinas
         </p>
       </div>
     </div>

@@ -5,14 +5,17 @@ import { writeAuditLog } from '../utils/auditLogger.js';
 
 // POST /api/quotes — público
 export const createQuoteRequest = asyncHandler(async (req, res) => {
-  const { projectType, name, phone, email, location, message } = req.body;
+  const { projectType, name, phone, email, location, message, source } = req.body;
 
   if (!projectType || !name || !phone || !email) {
     res.status(400);
     throw new Error('Tipo de proyecto, nombre, teléfono y email son requeridos');
   }
 
-  const quote = await QuoteRequest.create({ projectType, name, phone, email, location, message });
+  const quote = await QuoteRequest.create({
+    projectType, name, phone, email, location, message,
+    source: source === 'contact' ? 'contact' : 'quote',
+  });
 
   const emailSent = await sendQuoteNotification(quote).catch((err) => {
     console.error('[quotes] error enviando email de notificación:', err.message);

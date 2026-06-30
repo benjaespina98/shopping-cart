@@ -3,6 +3,7 @@ import { Schema, model } from 'mongoose';
 const quoteRequestSchema = new Schema(
   {
     projectType: { type: String, required: true, trim: true },
+    source:      { type: String, enum: ['quote', 'contact'], default: 'quote' },
     name:        { type: String, required: true, trim: true },
     phone:       { type: String, required: true, trim: true },
     email:       { type: String, required: true, trim: true, lowercase: true },
