@@ -2,22 +2,20 @@ import { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import {
   FiGrid, FiPackage, FiShoppingBag, FiBarChart2,
-  FiLogOut, FiMenu, FiX, FiUser, FiSettings, FiImage, FiActivity, FiLayout, FiTool, FiMail,
+  FiLogOut, FiMenu, FiX, FiSettings, FiActivity, FiLayout, FiTool, FiMail,
 } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 
 const navItems = [
   { to: '/admin/dashboard',     label: 'Dashboard',      Icon: FiGrid },
-  { to: '/admin/sitio',         label: 'Sitio web',      Icon: FiLayout },
+  { to: '/admin/presupuestos',  label: 'Consultas',      Icon: FiMail },
+  { to: '/admin/sitio',         label: 'Proyectos',      Icon: FiLayout },
   { to: '/admin/servicios',     label: 'Servicios',      Icon: FiTool },
   { to: '/admin/productos',     label: 'Productos',      Icon: FiPackage },
   { to: '/admin/pedidos',       label: 'Pedidos',        Icon: FiShoppingBag },
-  { to: '/admin/presupuestos',  label: 'Consultas',      Icon: FiMail },
   { to: '/admin/metricas',      label: 'Métricas',       Icon: FiBarChart2 },
-  { to: '/admin/logs',          label: 'Logs',           Icon: FiActivity },
-  { to: '/admin/galeria',       label: 'Galería',        Icon: FiImage },
   { to: '/admin/configuracion', label: 'Configuración',  Icon: FiSettings },
-  { to: '/admin/perfil',        label: 'Mi perfil',      Icon: FiUser },
+  { to: '/admin/logs',          label: 'Registros',      Icon: FiActivity },
 ];
 
 function SidebarLink({ to, label, Icon, onClick }) {
