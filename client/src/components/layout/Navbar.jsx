@@ -61,14 +61,8 @@ export default function Navbar() {
         {/* Logo */}
         <button onClick={() => handleNav('/')}
           style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0,
-                   display: 'flex', alignItems: 'center', gap: 8, whiteSpace: 'nowrap' }}>
-          <svg width="32" height="32" viewBox="0 0 100 100" aria-hidden="true" style={{ flexShrink: 0 }}>
-            <circle cx="50" cy="33" r="19" fill="none" stroke="#FFC629" strokeWidth="7"/>
-            <path d="M10 64 Q20 57 30 64 Q40 71 50 64 Q60 57 70 64 Q80 71 90 64" stroke="#244B5A" strokeWidth="7" strokeLinecap="round" fill="none"/>
-            <line x1="10" y1="80" x2="90" y2="80" stroke="#244B5A" strokeWidth="7" strokeLinecap="round"/>
-          </svg>
-          <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 20, color: 'var(--teal-700)' }}>Playa</span>
-          <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 20, color: 'var(--sun-600)' }}>&amp; Sol</span>
+                   display: 'flex', alignItems: 'center' }}>
+          <img src="/brand/logo-horizontal.png" alt="Playa & Sol" style={{ height: 34, width: 'auto', display: 'block' }} />
         </button>
 
         {/* Desktop nav — hidden on mobile via className */}

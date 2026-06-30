@@ -48,14 +48,6 @@ function SidebarLink({ to, label, Icon, onClick }) {
   );
 }
 
-const BrandIcon = () => (
-  <svg width="32" height="32" viewBox="0 0 100 100" aria-hidden="true" style={{ flexShrink: 0 }}>
-    <circle cx="50" cy="33" r="19" fill="none" stroke="#FFC629" strokeWidth="7"/>
-    <path d="M10 64 Q20 57 30 64 Q40 71 50 64 Q60 57 70 64 Q80 71 90 64" stroke="#ffffff" strokeWidth="7" strokeLinecap="round" fill="none"/>
-    <line x1="10" y1="80" x2="90" y2="80" stroke="#ffffff" strokeWidth="7" strokeLinecap="round"/>
-  </svg>
-);
-
 export default function AdminLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -82,16 +74,13 @@ export default function AdminLayout() {
         {/* Logo */}
         <div className="flex items-center justify-between px-5 py-4"
              style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-          <div className="flex items-center gap-2.5">
-            <BrandIcon />
-            <div>
-              <div style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: 15, lineHeight: 1, color: '#fff' }}>
-                Playa &amp; Sol
-              </div>
-              <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase',
-                            color: '#FFC629', marginTop: 2 }}>
-                Panel admin
-              </div>
+          <div className="flex flex-col gap-1.5">
+            <div style={{ background: '#fff', borderRadius: 8, padding: '6px 10px', display: 'inline-flex', width: 'fit-content' }}>
+              <img src="/brand/logo-horizontal.png" alt="Playa & Sol" style={{ height: 20, width: 'auto', display: 'block' }} />
+            </div>
+            <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase',
+                          color: '#FFC629', marginLeft: 2 }}>
+              Panel admin
             </div>
           </div>
           <button className="lg:hidden p-1.5 rounded-lg text-white/60 hover:text-white hover:bg-white/10"
@@ -159,11 +148,7 @@ export default function AdminLayout() {
             <a href="/" target="_blank" rel="noreferrer"
                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors hover:bg-primary-50"
                style={{ color: '#244B5A', border: '1px solid #BCD6DD' }}>
-              <svg width="14" height="14" viewBox="0 0 100 100">
-                <circle cx="50" cy="33" r="19" fill="none" stroke="#FFC629" strokeWidth="9"/>
-                <path d="M10 64 Q20 57 30 64 Q40 71 50 64 Q60 57 70 64 Q80 71 90 64" stroke="#244B5A" strokeWidth="9" strokeLinecap="round" fill="none"/>
-                <line x1="10" y1="80" x2="90" y2="80" stroke="#244B5A" strokeWidth="9" strokeLinecap="round"/>
-              </svg>
+              <img src="/brand/logo-icon.png" alt="" style={{ height: 14, width: 'auto', display: 'block' }} />
               Ver sitio
             </a>
           </div>

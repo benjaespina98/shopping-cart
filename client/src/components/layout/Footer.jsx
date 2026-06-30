@@ -27,14 +27,12 @@ export default function Footer() {
 
         {/* Brand */}
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, whiteSpace: 'nowrap' }}>
-            <svg width="30" height="30" viewBox="0 0 100 100" aria-hidden="true" style={{ flexShrink: 0 }}>
-              <circle cx="50" cy="33" r="19" fill="none" stroke="var(--sun-500)" strokeWidth="7"/>
-              <path d="M10 64 Q20 57 30 64 Q40 71 50 64 Q60 57 70 64 Q80 71 90 64" stroke="var(--text-inverse)" strokeWidth="7" strokeLinecap="round" fill="none"/>
-              <line x1="10" y1="80" x2="90" y2="80" stroke="var(--text-inverse)" strokeWidth="7" strokeLinecap="round"/>
-            </svg>
-            <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 20, color: 'var(--text-inverse)' }}>Playa</span>
-            <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 20, color: 'var(--sun-400)' }}>&amp; Sol</span>
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', marginBottom: 14,
+            background: 'var(--surface-card)', borderRadius: 'var(--radius-md)',
+            padding: '10px 16px',
+          }}>
+            <img src="/brand/logo-horizontal.png" alt="Playa & Sol" style={{ height: 26, width: 'auto', display: 'block' }} />
           </div>
           <p style={{ fontSize: 14, lineHeight: 1.6, maxWidth: 240, marginBottom: 18 }}>
             Diseño, construcción y mantenimiento de piscinas en Villa María y la región desde 2004.

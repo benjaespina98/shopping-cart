@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Photo } from '../design-system/Photo';
+import { Lightbox } from '../components/ui/Lightbox';
 import { projectsAPI } from '../services/api';
 
 export default function Projects() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [lightboxIndex, setLightboxIndex] = useState(null);
 
   useEffect(() => {
     projectsAPI.getAll()
@@ -12,6 +14,10 @@ export default function Projects() {
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
+
+  const lightboxImages = projects
+    .filter((p) => p.imageUrl)
+    .map((p) => ({ src: p.imageUrl, label: `${p.title} · ${p.location}` }));
 
   return (
     <section style={{ background: 'var(--bg-page)', padding: '52px 20px 72px', fontFamily: 'var(--font-body)' }}>
@@ -38,19 +44,31 @@ export default function Projects() {
           </div>
         ) : (
           <div className="ps-masonry">
-            {projects.map((p, i) => (
-              <div key={p._id} style={{ breakInside: 'avoid', marginBottom: 16, borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
-                <Photo
-                  label={`${p.title} · ${p.location}`}
-                  height={i % 3 === 0 ? 280 : 220}
-                  src={p.imageUrl || undefined}
-                  zoom
-                />
-              </div>
-            ))}
+            {projects.map((p, i) => {
+              const lightboxIdx = lightboxImages.findIndex((img) => img.src === p.imageUrl);
+              return (
+                <div key={p._id}
+                  onClick={() => p.imageUrl && lightboxIdx !== -1 && setLightboxIndex(lightboxIdx)}
+                  style={{
+                    breakInside: 'avoid', marginBottom: 16, borderRadius: 'var(--radius-lg)', overflow: 'hidden',
+                    cursor: p.imageUrl ? 'pointer' : 'default',
+                  }}>
+                  <Photo
+                    label={`${p.title} · ${p.location}`}
+                    height={i % 3 === 0 ? 280 : 220}
+                    src={p.imageUrl || undefined}
+                    zoom
+                  />
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
+
+      {lightboxIndex !== null && (
+        <Lightbox images={lightboxImages} index={lightboxIndex} onClose={() => setLightboxIndex(null)} />
+      )}
     </section>
   );
 }
