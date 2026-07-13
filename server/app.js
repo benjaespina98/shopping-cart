@@ -130,10 +130,24 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   // Mostrar el error en consola para debugging
   console.error('Express error:', err);
-  // Preserve statuses set by controllers/middleware (401/403/404/etc.).
-  const statusCode = err.statusCode || (res.statusCode >= 400 ? res.statusCode : 500);
+
+  let statusCode = err.statusCode || (res.statusCode >= 400 ? res.statusCode : 500);
+  let message = err.message || 'Internal Server Error';
+
+  // Errores de carga de archivos (multer) → 400 con mensaje claro
+  if (err.name === 'MulterError') {
+    statusCode = 400;
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      message = 'La imagen es demasiado grande. El máximo permitido es 8 MB.';
+    } else if (err.code === 'LIMIT_UNEXPECTED_FILE') {
+      message = 'Se recibió un archivo en un campo inesperado.';
+    } else if (err.code === 'LIMIT_FILE_COUNT') {
+      message = 'Se superó la cantidad máxima de imágenes permitidas.';
+    }
+  }
+
   res.status(statusCode).json({
-    message: err.message || 'Internal Server Error',
+    message,
     stack: process.env.NODE_ENV === 'production' ? null : err.stack,
   });
 });

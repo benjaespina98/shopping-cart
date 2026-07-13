@@ -3,9 +3,11 @@ import { FiPlus, FiEdit2, FiTrash2, FiX, FiCheck, FiTag, FiAlertCircle } from 'r
 import { categoriesAPI } from '../../services/api';
 import { toast } from 'react-toastify';
 
-export default function AdminCategories() {
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
+// Gestión de categorías (alta / renombrar / eliminar). Se usa integrada dentro
+// de la pantalla de Productos. `onChanged` avisa al padre para refrescar los
+// combos y filtros que dependen de las categorías.
+export default function CategoryManager({ categories, loading, onChanged }) {
+  const [list, setList] = useState(categories || []);
   const [newName, setNewName] = useState('');
   const [creating, setCreating] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -13,19 +15,7 @@ export default function AdminCategories() {
   const [savingId, setSavingId] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
 
-  const fetchCategories = async () => {
-    setLoading(true);
-    try {
-      const { data } = await categoriesAPI.getAll();
-      setCategories(data);
-    } catch {
-      toast.error('Error al cargar categorías');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => { fetchCategories(); }, []);
+  useEffect(() => { setList(categories || []); }, [categories]);
 
   const handleCreate = async (e) => {
     e.preventDefault();
@@ -36,7 +26,7 @@ export default function AdminCategories() {
       await categoriesAPI.create({ name });
       toast.success('Categoría creada');
       setNewName('');
-      fetchCategories();
+      onChanged?.();
     } catch (err) {
       toast.error(err.response?.data?.message || 'Error al crear');
     } finally {
@@ -44,15 +34,8 @@ export default function AdminCategories() {
     }
   };
 
-  const beginEdit = (cat) => {
-    setEditingId(cat._id);
-    setEditName(cat.name);
-  };
-
-  const cancelEdit = () => {
-    setEditingId(null);
-    setEditName('');
-  };
+  const beginEdit = (cat) => { setEditingId(cat._id); setEditName(cat.name); };
+  const cancelEdit = () => { setEditingId(null); setEditName(''); };
 
   const saveEdit = async (cat) => {
     const name = editName.trim();
@@ -63,7 +46,7 @@ export default function AdminCategories() {
       await categoriesAPI.update(cat._id, { name });
       toast.success('Categoría actualizada. Los productos se reasignaron automáticamente.');
       cancelEdit();
-      fetchCategories();
+      onChanged?.();
     } catch (err) {
       toast.error(err.response?.data?.message || 'Error al actualizar');
     } finally {
@@ -77,7 +60,7 @@ export default function AdminCategories() {
     try {
       await categoriesAPI.delete(cat._id);
       toast.success('Categoría eliminada');
-      fetchCategories();
+      onChanged?.();
     } catch (err) {
       toast.error(err.response?.data?.message || 'No se pudo eliminar');
     } finally {
@@ -87,17 +70,7 @@ export default function AdminCategories() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Categorías</h1>
-          <p className="text-slate-500 text-sm mt-0.5">
-            {categories.length} categoría{categories.length !== 1 ? 's' : ''} · se usan en la tienda y en el alta de productos
-          </p>
-        </div>
-      </div>
-
-      {/* Alta rápida */}
-      <form onSubmit={handleCreate} className="card p-4 mb-6 flex flex-col sm:flex-row gap-3">
+      <form onSubmit={handleCreate} className="card p-4 mb-5 flex flex-col sm:flex-row gap-3">
         <input
           className="input flex-1"
           value={newName}
@@ -110,12 +83,11 @@ export default function AdminCategories() {
         </button>
       </form>
 
-      {/* Lista */}
       {loading ? (
         <div className="card p-6 animate-pulse space-y-3">
           {Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-11 bg-slate-200 rounded" />)}
         </div>
-      ) : categories.length === 0 ? (
+      ) : list.length === 0 ? (
         <div className="card p-12 text-center">
           <FiAlertCircle size={40} className="mx-auto text-slate-300 mb-3" />
           <p className="text-slate-500 font-medium">No hay categorías todavía</p>
@@ -124,12 +96,11 @@ export default function AdminCategories() {
       ) : (
         <div className="card overflow-hidden">
           <ul>
-            {categories.map((cat) => (
+            {list.map((cat) => (
               <li key={cat._id} className="flex items-center gap-3 px-4 py-3 border-b border-slate-50 last:border-0 hover:bg-slate-50/50 transition-colors">
                 <div className="w-9 h-9 rounded-lg bg-brand-light/40 text-brand flex items-center justify-center shrink-0">
                   <FiTag size={16} />
                 </div>
-
                 {editingId === cat._id ? (
                   <>
                     <input
