@@ -24,6 +24,7 @@ const AdminLayout    = lazy(() => import('./components/layout/AdminLayout'));
 const AdminLogin     = lazy(() => import('./pages/admin/AdminLogin'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 const AdminProducts  = lazy(() => import('./pages/admin/AdminProducts'));
+const AdminCategories = lazy(() => import('./pages/admin/AdminCategories'));
 const AdminOrders    = lazy(() => import('./pages/admin/AdminOrders'));
 const AdminQuotes    = lazy(() => import('./pages/admin/AdminQuotes'));
 const AdminMetrics   = lazy(() => import('./pages/admin/AdminMetrics'));
@@ -79,6 +80,7 @@ export default function App() {
         <Route path="sitio" element={<AdminSite />} />
         <Route path="servicios" element={<AdminServices />} />
         <Route path="productos" element={<AdminProducts />} />
+        <Route path="categorias" element={<AdminCategories />} />
         <Route path="pedidos" element={<AdminOrders />} />
         <Route path="presupuestos" element={<AdminQuotes />} />
         <Route path="metricas" element={<AdminMetrics />} />

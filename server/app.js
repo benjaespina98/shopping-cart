@@ -16,6 +16,7 @@ import logRoutes from './routes/logRoutes.js';
 import projectRoutes from './routes/projectRoutes.js';
 import serviceRoutes from './routes/serviceRoutes.js';
 import quoteRoutes from './routes/quoteRoutes.js';
+import categoryRoutes from './routes/categoryRoutes.js';
 
 loadServerEnv();
 
@@ -120,6 +121,7 @@ app.use('/api/logs', logRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/quotes', quoteRoutes);
+app.use('/api/categories', categoryRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });

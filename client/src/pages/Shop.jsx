@@ -1,11 +1,13 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { FiSearch, FiX, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
-import { productsAPI } from '../services/api';
+import { productsAPI, categoriesAPI } from '../services/api';
 import ProductCard from '../components/ui/ProductCard';
+import ProductDetailModal from '../components/ui/ProductDetailModal';
 import { useCart } from '../context/CartContext';
 import { Button } from '../design-system/Button';
 
-const CATEGORIES = [
+// Respaldo por si la API de categorías no responde
+const FALLBACK_CATEGORIES = [
   'Química del agua',
   'Limpieza',
   'Cercos y seguridad',
@@ -32,6 +34,8 @@ const pillStyle = (active) => ({
 export default function Shop() {
   const { items } = useCart();
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState(FALLBACK_CATEGORIES);
+  const [detailProduct, setDetailProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
@@ -52,6 +56,14 @@ export default function Shop() {
     const t = setTimeout(() => setDebouncedSearch(search), 400);
     return () => clearTimeout(t);
   }, [search]);
+
+  useEffect(() => {
+    categoriesAPI.getAll()
+      .then(({ data }) => {
+        if (Array.isArray(data) && data.length > 0) setCategories(data.map((c) => c.name));
+      })
+      .catch(() => {}); // conserva el respaldo
+  }, []);
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -103,7 +115,7 @@ export default function Shop() {
         {/* Category pills */}
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 24 }}>
           <button onClick={() => handleCategory('')} style={pillStyle(!selectedCategory)}>Todos</button>
-          {CATEGORIES.map(cat => (
+          {categories.map(cat => (
             <button key={cat} onClick={() => handleCategory(cat)} style={pillStyle(selectedCategory === cat)}>
               {cat}
             </button>
@@ -211,7 +223,12 @@ export default function Shop() {
           <>
             <div className="ps-products-grid">
               {products.map((p) => (
-                <ProductCard key={p._id} product={p} inCartQuantity={inCartByProductId.get(p._id) || 0} />
+                <ProductCard
+                  key={p._id}
+                  product={p}
+                  inCartQuantity={inCartByProductId.get(p._id) || 0}
+                  onOpenDetail={setDetailProduct}
+                />
               ))}
             </div>
 
@@ -272,6 +289,14 @@ export default function Shop() {
           </>
         )}
       </div>
+
+      {detailProduct && (
+        <ProductDetailModal
+          product={detailProduct}
+          inCartQuantity={inCartByProductId.get(detailProduct._id) || 0}
+          onClose={() => setDetailProduct(null)}
+        />
+      )}
     </section>
   );
 }

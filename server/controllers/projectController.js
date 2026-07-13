@@ -6,7 +6,7 @@ import { cloudinary } from '../config/cloudinary.js';
 export const getProjects = asyncHandler(async (req, res) => {
   const filter = {};
   if (req.query.featured === 'true') filter.featured = true;
-  const projects = await Project.find(filter).sort({ order: 1, createdAt: -1 });
+  const projects = await Project.find(filter).sort({ order: 1, createdAt: -1 }).lean();
   res.json(projects);
 });
 

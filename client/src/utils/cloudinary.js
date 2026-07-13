@@ -17,16 +17,20 @@ export function cldUrl(url, transform) {
   return `${head}${UPLOAD_SEGMENT}${transform}/${tail}`;
 }
 
+// c_limit: `w_` actúa como ancho MÁXIMO y nunca reescala hacia arriba una foto
+// más chica, así no se pide a Cloudinary generar derivadas más pesadas que el original.
+const FIT = 'f_auto,q_auto,c_limit';
+
 // Versión optimizada a un ancho concreto (formato y calidad automáticos).
 export function cldOptimized(url, width = 1200) {
-  return cldUrl(url, `f_auto,q_auto,w_${width}`);
+  return cldUrl(url, `${FIT},w_${width}`);
 }
 
 // srcset responsive: el navegador elige el ancho según viewport y densidad.
 export function cldSrcSet(url, widths = [480, 768, 1024, 1400]) {
   if (!isCloudinary(url)) return undefined;
   return widths
-    .map((w) => `${cldUrl(url, `f_auto,q_auto,w_${w}`)} ${w}w`)
+    .map((w) => `${cldUrl(url, `${FIT},w_${w}`)} ${w}w`)
     .join(', ');
 }
 
