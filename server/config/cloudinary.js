@@ -19,7 +19,9 @@ cloudinary.config({
 const fileFilter = (req, file, cb) => {
   const allowed = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
   if (allowed.includes(file.mimetype)) return cb(null, true);
-  cb(new Error('Solo se permiten imágenes JPG, PNG y WEBP'));
+  const err = new Error('Formato no permitido. Subí una imagen JPG, PNG o WEBP.');
+  err.statusCode = 400;
+  cb(err);
 };
 
 const storage = new CloudinaryStorage({

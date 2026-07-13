@@ -4,9 +4,13 @@ const isProduction = import.meta.env.PROD;
 const configuredApiUrl = (import.meta.env.VITE_API_URL || '').trim();
 const initialBaseUrl = isProduction ? '/api' : configuredApiUrl || '/api';
 
+// Nota: NO fijamos un Content-Type por defecto. axios pone application/json
+// automáticamente para bodies de objeto, y para FormData deja que el navegador
+// arme el multipart CON boundary. Fijar 'application/json' acá rompía los uploads:
+// axios serializaba el FormData a JSON y descartaba el archivo; y fijar
+// 'multipart/form-data' a mano lo enviaba sin boundary ("Boundary not found").
 const api = axios.create({
   baseURL: initialBaseUrl,
-  headers: { 'Content-Type': 'application/json' },
 });
 
 // Attach JWT token automatically
@@ -59,9 +63,9 @@ export const productsAPI = {
   // Admin
   getAllAdmin: (params) => api.get('/products/admin/all', { params }),
   create: (formData) =>
-    api.post('/products', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+    api.post('/products', formData),
   update: (id, formData) =>
-    api.put(`/products/${id}`, formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+    api.put(`/products/${id}`, formData),
   updateStock: (id, stock) => api.patch(`/products/${id}/stock`, { stock }),
   delete: (id) => api.delete(`/products/${id}`),
 };
@@ -94,7 +98,7 @@ export const metricsAPI = {
 export const galleryAPI = {
   getAll: () => api.get('/gallery'),
   add: (formData) =>
-    api.post('/gallery', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+    api.post('/gallery', formData),
   update: (id, data) => api.put(`/gallery/${id}`, data),
   reorder: (items) => api.put('/gallery/reorder', { items }),
   delete: (id) => api.delete(`/gallery/${id}`),
@@ -106,9 +110,9 @@ export const settingsAPI = {
   getAdmin: () => api.get('/settings/admin'),
   updateAdmin: (data) => api.put('/settings/admin', data),
   uploadContactPhoto: (formData) =>
-    api.post('/settings/contact-photo', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+    api.post('/settings/contact-photo', formData),
   uploadAboutPhoto: (formData) =>
-    api.post('/settings/about-photo', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+    api.post('/settings/about-photo', formData),
   getUsers: () => api.get('/settings/users'),
   createUser: (data) => api.post('/settings/users', data),
   deleteUser: (id) => api.delete(`/settings/users/${id}`),
@@ -118,9 +122,9 @@ export const settingsAPI = {
 export const projectsAPI = {
   getAll: (params) => api.get('/projects', { params }),
   create: (formData) =>
-    api.post('/projects', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+    api.post('/projects', formData),
   update: (id, formData) =>
-    api.put(`/projects/${id}`, formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+    api.put(`/projects/${id}`, formData),
   reorder: (items) => api.put('/projects/reorder', { items }),
   delete: (id) => api.delete(`/projects/${id}`),
 };
@@ -135,9 +139,9 @@ export const servicesAPI = {
   getAll: () => api.get('/services'),
   getAllAdmin: () => api.get('/services/admin'),
   create: (formData) =>
-    api.post('/services', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+    api.post('/services', formData),
   update: (id, formData) =>
-    api.put(`/services/${id}`, formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+    api.put(`/services/${id}`, formData),
   reorder: (items) => api.put('/services/reorder', { items }),
   delete: (id) => api.delete(`/services/${id}`),
 };

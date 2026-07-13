@@ -1,7 +1,17 @@
-import { useEffect, useState, useRef } from 'react';
-import { FiPlus, FiEdit2, FiTrash2, FiX, FiUpload, FiCheck, FiAlertCircle, FiSave } from 'react-icons/fi';
+import { useEffect, useMemo, useState, useRef } from 'react';
+import { FiPlus, FiEdit2, FiTrash2, FiX, FiUpload, FiCheck, FiAlertCircle, FiSave, FiSearch, FiPackage, FiTag } from 'react-icons/fi';
 import { productsAPI, categoriesAPI } from '../../services/api';
+import CategoryManager from '../../components/admin/CategoryManager';
 import { toast } from 'react-toastify';
+
+const SORT_OPTIONS = [
+  { value: 'recent',     label: 'Más recientes' },
+  { value: 'name_asc',   label: 'Nombre A → Z' },
+  { value: 'name_desc',  label: 'Nombre Z → A' },
+  { value: 'price_asc',  label: 'Menor precio' },
+  { value: 'price_desc', label: 'Mayor precio' },
+  { value: 'stock_asc',  label: 'Menos stock' },
+];
 
 const FALLBACK_CATEGORIES = [
   'Química del agua',
@@ -209,13 +219,25 @@ function ProductModal({ product, categories, onClose, onSaved }) {
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState(FALLBACK_CATEGORIES);
+  const [categoriesData, setCategoriesData] = useState([]); // [{_id, name}]
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState(null); // null | 'create' | product
   const [deleting, setDeleting] = useState(null);
   const [editingStockId, setEditingStockId] = useState(null);
   const [draftStocks, setDraftStocks] = useState({});
   const [savingStockId, setSavingStockId] = useState(null);
+
+  // Vista y filtros
+  const [tab, setTab] = useState('products'); // 'products' | 'categories'
+  const [search, setSearch] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('');
+  const [sort, setSort] = useState('recent');
+
+  const categoryNames = useMemo(
+    () => (categoriesData.length > 0 ? categoriesData.map((c) => c.name) : FALLBACK_CATEGORIES),
+    [categoriesData]
+  );
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -230,15 +252,44 @@ export default function AdminProducts() {
   };
 
   const fetchCategories = async () => {
+    setCategoriesLoading(true);
     try {
       const { data } = await categoriesAPI.getAll();
-      if (Array.isArray(data) && data.length > 0) setCategories(data.map((c) => c.name));
+      if (Array.isArray(data)) setCategoriesData(data);
     } catch {
-      // conserva el respaldo
+      // conserva el respaldo (categoryNames cae en FALLBACK_CATEGORIES)
+    } finally {
+      setCategoriesLoading(false);
     }
   };
 
   useEffect(() => { fetchProducts(); fetchCategories(); }, []);
+
+  // Filtro + búsqueda + orden (en el back office, sobre los productos ya cargados)
+  const visibleProducts = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    let list = products.filter((p) => {
+      if (categoryFilter && p.category !== categoryFilter) return false;
+      if (!q) return true;
+      return (
+        p.name?.toLowerCase().includes(q) ||
+        p.category?.toLowerCase().includes(q) ||
+        p.description?.toLowerCase().includes(q)
+      );
+    });
+    const by = {
+      name_asc:   (a, b) => a.name.localeCompare(b.name),
+      name_desc:  (a, b) => b.name.localeCompare(a.name),
+      price_asc:  (a, b) => a.price - b.price,
+      price_desc: (a, b) => b.price - a.price,
+      stock_asc:  (a, b) => a.stock - b.stock,
+      recent:     (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+    }[sort];
+    return by ? [...list].sort(by) : list;
+  }, [products, search, categoryFilter, sort]);
+
+  const hasFilters = search || categoryFilter || sort !== 'recent';
+  const clearFilters = () => { setSearch(''); setCategoryFilter(''); setSort('recent'); };
 
   const handleDelete = async (product) => {
     if (!window.confirm(`¿Eliminar "${product.name}"? Esta acción no se puede deshacer.`)) return;
@@ -291,30 +342,95 @@ export default function AdminProducts() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Productos</h1>
-          <p className="text-slate-500 text-sm mt-0.5">{products.length} productos en total</p>
+          <p className="text-slate-500 text-sm mt-0.5">
+            {products.length} producto{products.length !== 1 ? 's' : ''} · {categoryNames.length} categoría{categoryNames.length !== 1 ? 's' : ''}
+          </p>
         </div>
-        <button onClick={() => setModal('create')} className="btn-primary flex items-center gap-2">
-          <FiPlus size={17} /> Nuevo producto
-        </button>
+        {tab === 'products' && (
+          <button onClick={() => setModal('create')} className="btn-primary flex items-center gap-2 self-start sm:self-auto">
+            <FiPlus size={17} /> Nuevo producto
+          </button>
+        )}
       </div>
 
-      {/* Table */}
-      {loading ? (
-        <div className="card p-6 animate-pulse space-y-3">
-          {Array.from({ length: 5 }).map((_, i) => <div key={i} className="h-12 bg-slate-200 rounded" />)}
-        </div>
-      ) : products.length === 0 ? (
-        <div className="card p-12 text-center">
-          <FiAlertCircle size={40} className="mx-auto text-slate-300 mb-3" />
-          <p className="text-slate-500 font-medium">No hay productos</p>
-          <button onClick={() => setModal('create')} className="btn-primary mt-4 inline-flex items-center gap-2">
-            <FiPlus size={15} /> Crear primer producto
+      {/* Tabs */}
+      <div className="flex gap-1 mb-6 border-b border-slate-200">
+        {[
+          { id: 'products', label: 'Productos', Icon: FiPackage },
+          { id: 'categories', label: 'Categorías', Icon: FiTag },
+        ].map(({ id, label, Icon }) => (
+          <button
+            key={id}
+            onClick={() => setTab(id)}
+            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-colors ${
+              tab === id ? 'border-brand text-brand' : 'border-transparent text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            <Icon size={15} /> {label}
           </button>
-        </div>
-      ) : (
+        ))}
+      </div>
+
+      {tab === 'categories' && (
+        <CategoryManager
+          categories={categoriesData}
+          loading={categoriesLoading}
+          onChanged={() => { fetchCategories(); fetchProducts(); }}
+        />
+      )}
+
+      {tab === 'products' && (
+        <>
+          {/* Toolbar: búsqueda + categoría + orden */}
+          <div className="flex flex-wrap items-center gap-2 mb-4">
+            <div className="relative flex-1 min-w-[180px]">
+              <FiSearch size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Buscar por nombre, categoría o descripción..."
+                className="input pl-9"
+              />
+            </div>
+            <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)} className="input w-auto">
+              <option value="">Todas las categorías</option>
+              {categoryNames.map((c) => <option key={c} value={c}>{c}</option>)}
+            </select>
+            <select value={sort} onChange={(e) => setSort(e.target.value)} className="input w-auto">
+              {SORT_OPTIONS.map(({ value, label }) => <option key={value} value={value}>{label}</option>)}
+            </select>
+            {hasFilters && (
+              <button onClick={clearFilters} className="btn-ghost btn-sm flex items-center gap-1 text-slate-500">
+                <FiX size={14} /> Limpiar
+              </button>
+            )}
+          </div>
+
+          {loading ? (
+            <div className="card p-6 animate-pulse space-y-3">
+              {Array.from({ length: 5 }).map((_, i) => <div key={i} className="h-12 bg-slate-200 rounded" />)}
+            </div>
+          ) : products.length === 0 ? (
+            <div className="card p-12 text-center">
+              <FiAlertCircle size={40} className="mx-auto text-slate-300 mb-3" />
+              <p className="text-slate-500 font-medium">No hay productos</p>
+              <button onClick={() => setModal('create')} className="btn-primary mt-4 inline-flex items-center gap-2">
+                <FiPlus size={15} /> Crear primer producto
+              </button>
+            </div>
+          ) : visibleProducts.length === 0 ? (
+            <div className="card p-12 text-center">
+              <FiSearch size={36} className="mx-auto text-slate-300 mb-3" />
+              <p className="text-slate-500 font-medium">Sin resultados</p>
+              <p className="text-slate-400 text-sm mt-1">Probá con otra búsqueda o cambiá la categoría.</p>
+              <button onClick={clearFilters} className="btn-secondary mt-4 inline-flex items-center gap-2">
+                <FiX size={15} /> Limpiar filtros
+              </button>
+            </div>
+          ) : (
         <div className="card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -330,7 +446,7 @@ export default function AdminProducts() {
                 </tr>
               </thead>
               <tbody>
-                {products.map((p) => (
+                {visibleProducts.map((p) => (
                   <tr key={p._id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
                     <td className="px-4 py-3">
                       <div className="w-10 h-10 rounded-lg overflow-hidden bg-slate-100 shrink-0">
@@ -415,13 +531,15 @@ export default function AdminProducts() {
             </table>
           </div>
         </div>
+          )}
+        </>
       )}
 
       {/* Modal */}
       {modal && (
         <ProductModal
           product={modal === 'create' ? null : modal}
-          categories={categories}
+          categories={categoryNames}
           onClose={() => setModal(null)}
           onSaved={fetchProducts}
         />
