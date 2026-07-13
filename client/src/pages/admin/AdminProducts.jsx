@@ -1,9 +1,9 @@
 import { useEffect, useState, useRef } from 'react';
 import { FiPlus, FiEdit2, FiTrash2, FiX, FiUpload, FiCheck, FiAlertCircle, FiSave } from 'react-icons/fi';
-import { productsAPI } from '../../services/api';
+import { productsAPI, categoriesAPI } from '../../services/api';
 import { toast } from 'react-toastify';
 
-const PRODUCT_CATEGORIES = [
+const FALLBACK_CATEGORIES = [
   'Química del agua',
   'Limpieza',
   'Cercos y seguridad',
@@ -22,7 +22,11 @@ const EMPTY_FORM = {
   tags: '',
 };
 
-function ProductModal({ product, onClose, onSaved }) {
+function ProductModal({ product, categories, onClose, onSaved }) {
+  // Incluye siempre la categoría actual del producto aunque ya no exista en la lista
+  const categoryOptions = Array.from(
+    new Set([...(categories || []), product?.category].filter(Boolean))
+  );
   const [form, setForm] = useState(
     product
       ? { ...product, tags: product.tags?.join(', ') || '', featured: product.featured, active: product.active }
@@ -114,8 +118,11 @@ function ProductModal({ product, onClose, onSaved }) {
               <label className="label">Categoría *</label>
               <select className="input" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} required>
                 <option value="">Seleccionar categoría...</option>
-                {PRODUCT_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                {categoryOptions.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
+              {categoryOptions.length === 0 && (
+                <p className="text-xs text-slate-400 mt-1">No hay categorías cargadas. Creá una en la sección Categorías.</p>
+              )}
             </div>
             <div className="col-span-2">
               <label className="label">Descripción</label>
@@ -202,6 +209,7 @@ function ProductModal({ product, onClose, onSaved }) {
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState(FALLBACK_CATEGORIES);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState(null); // null | 'create' | product
   const [deleting, setDeleting] = useState(null);
@@ -221,7 +229,16 @@ export default function AdminProducts() {
     }
   };
 
-  useEffect(() => { fetchProducts(); }, []);
+  const fetchCategories = async () => {
+    try {
+      const { data } = await categoriesAPI.getAll();
+      if (Array.isArray(data) && data.length > 0) setCategories(data.map((c) => c.name));
+    } catch {
+      // conserva el respaldo
+    }
+  };
+
+  useEffect(() => { fetchProducts(); fetchCategories(); }, []);
 
   const handleDelete = async (product) => {
     if (!window.confirm(`¿Eliminar "${product.name}"? Esta acción no se puede deshacer.`)) return;
@@ -404,6 +421,7 @@ export default function AdminProducts() {
       {modal && (
         <ProductModal
           product={modal === 'create' ? null : modal}
+          categories={categories}
           onClose={() => setModal(null)}
           onSaved={fetchProducts}
         />

@@ -3,7 +3,7 @@ import { FiShoppingCart, FiPlus, FiMinus, FiCheck, FiAlertTriangle } from 'react
 import { useCart } from '../../context/CartContext';
 import { toast } from 'react-toastify';
 
-function ProductCard({ product, inCartQuantity = 0 }) {
+function ProductCard({ product, inCartQuantity = 0, onOpenDetail }) {
   const { addItem } = useCart();
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
@@ -42,10 +42,19 @@ function ProductCard({ product, inCartQuantity = 0 }) {
   const safePrice = Number(product.price) || 0;
   const selectedTotalPrice = safePrice * qty;
 
+  const openDetail = () => onOpenDetail?.(product);
+
   return (
     <div className="card flex flex-col group overflow-hidden">
       {/* Image */}
-      <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
+      <div
+        className={`relative aspect-[4/3] overflow-hidden bg-slate-100 ${onOpenDetail ? 'cursor-pointer' : ''}`}
+        onClick={onOpenDetail ? openDetail : undefined}
+        role={onOpenDetail ? 'button' : undefined}
+        tabIndex={onOpenDetail ? 0 : undefined}
+        onKeyDown={onOpenDetail ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDetail(); } } : undefined}
+        aria-label={onOpenDetail ? `Ver detalle de ${product.name}` : undefined}
+      >
         {currentImg ? (
           <img
             src={currentImg}
@@ -79,15 +88,23 @@ function ProductCard({ product, inCartQuantity = 0 }) {
 
       {/* Info */}
       <div className="p-4 flex flex-col flex-1 gap-3">
-        <div className="flex-1">
+        <div
+          className={`flex-1 ${onOpenDetail ? 'cursor-pointer' : ''}`}
+          onClick={onOpenDetail ? openDetail : undefined}
+        >
           <span className="text-[11px] font-semibold text-primary-700 uppercase tracking-widest bg-primary-700/5 px-2 py-0.5 rounded-full">
             {product.category}
           </span>
-          <h3 className="font-semibold text-slate-800 mt-2 line-clamp-2 leading-snug text-sm">
+          <h3 className="font-semibold text-slate-800 mt-2 line-clamp-2 leading-snug text-sm group-hover:text-primary-700 transition-colors">
             {product.name}
           </h3>
           {product.description && (
             <p className="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">{product.description}</p>
+          )}
+          {onOpenDetail && (
+            <span className="inline-block text-[11px] font-semibold text-primary-700 mt-1.5 hover:underline">
+              Ver detalle →
+            </span>
           )}
         </div>
 
