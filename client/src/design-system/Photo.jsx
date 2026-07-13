@@ -1,9 +1,25 @@
 import { useState } from 'react';
+import { cldOptimized, cldSrcSet, cldPlaceholder } from '../utils/cloudinary';
 
 const overlayGradient = 'linear-gradient(180deg, rgba(18,43,51,0) 55%, rgba(18,43,51,0.78) 100%)';
+// Mismo degradado de marca que el placeholder sin imagen: se ve al instante (0 red)
+// mientras carga la foto, así el hueco nunca queda vacío.
+const brandGradient = 'linear-gradient(160deg, var(--teal-500) 0%, var(--teal-700) 55%, var(--teal-800) 100%)';
 
-export function Photo({ label = 'Foto de piscina', height = 240, radius = 'var(--radius-lg)', src, zoom = false, style }) {
+export function Photo({
+  label = 'Foto de piscina',
+  alt,
+  height = 240,
+  radius = 'var(--radius-lg)',
+  src,
+  zoom = false,
+  priority = false,
+  sizes = '100vw',
+  className,
+  style,
+}) {
   const [hovered, setHovered] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
   const hoverHandlers = zoom ? {
     onMouseEnter: () => setHovered(true),
@@ -11,13 +27,41 @@ export function Photo({ label = 'Foto de piscina', height = 240, radius = 'var(-
   } : {};
 
   if (src) {
+    const optimized = cldOptimized(src);
+    const srcSet = cldSrcSet(src);
+    const placeholder = cldPlaceholder(src);
+    const rootClass = ['ps-photo', className].filter(Boolean).join(' ');
+
     return (
-      <div style={{ position: 'relative', height, borderRadius: radius, overflow: 'hidden', ...style }} {...hoverHandlers}>
-        <img src={src} alt={label} style={{
-          width: '100%', height: '100%', objectFit: 'cover', display: 'block',
-          transform: zoom && hovered ? 'scale(1.05)' : 'scale(1)',
-          transition: 'transform var(--duration-normal) var(--ease-out)',
-        }} />
+      <div
+        className={rootClass}
+        style={{ position: 'relative', height, borderRadius: radius, overflow: 'hidden', background: brandGradient, ...style }}
+        {...hoverHandlers}
+      >
+        {/* Capa blur-up: se desvanece cuando carga la imagen definitiva */}
+        {placeholder && !loaded && (
+          <div aria-hidden style={{
+            position: 'absolute', inset: 0,
+            backgroundImage: `url(${placeholder})`, backgroundSize: 'cover', backgroundPosition: 'center',
+            filter: 'blur(14px)', transform: 'scale(1.1)',
+          }} />
+        )}
+        <img
+          src={optimized}
+          srcSet={srcSet}
+          sizes={srcSet ? sizes : undefined}
+          alt={alt || label}
+          loading={priority ? 'eager' : 'lazy'}
+          fetchPriority={priority ? 'high' : undefined}
+          decoding="async"
+          onLoad={() => setLoaded(true)}
+          style={{
+            width: '100%', height: '100%', objectFit: 'cover', display: 'block',
+            opacity: loaded ? 1 : 0,
+            transform: zoom && hovered ? 'scale(1.05)' : 'scale(1)',
+            transition: 'opacity var(--duration-slow) var(--ease-out), transform var(--duration-normal) var(--ease-out)',
+          }}
+        />
         {label && (
           <>
             <div style={{ position: 'absolute', inset: 0, background: overlayGradient, pointerEvents: 'none' }} />
@@ -34,9 +78,9 @@ export function Photo({ label = 'Foto de piscina', height = 240, radius = 'var(-
   }
 
   return (
-    <div style={{
+    <div className={['ps-photo', className].filter(Boolean).join(' ')} style={{
       position: 'relative', height, borderRadius: radius, overflow: 'hidden',
-      background: 'linear-gradient(160deg, var(--teal-500) 0%, var(--teal-700) 55%, var(--teal-800) 100%)',
+      background: brandGradient,
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       ...style,
     }}>

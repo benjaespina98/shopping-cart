@@ -20,6 +20,12 @@
 @media (max-width: 767px) {
   .ps-hero-grid       { grid-template-columns: 1fr; gap: 0; }
   .ps-hero-photo      { display: none; }
+  /* La foto del hero de Landing sí se muestra en móvil, debajo de los botones */
+  .ps-hero-photo--show          { display: block; margin-top: 28px; }
+  /* Altura fluida (no fija) acotada a un rango cómodo, sin salto de layout */
+  .ps-hero-photo--show .ps-photo { height: clamp(250px, 60vw, 340px) !important; }
+  /* Encuadre hacia abajo: prioriza la piscina y evita dejar el cielo protagonista */
+  .ps-hero-photo--show .ps-photo img { object-position: center 68% !important; }
   .ps-hero-section    { padding: 44px 20px 52px !important; }
   .ps-hero-title      { font-size: 36px !important; line-height: 1.1 !important; }
   .ps-hero-subtitle   { font-size: 15px !important; }

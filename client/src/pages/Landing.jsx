@@ -111,7 +111,7 @@ export default function Landing() {
               <Button variant="outline" inverse size="lg" onClick={() => navigate('/proyectos')}>Ver proyectos</Button>
             </div>
           </div>
-          <div className="ps-hero-photo">
+          <div className="ps-hero-photo ps-hero-photo--show">
             <div style={{
               borderRadius: 'var(--radius-xl)', padding: 3,
               background: 'var(--surface-on-dark)',
@@ -120,9 +120,14 @@ export default function Landing() {
             }}>
               <Photo
                 label={heroProject ? `${heroProject.title} · ${heroProject.location}` : 'Piscina infinity · Villa María'}
+                alt={heroProject
+                  ? `Piscina ${heroProject.title} construida por Playa & Sol en ${heroProject.location}`
+                  : 'Piscina de obra a medida construida por Playa & Sol en Villa María, Córdoba'}
                 height={460}
                 radius="var(--radius-lg)"
                 src={heroProject?.imageUrl || undefined}
+                priority
+                sizes="(max-width: 767px) calc(100vw - 40px), 540px"
               />
             </div>
           </div>
