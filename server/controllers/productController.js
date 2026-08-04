@@ -1,7 +1,31 @@
 import asyncHandler from 'express-async-handler';
 import Product from '../models/Product.js';
+import Category from '../models/Category.js';
 import { cloudinary } from '../config/cloudinary.js';
 import { writeAuditLog } from '../utils/auditLogger.js';
+
+// El producto guarda la categoría como texto, no como referencia. Eso funciona (renombrar
+// una categoría propaga el cambio a los productos, y no se puede borrar una en uso),
+// pero hasta ahora la API aceptaba cualquier texto: un producto podía quedar en una
+// categoría inexistente, invisible desde los filtros de la tienda y desde el admin.
+// Acá se valida contra la colección y se guarda el nombre canónico, así "limpieza" y
+// "Limpieza" no terminan siendo dos categorías distintas.
+const resolveCategoryName = async (rawCategory, res) => {
+  const name = String(rawCategory || '').trim();
+  if (!name) {
+    res.status(400);
+    throw new Error('La categoría es requerida');
+  }
+
+  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const category = await Category.findOne({ name: new RegExp(`^${escaped}$`, 'i') }).lean();
+  if (!category) {
+    res.status(400);
+    throw new Error(`La categoría "${name}" no existe. Creala primero desde Productos › Categorías.`);
+  }
+
+  return category.name;
+};
 
 const parseJsonArray = (value, fallback = []) => {
   if (value === undefined || value === null || value === '') return fallback;
@@ -59,13 +83,6 @@ export const getProducts = asyncHandler(async (req, res) => {
   });
 });
 
-// GET /api/products/categories — público
-export const getCategories = asyncHandler(async (req, res) => {
-  res.set('Cache-Control', 'public, s-maxage=120, stale-while-revalidate=240');
-  const categories = await Product.distinct('category', { active: true });
-  res.json(categories);
-});
-
 // GET /api/products/:id — público
 export const getProductById = asyncHandler(async (req, res) => {
   res.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120');
@@ -81,20 +98,17 @@ export const getProductById = asyncHandler(async (req, res) => {
 
 // POST /api/products — admin
 export const createProduct = asyncHandler(async (req, res) => {
+  const images = (req.files || []).map((f) => ({ url: f.path, publicId: f.filename }));
+
   try {
     const { name, description, price, stock, category, featured, tags } = req.body;
-
-    let images = [];
-    if (req.files && req.files.length > 0) {
-      images = req.files.map((f) => ({ url: f.path, publicId: f.filename }));
-    }
 
     const product = await Product.create({
       name,
       description,
       price: Number(price),
       stock: Number(stock),
-      category,
+      category: await resolveCategoryName(category, res),
       featured: featured === 'true',
       tags: parseJsonArray(tags),
       images,
@@ -116,6 +130,12 @@ export const createProduct = asyncHandler(async (req, res) => {
 
     res.status(201).json(product);
   } catch (error) {
+    // multer ya subió las imágenes a Cloudinary antes de llegar acá. Si la creación
+    // falla (categoría inexistente, validación del modelo), sin esto quedaban archivos
+    // huérfanos ocupando la cuenta sin ningún producto que los referencie.
+    await Promise.all(
+      images.map(({ publicId }) => cloudinary.uploader.destroy(publicId).catch(() => {}))
+    );
     console.error('Error al crear producto:', error);
     throw error;
   }
@@ -151,7 +171,7 @@ export const updateProduct = asyncHandler(async (req, res) => {
   if (description !== undefined) product.description = description;
   if (price !== undefined) product.price = Number(price);
   if (stock !== undefined) product.stock = Number(stock);
-  if (category !== undefined) product.category = category;
+  if (category !== undefined) product.category = await resolveCategoryName(category, res);
   if (featured !== undefined) product.featured = featured === 'true';
   if (active !== undefined) product.active = active === 'true';
   if (tags !== undefined) product.tags = parseJsonArray(tags);

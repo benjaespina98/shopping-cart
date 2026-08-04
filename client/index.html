@@ -4,25 +4,31 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Playa y Sol — Construcción, reforma y mantenimiento de piscinas en Villa María, Córdoba." />
-    <title>Playa y Sol Piscinas</title>
+    <meta name="description" content="Playa &amp; Sol — Construcción, reforma y mantenimiento de piscinas en Villa María, Córdoba." />
+    <title>Playa &amp; Sol Piscinas</title>
 
     <!-- Open Graph / Social preview -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Playa y Sol Piscinas" />
+    <meta property="og:title" content="Playa &amp; Sol Piscinas" />
     <meta property="og:description" content="Construcción, reforma y mantenimiento de piscinas en Villa María, Córdoba. +30 años de experiencia." />
     <meta property="og:image" content="/brand/logo-stacked.png" />
     <meta property="og:image:width" content="1032" />
     <meta property="og:image:height" content="840" />
     <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:title" content="Playa y Sol Piscinas" />
+    <meta property="twitter:title" content="Playa &amp; Sol Piscinas" />
     <meta property="twitter:image" content="/brand/logo-stacked.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <!-- La imagen del Hero se sirve desde Cloudinary; abrimos la conexión cuanto antes
          para que la foto principal descargue lo más rápido posible en el primer render -->
     <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@600&display=swap" rel="stylesheet" />
+    <!-- Quicksand es la tipografía de marca según el manual de identidad; Mulish se usa
+         para el texto corrido, donde prima la legibilidad. Acá se pedían Inter y
+         JetBrains Mono, que no usa ningún componente: dos descargas por visita para
+         nada. Y Mulish se cargaba recién desde un @import dentro del CSS — el navegador
+         tenía que bajar y parsear la hoja antes de enterarse de que existía, así que el
+         texto aparecía un instante con la fuente del sistema y después saltaba. -->
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Mulish:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   </head>
   <body>
     <div id="root"></div>

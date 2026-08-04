@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { FiX, FiShoppingCart, FiPlus, FiMinus, FiCheck, FiAlertTriangle, FiImage } from 'react-icons/fi';
 import { useCart } from '../../context/CartContext';
+import CldImage from './CldImage';
 import { cldOptimized } from '../../utils/cloudinary';
 import { toast } from 'react-toastify';
 
@@ -46,11 +47,11 @@ export default function ProductDetailModal({ product, inCartQuantity = 0, onClos
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm ps-scrim"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto"
+        className="bg-white rounded-2xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
@@ -69,21 +70,22 @@ export default function ProductDetailModal({ product, inCartQuantity = 0, onClos
           {/* Galería */}
           <div>
             <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-slate-100">
-              {images[activeImg]?.url ? (
-                <img
-                  src={cldOptimized(images[activeImg].url, 800)}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center text-slate-300 gap-2">
-                  <FiImage size={36} />
-                  <span className="text-xs">Sin imagen</span>
-                </div>
-              )}
+              <CldImage
+                src={images[activeImg]?.url}
+                alt={product.name}
+                width={800}
+                priority
+                className="w-full h-full object-cover"
+                fallback={
+                  <div className="w-full h-full flex flex-col items-center justify-center text-slate-300 gap-2">
+                    <FiImage size={36} />
+                    <span className="text-xs">Sin imagen</span>
+                  </div>
+                }
+              />
               {isOutOfStock && (
-                <div className="absolute inset-0 bg-slate-900/60 flex items-center justify-center backdrop-blur-[2px]">
-                  <span className="badge bg-white text-slate-800 font-extrabold text-sm px-5 py-2 shadow-xl">Sin stock</span>
+                <div className="absolute inset-0 ps-scrim flex items-center justify-center backdrop-blur-[2px]">
+                  <span className="badge bg-white text-slate-800 text-sm px-5 py-2 shadow-lg">Sin stock</span>
                 </div>
               )}
             </div>
@@ -106,12 +108,14 @@ export default function ProductDetailModal({ product, inCartQuantity = 0, onClos
           <div className="flex flex-col">
             <h2 className="text-xl font-bold text-slate-900 leading-snug">{product.name}</h2>
 
-            <div className="flex items-baseline gap-1 mt-3">
-              <span className="text-sm text-primary-600 font-bold">$</span>
-              <span className="text-4xl font-extrabold text-primary-700 leading-none">
+            {/* Mismo tratamiento del precio que en la tarjeta: cifra en el teal más
+                oscuro y el símbolo en gris, para que el número sea lo que pesa. */}
+            <div className="flex items-baseline gap-1 mt-3 font-display">
+              <span className="text-lg text-neutral-500 font-semibold">$</span>
+              <span className="text-4xl font-bold text-primary-900 leading-none tracking-tight">
                 {safePrice.toLocaleString('es-AR')}
               </span>
-              <span className="text-sm text-primary-600 font-medium">c/u</span>
+              <span className="text-sm text-neutral-500 font-medium">c/u</span>
             </div>
 
             {/* Estado de stock */}
@@ -151,7 +155,7 @@ export default function ProductDetailModal({ product, inCartQuantity = 0, onClos
             {!isOutOfStock && (
               <div className="mt-auto pt-5">
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center border-2 border-slate-200 rounded-2xl overflow-hidden bg-slate-50">
+                  <div className="flex items-center border-2 border-slate-200 rounded-md overflow-hidden bg-slate-50">
                     <button
                       onClick={() => setQty((q) => Math.max(1, q - 1))}
                       disabled={qty <= 1}
@@ -174,7 +178,7 @@ export default function ProductDetailModal({ product, inCartQuantity = 0, onClos
                   <button
                     onClick={handleAdd}
                     disabled={added || hasReachedCartStockLimit}
-                    className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-bold transition-all duration-300
+                    className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-md text-sm font-semibold transition-all duration-300
                       ${added
                         ? 'bg-green-500 text-white scale-[0.98]'
                         : hasReachedCartStockLimit

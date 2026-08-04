@@ -1,48 +1,48 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { FiInstagram, FiFacebook } from 'react-icons/fi';
 import { FaWhatsapp, FaTiktok } from 'react-icons/fa';
-import { settingsAPI, servicesAPI } from '../../services/api';
-
-const defaultContactSettings = {
-  whatsappNumber: import.meta.env.VITE_WHATSAPP_NUMBER || '5493534224605',
-  phoneNumberDisplay: '3534224605',
-  phoneNumberLink: 'tel:+543534224605',
-  contactEmail: 'piscinas@playaysol.com.ar',
-};
+import { servicesAPI } from '../../services/api';
+import { useSettings } from '../../context/SettingsContext';
 
 const FALLBACK_SERVICE_NAMES = ['Piscinas de obra', 'Reformas', 'Climatización', 'Cercos y seguridad'];
 
 const empresaLinks = [
   ['/nosotros', 'Nosotros'],
   ['/proyectos', 'Proyectos'],
-  ['/ubicacion', 'Ubicación'],
+  ['/servicios', 'Servicios'],
   ['/tienda', 'Tienda'],
 ];
 
+const linkStyle = {
+  fontSize: 14, color: 'var(--text-inverse-muted)', textDecoration: 'none',
+  transition: 'color var(--duration-fast) var(--ease-out)',
+};
 const linkHover = (e, on) => { e.currentTarget.style.color = on ? 'var(--text-inverse)' : 'var(--text-inverse-muted)'; };
 const socialHover = (e, on) => {
   e.currentTarget.style.transform = on ? 'translateY(-3px) scale(1.06)' : 'translateY(0) scale(1)';
   e.currentTarget.style.boxShadow = on ? 'var(--shadow-lg)' : 'var(--shadow-sm)';
 };
 
+// Las rutas internas se navegan con <Link>; teléfonos, mails y redes con <a>.
+// Todo el footer usaba <a href="/...">, así que cada click recargaba la aplicación
+// entera: se perdía el carrito en memoria y volvían a descargarse todos los bundles.
+function FooterLink({ to, label }) {
+  const handlers = {
+    onMouseEnter: (e) => linkHover(e, true),
+    onMouseLeave: (e) => linkHover(e, false),
+  };
+
+  return to.startsWith('/')
+    ? <Link to={to} style={linkStyle} {...handlers}>{label}</Link>
+    : <a href={to} target="_blank" rel="noreferrer" style={linkStyle} {...handlers}>{label}</a>;
+}
+
 export default function Footer() {
-  const [settings, setSettings] = useState(defaultContactSettings);
+  const { settings } = useSettings();
   const [serviceNames, setServiceNames] = useState(FALLBACK_SERVICE_NAMES);
 
   useEffect(() => {
-    settingsAPI.getPublic()
-      .then(({ data }) => {
-        setSettings({
-          whatsappNumber: data?.whatsappNumber || defaultContactSettings.whatsappNumber,
-          phoneNumberDisplay: data?.phoneNumberDisplay || defaultContactSettings.phoneNumberDisplay,
-          phoneNumberLink: data?.phoneNumberLink || defaultContactSettings.phoneNumberLink,
-          contactEmail: data?.contactEmail || defaultContactSettings.contactEmail,
-        });
-      })
-      .catch(() => {
-        // Keep fallback defaults if settings are unavailable.
-      });
-
     // Mismos servicios que administrás en /admin/servicios — así el footer
     // nunca queda desactualizado respecto a lo que realmente se ofrece.
     servicesAPI.getAll()
@@ -63,7 +63,7 @@ export default function Footer() {
     { title: 'Servicios', items: serviceNames.map((name) => ['/servicios', name]) },
     { title: 'Empresa',   items: empresaLinks },
     { title: 'Contacto',  items: [
-      ['/contacto', 'Escribínos'],
+      ['/contacto', 'Escribinos'],
       [settings.phoneNumberLink, settings.phoneNumberDisplay],
       [`https://wa.me/${settings.whatsappNumber}`, 'WhatsApp'],
       [`mailto:${settings.contactEmail}`, settings.contactEmail],
@@ -78,7 +78,8 @@ export default function Footer() {
         {/* Brand */}
         <div>
           <div style={{ marginBottom: 14 }}>
-            <img src="/brand/logo-horizontal.png" alt="Playa y Sol" style={{ height: 30, width: 'auto', display: 'block' }} />
+            <img src="/brand/logo-horizontal.png" alt="Playa & Sol" className="ps-logo-inverse"
+                 style={{ height: 30, width: 'auto', display: 'block' }} />
           </div>
           <p style={{ fontSize: 14, lineHeight: 1.6, maxWidth: 240, marginBottom: 18 }}>
             Diseño, construcción y mantenimiento de piscinas en Villa María y la región, con más de 30 años de trayectoria.
@@ -111,27 +112,22 @@ export default function Footer() {
             </h4>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 9 }}>
               {c.items.map(([to, label]) => (
-                <li key={label}>
-                  <a href={to} style={{ fontSize: 14, color: 'var(--text-inverse-muted)', textDecoration: 'none',
-                                        transition: 'color var(--duration-fast) var(--ease-out)' }}
-                    onMouseEnter={e => linkHover(e, true)}
-                    onMouseLeave={e => linkHover(e, false)}>
-                    {label}
-                  </a>
-                </li>
+                <li key={label}><FooterLink to={to} label={label} /></li>
               ))}
             </ul>
           </div>
         ))}
       </div>
 
+      {/* Antes decía "Aviso legal · Privacidad · Cookies" en texto plano, sin enlaces ni
+          páginas detrás. Se reemplaza por un dato real en lugar de una promesa vacía. */}
       <div style={{ maxWidth: 1120, margin: '32px auto 0', paddingTop: 18,
                     borderTop: '1px solid var(--border-on-dark-subtle)',
                     display: 'flex', justifyContent: 'space-between',
                     flexWrap: 'wrap', gap: 8, fontSize: 13 }}
            className="ps-section">
-        <span>© {new Date().getFullYear()} Playa y Sol Piscinas</span>
-        <span style={{ opacity: 0.6 }}>Aviso legal · Privacidad · Cookies</span>
+        <span>© {new Date().getFullYear()} Playa & Sol Piscinas</span>
+        <span style={{ opacity: 0.6 }}>Corrientes 1210, Villa María, Córdoba</span>
       </div>
     </footer>
   );

@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import {
   getProducts,
-  getCategories,
   getProductById,
   createProduct,
   updateProduct,
@@ -16,7 +15,9 @@ const router = Router();
 
 // Públicas
 router.get('/', getProducts);
-router.get('/categories', getCategories);
+// /products/categories se eliminó: devolvía las categorías distintas de los productos,
+// compitiendo con /api/categories (la colección que administra el panel). Dos fuentes
+// para el mismo dato, y ninguna pantalla usaba ésta.
 router.get('/:id', getProductById);
 
 // Admin

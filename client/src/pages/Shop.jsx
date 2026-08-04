@@ -5,15 +5,7 @@ import ProductCard from '../components/ui/ProductCard';
 import ProductDetailModal from '../components/ui/ProductDetailModal';
 import { useCart } from '../context/CartContext';
 import { Button } from '../design-system/Button';
-
-// Respaldo por si la API de categorías no responde
-const FALLBACK_CATEGORIES = [
-  'Química del agua',
-  'Limpieza',
-  'Cercos y seguridad',
-  'Climatización',
-  'Accesorios',
-];
+import { FALLBACK_CATEGORIES } from '../data/fallbackCategories';
 
 const SORT_OPTIONS = [
   { value: '',           label: 'Relevancia' },
@@ -23,13 +15,36 @@ const SORT_OPTIONS = [
 ];
 
 const pillStyle = (active) => ({
-  padding: '8px 18px', borderRadius: 'var(--radius-pill)', cursor: 'pointer',
+  padding: '8px 16px', borderRadius: 'var(--radius-pill)', cursor: 'pointer',
   fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: 13,
-  border: active ? '2px solid var(--brand-primary)' : '2px solid var(--border-subtle)',
-  background: active ? 'var(--brand-primary)' : '#fff',
-  color: active ? '#fff' : 'var(--text-body)',
-  transition: 'all var(--duration-fast) var(--ease-out)',
+  border: `1.5px solid ${active ? 'var(--brand-primary)' : 'var(--border-subtle)'}`,
+  background: active ? 'var(--brand-primary)' : 'var(--surface-card)',
+  color: active ? 'var(--text-inverse)' : 'var(--text-body)',
+  boxShadow: active ? 'var(--shadow-primary)' : 'none',
+  transition: 'background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out)',
 });
+
+// Esqueleto de carga. Antes eran bloques planos del color del borde: se veían
+// congelados, sin señal de que algo estuviera pasando. Ahora barren con `.skeleton`
+// y reproducen la forma real de la tarjeta, así el salto al contenido no se nota.
+function ProductSkeleton() {
+  return (
+    <div style={{
+      background: 'var(--surface-card)', borderRadius: 'var(--radius-lg)',
+      border: '1px solid var(--border-subtle)', overflow: 'hidden',
+      boxShadow: 'var(--shadow-sm)',
+    }}>
+      <div className="skeleton" style={{ aspectRatio: '4 / 3', borderRadius: 0 }} />
+      <div style={{ padding: 'var(--space-4)', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div className="skeleton" style={{ height: 10, width: '40%' }} />
+        <div className="skeleton" style={{ height: 15, width: '85%' }} />
+        <div className="skeleton" style={{ height: 12, width: '65%' }} />
+        <div className="skeleton" style={{ height: 26, width: '45%', marginTop: 6 }} />
+        <div className="skeleton" style={{ height: 42, width: '100%', marginTop: 4, borderRadius: 12 }} />
+      </div>
+    </div>
+  );
+}
 
 export default function Shop() {
   const { items } = useCart();
@@ -186,18 +201,7 @@ export default function Shop() {
         {/* Products */}
         {loading ? (
           <div className="ps-products-grid">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} style={{ background: '#fff', borderRadius: 'var(--radius-lg)',
-                                    border: '1px solid var(--border-subtle)', overflow: 'hidden' }}>
-                <div style={{ aspectRatio: '4/3', background: 'var(--border-subtle)' }} />
-                <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  <div style={{ height: 11, background: 'var(--border-subtle)', borderRadius: 6, width: '38%' }} />
-                  <div style={{ height: 15, background: 'var(--border-subtle)', borderRadius: 6, width: '72%' }} />
-                  <div style={{ height: 11, background: 'var(--border-subtle)', borderRadius: 6, width: '88%' }} />
-                  <div style={{ height: 30, background: 'var(--border-subtle)', borderRadius: 6, width: '48%', marginTop: 6 }} />
-                </div>
-              </div>
-            ))}
+            {Array.from({ length: 8 }).map((_, i) => <ProductSkeleton key={i} />)}
           </div>
         ) : error ? (
           <div style={{ textAlign: 'center', padding: '56px 24px', background: '#fff',
@@ -222,12 +226,15 @@ export default function Shop() {
         ) : (
           <>
             <div className="ps-products-grid">
-              {products.map((p) => (
+              {products.map((p, i) => (
                 <ProductCard
                   key={p._id}
                   product={p}
                   inCartQuantity={inCartByProductId.get(p._id) || 0}
                   onOpenDetail={setDetailProduct}
+                  // La primera fila entra en pantalla sin scrollear: cargarla en diferido
+                  // sólo hacía que el visitante viera huecos al abrir la tienda.
+                  priority={i < 4}
                 />
               ))}
             </div>

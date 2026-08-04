@@ -24,54 +24,31 @@ const fileFilter = (req, file, cb) => {
   cb(err);
 };
 
-const storage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: 'shopping-cart/products',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
-    transformation: [{ width: 800, height: 800, crop: 'limit', quality: 'auto' }],
-  },
-});
+const ALLOWED_FORMATS = ['jpg', 'jpeg', 'png', 'webp'];
 
-const galleryStorage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: 'shopping-cart/gallery',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
-    transformation: [{ width: 1400, crop: 'limit', quality: 'auto' }],
-  },
-});
+// Había cinco bloques CloudinaryStorage prácticamente iguales, que sólo cambiaban la
+// carpeta y el ancho máximo. Un único creador evita que se desincronicen (de hecho la
+// carpeta de productos era la única que además limitaba el alto).
+//
+// `fetch_format: 'auto'` hace que el original quede guardado ya en el formato más
+// liviano que soporte Cloudinary; la entrega igual pide f_auto/q_auto desde el cliente,
+// pero así el archivo base tampoco es un JPG pesado.
+const createUploader = ({ folder, width, maxFileSizeMb = 8 }) =>
+  multer({
+    storage: new CloudinaryStorage({
+      cloudinary,
+      params: {
+        folder: `shopping-cart/${folder}`,
+        allowed_formats: ALLOWED_FORMATS,
+        transformation: [{ width, crop: 'limit', quality: 'auto', fetch_format: 'auto' }],
+      },
+    }),
+    limits: { fileSize: maxFileSizeMb * 1024 * 1024 },
+    fileFilter,
+  });
 
-const projectsStorage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: 'shopping-cart/projects',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
-    transformation: [{ width: 1400, crop: 'limit', quality: 'auto' }],
-  },
-});
-
-const servicesStorage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: 'shopping-cart/services',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
-    transformation: [{ width: 1400, crop: 'limit', quality: 'auto' }],
-  },
-});
-
-const settingsStorage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: 'shopping-cart/settings',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
-    transformation: [{ width: 1200, crop: 'limit', quality: 'auto' }],
-  },
-});
-
-export const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 }, fileFilter });
-export const uploadGallery = multer({ storage: galleryStorage, limits: { fileSize: 8 * 1024 * 1024 }, fileFilter });
-export const uploadProjects = multer({ storage: projectsStorage, limits: { fileSize: 8 * 1024 * 1024 }, fileFilter });
-export const uploadServices = multer({ storage: servicesStorage, limits: { fileSize: 8 * 1024 * 1024 }, fileFilter });
-export const uploadSettings = multer({ storage: settingsStorage, limits: { fileSize: 8 * 1024 * 1024 }, fileFilter });
+export const upload = createUploader({ folder: 'products', width: 1000, maxFileSizeMb: 5 });
+export const uploadProjects = createUploader({ folder: 'projects', width: 1400 });
+export const uploadServices = createUploader({ folder: 'services', width: 1400 });
+export const uploadSettings = createUploader({ folder: 'settings', width: 1200 });
 export { cloudinary };

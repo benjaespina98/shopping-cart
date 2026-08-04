@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { FiX, FiTrash2, FiPlus, FiMinus, FiMessageCircle, FiShoppingCart } from 'react-icons/fi';
 import { useCart } from '../../context/CartContext';
+import CldImage from './CldImage';
 import { ordersAPI } from '../../services/api';
 import { toast } from 'react-toastify';
 
@@ -57,17 +58,29 @@ export default function CartDrawer() {
   return (
     <>
       {/* Overlay */}
+      {/* El velo era negro puro; sobre el teal petróleo del sitio ensuciaba el color.
+          En tono de marca se lee como profundidad y no como una capa gris encima. */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/40 z-40 backdrop-blur-sm"
+          className="fixed inset-0 z-40 backdrop-blur-sm transition-opacity duration-standard"
+          style={{ background: 'rgba(18, 43, 51, 0.48)' }}
           onClick={toggleCart}
         />
       )}
 
-      {/* Drawer */}
+      {/* Drawer.
+          Queda siempre montado para poder animar la entrada y la salida, pero cuando
+          está cerrado hay que sacarlo de la navegación: si no, tabulando desde la
+          tienda el foco se iba a botones invisibles fuera de pantalla, y los lectores
+          de pantalla anunciaban un carrito que no está a la vista. */}
       <div
-        className={`fixed top-0 right-0 h-full w-full max-w-md bg-white z-50 flex flex-col shadow-2xl
-          transition-transform duration-300 ease-in-out
+        role="dialog"
+        aria-modal={isOpen}
+        aria-label="Carrito de compras"
+        aria-hidden={!isOpen}
+        inert={isOpen ? undefined : ''}
+        className={`fixed top-0 right-0 h-full w-full max-w-md bg-white z-50 flex flex-col shadow-xl
+          transition-transform duration-slow ease-out-brand
           ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
       >
         {/* Header */}
@@ -112,13 +125,17 @@ export default function CartDrawer() {
               <div key={item.productId} className="flex gap-3 items-start">
                 {/* Image */}
                 <div className="w-16 h-16 rounded-xl overflow-hidden bg-slate-100 shrink-0">
-                  {item.image ? (
-                    <img src={item.image} alt={item.name} loading="lazy" className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-slate-300 text-xs">
-                      N/A
-                    </div>
-                  )}
+                  <CldImage
+                    src={item.image}
+                    alt={item.name}
+                    width={128}
+                    className="w-full h-full object-cover"
+                    fallback={
+                      <div className="w-full h-full flex items-center justify-center text-slate-300 text-xs">
+                        N/A
+                      </div>
+                    }
+                  />
                 </div>
 
                 {/* Details */}
@@ -170,19 +187,21 @@ export default function CartDrawer() {
                 ${totalPrice.toLocaleString('es-AR')}
               </span>
             </div>
+            {/* Tenía un shimmer permanente encima: un CTA que titila solo distrae y
+                da impresión de que algo está cargando. La jerarquía la da el color. */}
             <button
               onClick={handleWhatsApp}
               disabled={sending}
-              className="w-full flex flex-col items-center justify-center gap-1.5 bg-success-500 hover:bg-success-600 text-white font-bold py-4 rounded-xl shadow-success hover:shadow-lg hover:-translate-y-1 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed text-sm transition-all duration-standard shimmer-soft"
+              className="w-full flex flex-col items-center justify-center gap-1 bg-success-500 hover:bg-success-600 text-white font-display font-semibold py-3.5 rounded-md shadow-success hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-sm disabled:opacity-60 disabled:pointer-events-none text-base transition-all duration-standard ease-out-brand"
             >
-              <div className="flex items-center gap-2.5">
-                <FiMessageCircle size={20} />
-                <span>{sending ? 'Procesando...' : '🛒 Finalizar compra'}</span>
-              </div>
-              <span className="text-xs font-medium opacity-90">Por WhatsApp • Sin recargo</span>
+              <span className="flex items-center gap-2.5">
+                <FiMessageCircle size={19} />
+                {sending ? 'Procesando...' : 'Finalizar compra'}
+              </span>
+              <span className="text-xs font-normal opacity-85">Por WhatsApp · sin recargo</span>
             </button>
             <p className="text-xs text-center text-neutral-500">
-              Se abrirá WhatsApp con tu pedido
+              Se abrirá WhatsApp con tu pedido cargado
             </p>
           </div>
         )}

@@ -94,8 +94,18 @@
   /* Glass surface (sticky header) */
   --surface-glass: rgba(255, 255, 255, 0.92);
 
-  /* Fonts */
-  --font-display: 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* Tipografía — según el manual de identidad "[6] Imagen de Marca — PLAYA & SOL".
+     Quicksand es la tipografía de la marca: es la del propio signo marcario ("la
+     tipografía matter... perteneciente a la familia tipográfica Quicksand con todas
+     sus variables"). Antes el sitio usaba Poppins, que no figura en el manual.
+     Quicksand es geométrica y de terminaciones redondeadas, coherente con el círculo
+     del sol y la línea sinusoidal del isotipo.
+
+     Para el texto corrido se mantiene Mulish: Quicksand es una geométrica de caja
+     ancha, pensada para títulos, y en párrafos de 14–16 px pierde legibilidad. El
+     propio manual aplica ese criterio cuando aclara que para su cuerpo de texto eligió
+     otra familia "por su legibilidad y clarificación óptica". */
+  --font-display: 'Quicksand', 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-body:    'Mulish', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
   /* Spacing */
@@ -119,17 +129,27 @@
   --radius-2xl:  32px;
   --radius-pill: 999px;
 
-  /* Shadows */
+  /* Shadows — teñidas de teal, nunca negro puro: sobre el fondo arena una sombra
+     negra se ve gris sucia en vez de profundidad. */
   --shadow-xs: 0 1px 2px rgba(18, 43, 51, 0.06);
   --shadow-sm: 0 1px 3px rgba(18, 43, 51, 0.08), 0 1px 2px rgba(18, 43, 51, 0.06);
   --shadow-md: 0 4px 12px rgba(18, 43, 51, 0.08), 0 2px 4px rgba(18, 43, 51, 0.05);
   --shadow-lg: 0 12px 28px rgba(18, 43, 51, 0.12), 0 4px 8px rgba(18, 43, 51, 0.06);
-  --shadow-accent: 0 8px 22px rgba(255, 197, 38, 0.32);
+  --shadow-xl: 0 20px 44px rgba(18, 43, 51, 0.16), 0 8px 16px rgba(18, 43, 51, 0.08);
+  --shadow-accent: 0 8px 22px rgba(255, 197, 41, 0.32);
+  --shadow-primary: 0 8px 22px rgba(36, 75, 90, 0.28);
 
   /* Motion */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --duration-fast:   140ms;
   --duration-normal: 240ms;
+  --duration-slow:   400ms;
+
+  /* Elevación al pasar el mouse. Un solo desplazamiento para todo el sitio: antes
+     convivían -1px, -2px, -3px y -4px según el componente, y el conjunto se sentía
+     descoordinado. */
+  --lift-sm: translateY(-2px);
+  --lift-md: translateY(-4px);
 }
 
 /* ============================================================
@@ -159,7 +179,13 @@
   --shadow-sm: 0 1px 2px rgba(18, 43, 51, 0.06), 0 1px 1px rgba(18, 43, 51, 0.04);
   --shadow-md: 0 1px 6px rgba(18, 43, 51, 0.07), 0 1px 2px rgba(18, 43, 51, 0.04);
   --shadow-lg: 0 4px 14px rgba(18, 43, 51, 0.09), 0 2px 4px rgba(18, 43, 51, 0.05);
-  --shadow-accent: 0 3px 10px rgba(255, 197, 38, 0.22);
+  --shadow-xl: 0 8px 22px rgba(18, 43, 51, 0.11), 0 3px 6px rgba(18, 43, 51, 0.05);
+  --shadow-accent: 0 3px 10px rgba(255, 197, 41, 0.22);
+  --shadow-primary: 0 3px 10px rgba(36, 75, 90, 0.20);
+
+  /* Coherente con el carácter contenido del tema: la elevación es más discreta. */
+  --lift-sm: translateY(-1px);
+  --lift-md: translateY(-2px);
 }
 
 /* "moderno" — fondo con tinte teal muy suave, formas redondeadas,
@@ -181,7 +207,84 @@
   --shadow-sm: 0 2px 6px rgba(18, 43, 51, 0.10), 0 1px 3px rgba(18, 43, 51, 0.07);
   --shadow-md: 0 6px 18px rgba(18, 43, 51, 0.12), 0 3px 6px rgba(18, 43, 51, 0.07);
   --shadow-lg: 0 16px 36px rgba(18, 43, 51, 0.16), 0 6px 12px rgba(18, 43, 51, 0.08);
-  --shadow-accent: 0 10px 28px rgba(255, 197, 38, 0.38);
+  --shadow-xl: 0 26px 56px rgba(18, 43, 51, 0.20), 0 10px 20px rgba(18, 43, 51, 0.10);
+  --shadow-accent: 0 10px 28px rgba(255, 197, 41, 0.38);
+  --shadow-primary: 0 10px 28px rgba(36, 75, 90, 0.34);
+
+  /* Tema más suelto: la elevación acompaña con un poco más de recorrido. */
+  --lift-sm: translateY(-3px);
+  --lift-md: translateY(-6px);
+}
+
+/* Área de seguridad del logo. El manual de identidad la define como el módulo
+   contenedor del "sol" del isotipo: alrededor de la marca no debe entrar ningún otro
+   elemento dentro de esa distancia. Se aproxima con un padding proporcional a la
+   altura del logo (el sol ocupa aproximadamente un tercio de esa altura).
+   El manual también fija reducción mínima: 2 cm de ancho para el logotipo — a 96 dpi,
+   unos 75 px, por debajo de lo cual la marca deja de ser legible. */
+.ps-logo {
+  padding: 0.34em;
+  box-sizing: content-box;
+  flex-shrink: 0;
+}
+
+/* Logo sobre fondos oscuros (footer, sidebar del admin, login).
+   El PNG de marca es teal oscuro: sobre el teal-800 del footer prácticamente
+   desaparecía, sólo se distinguía el sol amarillo de la "O". Hasta tener el archivo
+   reversado del manual de marca, se invierte a blanco pleno — el tratamiento
+   monocromo estándar para logos sobre fondo oscuro. */
+.ps-logo-inverse {
+  filter: brightness(0) invert(1);
+}
+
+/* Velo detrás de modales y paneles. Era `bg-black/40`, `bg-black/50` y
+   `bg-slate-900/60` según el componente: tres opacidades distintas para el mismo
+   gesto, y el negro puro ensucia el teal petróleo en lugar de dar profundidad. */
+.ps-scrim {
+  background: rgba(18, 43, 51, 0.52);
+}
+
+/* ============================================================
+   Foco visible — un solo tratamiento para todo el sitio.
+   Antes cada componente resolvía el foco por su cuenta (o no lo resolvía):
+   había anillos teal, anillos ninguno y varios `outline: none` sueltos que
+   dejaban la navegación por teclado sin ninguna pista de dónde estabas.
+   Se usa :focus-visible para que el anillo aparezca al tabular pero no al
+   hacer click con el mouse.
+   ============================================================ */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}
+
+/* Sobre fondos teal oscuros el amarillo de foco pierde contraste contra el
+   propio acento de marca; ahí el anillo va blanco. */
+.ps-on-dark :where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline-color: var(--text-inverse);
+}
+
+/* Superficie interactiva: eleva y profundiza la sombra al pasar el mouse.
+   Reemplaza los hover ad-hoc que cada tarjeta traía con su propio recorrido. */
+.ps-interactive {
+  transition:
+    transform var(--duration-normal) var(--ease-out),
+    box-shadow var(--duration-normal) var(--ease-out),
+    border-color var(--duration-normal) var(--ease-out);
+}
+.ps-interactive:hover {
+  transform: var(--lift-sm);
+  box-shadow: var(--shadow-lg);
+}
+.ps-interactive:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ps-interactive,
+  .ps-interactive:hover,
+  .ps-interactive:active { transform: none; transition: box-shadow var(--duration-fast) linear; }
 }
 
 /* Eyebrow helper */
