@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState, useRef } from 'react';
 import { FiPlus, FiEdit2, FiTrash2, FiX, FiUpload, FiCheck, FiAlertCircle, FiSave, FiSearch, FiPackage, FiTag } from 'react-icons/fi';
 import { productsAPI, categoriesAPI } from '../../services/api';
 import CategoryManager from '../../components/admin/CategoryManager';
+import { cldOptimized } from '../../utils/cloudinary';
+import { FALLBACK_CATEGORIES } from '../../data/fallbackCategories';
 import { toast } from 'react-toastify';
 
 const SORT_OPTIONS = [
@@ -11,14 +13,6 @@ const SORT_OPTIONS = [
   { value: 'price_asc',  label: 'Menor precio' },
   { value: 'price_desc', label: 'Mayor precio' },
   { value: 'stock_asc',  label: 'Menos stock' },
-];
-
-const FALLBACK_CATEGORIES = [
-  'Química del agua',
-  'Limpieza',
-  'Cercos y seguridad',
-  'Climatización',
-  'Accesorios',
 ];
 
 const EMPTY_FORM = {
@@ -99,8 +93,8 @@ function ProductModal({ product, categories, onClose, onSaved }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm ps-scrim">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-xl max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
           <h2 className="font-semibold text-slate-800 text-lg">
             {product ? 'Editar producto' : 'Nuevo producto'}
@@ -166,7 +160,7 @@ function ProductModal({ product, categories, onClose, onSaved }) {
               <div className="flex flex-wrap gap-2">
                 {product.images.map((img) => (
                   <div key={img.publicId} className="relative w-20 h-20">
-                    <img src={img.url} alt="" className={`w-full h-full object-cover rounded-xl border-2 transition-all ${removeIds.includes(img.publicId) ? 'opacity-40 border-red-400' : 'border-slate-200'}`} />
+                    <img src={cldOptimized(img.url, 160)} alt="" loading="lazy" decoding="async" className={`w-full h-full object-cover rounded-xl border-2 transition-all ${removeIds.includes(img.publicId) ? 'opacity-40 border-red-400' : 'border-slate-200'}`} />
                     <button type="button" onClick={() => toggleRemoveImage(img.publicId)}
                       className={`absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full text-white flex items-center justify-center text-xs transition-colors ${removeIds.includes(img.publicId) ? 'bg-green-500' : 'bg-red-500'}`}>
                       {removeIds.includes(img.publicId) ? <FiCheck size={10} /> : <FiX size={10} />}
@@ -451,7 +445,7 @@ export default function AdminProducts() {
                     <td className="px-4 py-3">
                       <div className="w-10 h-10 rounded-lg overflow-hidden bg-slate-100 shrink-0">
                         {p.images?.[0]?.url ? (
-                          <img src={p.images[0].url} alt={p.name} className="w-full h-full object-cover" />
+                          <img src={cldOptimized(p.images[0].url, 80)} alt={p.name} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-slate-300 text-xs">N/A</div>
                         )}

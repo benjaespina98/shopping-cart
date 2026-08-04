@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { cldOptimized, cldSrcSet, cldPlaceholder } from '../utils/cloudinary';
+import CldImage from '../components/ui/CldImage';
 
 const overlayGradient = 'linear-gradient(180deg, rgba(18,43,51,0) 55%, rgba(18,43,51,0.78) 100%)';
 // Mismo degradado de marca que el placeholder sin imagen: se ve al instante (0 red)
@@ -19,7 +19,6 @@ export function Photo({
   style,
 }) {
   const [hovered, setHovered] = useState(false);
-  const [loaded, setLoaded] = useState(false);
 
   const hoverHandlers = zoom ? {
     onMouseEnter: () => setHovered(true),
@@ -27,9 +26,6 @@ export function Photo({
   } : {};
 
   if (src) {
-    const optimized = cldOptimized(src);
-    const srcSet = cldSrcSet(src);
-    const placeholder = cldPlaceholder(src);
     const rootClass = ['ps-photo', className].filter(Boolean).join(' ');
 
     return (
@@ -38,26 +34,16 @@ export function Photo({
         style={{ position: 'relative', height, borderRadius: radius, overflow: 'hidden', background: brandGradient, ...style }}
         {...hoverHandlers}
       >
-        {/* Capa blur-up: se desvanece cuando carga la imagen definitiva */}
-        {placeholder && !loaded && (
-          <div aria-hidden style={{
-            position: 'absolute', inset: 0,
-            backgroundImage: `url(${placeholder})`, backgroundSize: 'cover', backgroundPosition: 'center',
-            filter: 'blur(14px)', transform: 'scale(1.1)',
-          }} />
-        )}
-        <img
-          src={optimized}
-          srcSet={srcSet}
-          sizes={srcSet ? sizes : undefined}
+        {/* Blur-up, f_auto/q_auto y srcset los resuelve CldImage — misma lógica de
+            carga que usan las tarjetas de producto, para no mantenerla dos veces. */}
+        <CldImage
+          src={src}
           alt={alt || label}
-          loading={priority ? 'eager' : 'lazy'}
-          fetchPriority={priority ? 'high' : undefined}
-          decoding="async"
-          onLoad={() => setLoaded(true)}
-          style={{
+          width={1200}
+          sizes={sizes}
+          priority={priority}
+          imgStyle={{
             width: '100%', height: '100%', objectFit: 'cover', display: 'block',
-            opacity: loaded ? 1 : 0,
             transform: zoom && hovered ? 'scale(1.05)' : 'scale(1)',
             transition: 'opacity var(--duration-slow) var(--ease-out), transform var(--duration-normal) var(--ease-out)',
           }}

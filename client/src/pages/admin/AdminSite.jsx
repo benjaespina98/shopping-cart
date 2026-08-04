@@ -5,6 +5,7 @@ import {
 } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import { projectsAPI } from '../../services/api';
+import { cldOptimized } from '../../utils/cloudinary';
 
 const emptyForm = { title: '', location: '', featured: false, isHero: false };
 
@@ -258,7 +259,7 @@ export default function AdminSite() {
               {/* Image */}
               <div className="aspect-video relative bg-slate-100">
                 {p.imageUrl
-                  ? <img src={p.imageUrl} alt={p.title} className="w-full h-full object-cover" />
+                  ? <img src={cldOptimized(p.imageUrl, 480)} alt={p.title} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                   : <div className="w-full h-full flex items-center justify-center text-slate-300"><FiImage size={32} /></div>}
                 <div className="absolute top-2 left-2 flex flex-col gap-1 items-start">
                   {p.isHero && (

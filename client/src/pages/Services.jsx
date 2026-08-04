@@ -4,37 +4,12 @@ import { Button } from '../design-system/Button';
 import { Badge } from '../design-system/Badge';
 import { Photo } from '../design-system/Photo';
 import { servicesAPI } from '../services/api';
-
-const FALLBACK_ROWS = [
-  {
-    title: 'Piscinas de obra', tag: 'Diseño y obra', tone: 'sun', variant: 'solid',
-    description: 'Relevamos el terreno, proyectamos la forma y construimos en hormigón gunitado: la técnica que más años de vida le da a una pileta. Cada decisión, pensada para que dure generaciones.',
-    bullets: ['Proyecto 3D antes de iniciar la obra', 'Hormigón gunitado, sin uniones ni filtraciones', 'Garantía escrita de 10 años en el vaso'],
-    cta: 'Quiero mi piscina',
-  },
-  {
-    title: 'Reformas', tag: 'Puesta a punto', tone: 'teal', variant: 'soft',
-    description: 'Una pileta envejecida pierde agua, color y seguridad. Recuperamos el vaso, la coronación y la depuración con materiales actuales, sin romper más de lo necesario.',
-    bullets: ['Diagnóstico real antes de presupuestar', 'Cambio de revestimiento sin demoler el vaso', 'Filtros y bombas al día con la normativa'],
-    cta: 'Solicitar presupuesto',
-  },
-  {
-    title: 'Climatización', tag: 'Más temporada', tone: 'sun', variant: 'solid',
-    description: 'Octubre a abril ya no alcanza. Con la bomba de calor correcta y una cubierta bien elegida, el agua se mantiene a temperatura semanas antes y después de la temporada.',
-    bullets: ['Bombas de calor de bajo consumo eléctrico', 'Cubiertas automáticas que cortan la evaporación', 'Hasta dos meses más de baño al año'],
-    cta: 'Asesorarme',
-  },
-  {
-    title: 'Cercos y seguridad', tag: 'Tranquilidad en casa', tone: 'teal', variant: 'soft',
-    description: 'Un descuido de segundos puede ser grave. Instalamos barreras físicas certificadas, pensadas para frenar a los más chicos sin tapar la vista de la pileta.',
-    bullets: ['Barreras removibles o fijas, según el espacio', 'Resistentes a impacto y a la intemperie', 'Instalación con cierre de seguridad certificado'],
-    cta: 'Hablar con un especialista',
-  },
-];
+import CtaBlock from '../components/sections/CtaBlock';
+import { FALLBACK_SERVICES } from '../data/fallbackServices';
 
 export default function Services() {
   const navigate = useNavigate();
-  const [rows, setRows] = useState(FALLBACK_ROWS);
+  const [rows, setRows] = useState(FALLBACK_SERVICES);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -78,7 +53,9 @@ export default function Services() {
                   <Badge tone={r.tone} variant={r.variant} style={{ marginBottom: 14 }}>{r.tag}</Badge>
                   <h2 style={{ fontSize: 'clamp(20px, 5.5vw, 28px)', marginBottom: 12,
                                fontFamily: 'var(--font-display)', color: 'var(--text-strong)' }}>{r.title}</h2>
-                  <p style={{ fontSize: 16, color: 'var(--text-body)', lineHeight: 1.6, marginBottom: 18 }}>{r.description}</p>
+                  <p style={{ fontSize: 16, color: 'var(--text-body)', lineHeight: 1.6, marginBottom: 18 }}>
+                    {r.descriptionLong || r.description}
+                  </p>
                   {r.bullets?.length > 0 && (
                     <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px',
                                  display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -104,6 +81,18 @@ export default function Services() {
             ))}
           </div>
         )}
+      </div>
+
+      {/* Cierre consistente con el resto del sitio: todas las páginas informativas
+          terminan ofreciendo el mismo próximo paso. */}
+      <div style={{ marginTop: 64 }}>
+        <CtaBlock
+          title="¿Cuál de estos necesitás?"
+          text="Contanos qué tenés en mente y te armamos un presupuesto sin compromiso."
+          primaryLabel="Solicitar presupuesto"
+          secondaryLabel="Ver proyectos"
+          secondaryTo="/proyectos"
+        />
       </div>
     </section>
   );

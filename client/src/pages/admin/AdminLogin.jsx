@@ -26,7 +26,7 @@ export default function AdminLogin() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4"
-         style={{ background: 'linear-gradient(160deg, #122B33 0%, #193A45 60%, #244B5A 100%)' }}>
+         style={{ background: 'linear-gradient(160deg, var(--teal-900) 0%, var(--teal-800) 60%, var(--teal-700) 100%)' }}>
 
       {/* Background decoration */}
       <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
@@ -41,24 +41,25 @@ export default function AdminLogin() {
         {/* Brand header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center mb-4">
-            <img src="/brand/logo-stacked.png" alt="Playa y Sol" style={{ height: 76, width: 'auto', display: 'block' }} />
+            <img src="/brand/logo-stacked.png" alt="Playa & Sol" className="ps-logo-inverse"
+                 style={{ height: 76, width: 'auto', display: 'block' }} />
           </div>
-          <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, fontFamily: 'Mulish, sans-serif' }}>
+          <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, fontFamily: 'var(--font-body)' }}>
             Panel de administración
           </p>
         </div>
 
         {/* Card */}
-        <div className="rounded-2xl p-7 shadow-2xl"
+        <div className="rounded-2xl p-7 shadow-xl"
              style={{ background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(16px)',
                       border: '1px solid rgba(255,255,255,0.1)' }}>
 
           <div className="flex items-center justify-center w-12 h-12 rounded-xl mx-auto mb-5"
                style={{ background: 'rgba(255,197,38,0.15)', border: '1px solid rgba(255,197,38,0.3)' }}>
-            <FiLock size={20} style={{ color: '#FFC629' }} />
+            <FiLock size={20} style={{ color: 'var(--sun-500)' }} />
           </div>
 
-          <h2 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: 17,
+          <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: 17,
                        color: '#fff', textAlign: 'center', marginBottom: 20 }}>
             Ingresá a tu cuenta
           </h2>
@@ -66,7 +67,7 @@ export default function AdminLogin() {
           <form onSubmit={handleSubmit} autoComplete="off" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {/* Email */}
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, fontFamily: 'Poppins, sans-serif',
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, fontFamily: 'var(--font-display)',
                               color: 'rgba(255,255,255,0.65)', marginBottom: 6, letterSpacing: '0.03em' }}>
                 EMAIL
               </label>
@@ -83,7 +84,7 @@ export default function AdminLogin() {
                   name="admin-email-field"
                   style={{ width: '100%', paddingLeft: 38, paddingRight: 14, height: 42,
                            background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)',
-                           borderRadius: 10, color: '#fff', fontSize: 14, fontFamily: 'Mulish, sans-serif',
+                           borderRadius: 10, color: '#fff', fontSize: 14, fontFamily: 'var(--font-body)',
                            outline: 'none', boxSizing: 'border-box',
                            transition: 'border-color 140ms ease, background 140ms ease' }}
                   onFocus={e => { e.target.style.borderColor = 'rgba(255,197,38,0.6)'; e.target.style.background = 'rgba(255,255,255,0.10)'; }}
@@ -94,7 +95,7 @@ export default function AdminLogin() {
 
             {/* Password */}
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, fontFamily: 'Poppins, sans-serif',
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, fontFamily: 'var(--font-display)',
                               color: 'rgba(255,255,255,0.65)', marginBottom: 6, letterSpacing: '0.03em' }}>
                 CONTRASEÑA
               </label>
@@ -111,7 +112,7 @@ export default function AdminLogin() {
                   name="admin-password-field"
                   style={{ width: '100%', paddingLeft: 38, paddingRight: 40, height: 42,
                            background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)',
-                           borderRadius: 10, color: '#fff', fontSize: 14, fontFamily: 'Mulish, sans-serif',
+                           borderRadius: 10, color: '#fff', fontSize: 14, fontFamily: 'var(--font-body)',
                            outline: 'none', boxSizing: 'border-box',
                            transition: 'border-color 140ms ease, background 140ms ease' }}
                   onFocus={e => { e.target.style.borderColor = 'rgba(255,197,38,0.6)'; e.target.style.background = 'rgba(255,255,255,0.10)'; }}
@@ -129,17 +130,21 @@ export default function AdminLogin() {
               </div>
             </div>
 
-            {/* Submit */}
+            {/* Submit — amarillo sol, como toda acción principal del sitio. Era teal
+                sobre una tarjeta teal sobre un fondo teal: se perdía en el fondo y no
+                se leía como el botón que hay que apretar. */}
             <button
               type="submit"
               disabled={loading}
-              style={{ marginTop: 6, height: 44, borderRadius: 10, border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
-                       background: loading ? 'rgba(33,76,90,0.5)' : '#244B5A',
-                       color: '#fff', fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: 14,
-                       transition: 'background 140ms ease, transform 120ms ease',
-                       opacity: loading ? 0.7 : 1 }}
-              onMouseEnter={e => { if (!loading) e.target.style.background = '#193A45'; }}
-              onMouseLeave={e => { if (!loading) e.target.style.background = '#244B5A'; }}
+              style={{ marginTop: 6, height: 46, borderRadius: 'var(--radius-md)', border: 'none',
+                       cursor: loading ? 'not-allowed' : 'pointer',
+                       background: 'var(--brand-accent)', color: 'var(--text-on-accent)',
+                       fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: 15,
+                       boxShadow: 'var(--shadow-accent)',
+                       transition: 'background var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out)',
+                       opacity: loading ? 0.6 : 1 }}
+              onMouseEnter={e => { if (!loading) e.currentTarget.style.background = 'var(--brand-accent-hover)'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'var(--brand-accent)'; }}
             >
               {loading ? 'Ingresando...' : 'Ingresar al panel'}
             </button>
@@ -147,8 +152,8 @@ export default function AdminLogin() {
         </div>
 
         <p style={{ textAlign: 'center', marginTop: 20, fontSize: 12,
-                    color: 'rgba(255,255,255,0.3)', fontFamily: 'Mulish, sans-serif' }}>
-          © {new Date().getFullYear()} Playa y Sol Piscinas
+                    color: 'rgba(255,255,255,0.3)', fontFamily: 'var(--font-body)' }}>
+          © {new Date().getFullYear()} Playa & Sol Piscinas
         </p>
       </div>
     </div>

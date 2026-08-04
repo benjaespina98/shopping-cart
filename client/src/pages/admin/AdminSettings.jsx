@@ -3,6 +3,7 @@ import { FiSave, FiPlus, FiTrash2, FiUsers, FiClock, FiMail, FiUserMinus, FiDown
 import { toast } from 'react-toastify';
 import QRCode from 'qrcode';
 import { settingsAPI } from '../../services/api';
+import { cldOptimized } from '../../utils/cloudinary';
 import { useAuth } from '../../context/AuthContext';
 
 const defaultSettings = {
@@ -58,35 +59,35 @@ const THEMES = [
 // Miniatura fiel del sitio con diferencias de tema claramente visibles
 function ThemePreviewCard({ t }) {
   return (
-    <div style={{ borderRadius: 10, overflow: 'hidden', border: '1px solid #E0E5E7', width: '100%' }}>
+    <div style={{ borderRadius: 10, overflow: 'hidden', border: '1px solid var(--grey-200)', width: '100%' }}>
       {/* Mini header */}
-      <div style={{ background: '#244B5A', padding: '7px 10px', display: 'flex', alignItems: 'center', gap: 6 }}>
+      <div style={{ background: 'var(--teal-700)', padding: '7px 10px', display: 'flex', alignItems: 'center', gap: 6 }}>
         <div style={{ width: 44, height: 7, borderRadius: 3, background: 'rgba(255,198,41,0.9)' }} />
         <div style={{ flex: 1 }} />
-        <div style={{ width: 26, height: 7, borderRadius: t.pilRadius > 10 ? 99 : 3, background: '#FFC629' }} />
+        <div style={{ width: 26, height: 7, borderRadius: t.pilRadius > 10 ? 99 : 3, background: 'var(--sun-500)' }} />
       </div>
       {/* Mini hero */}
       <div style={{ background: '#1C3D49', padding: '10px', display: 'flex', flexDirection: 'column', gap: 5 }}>
         <div style={{ height: 7, width: '70%', borderRadius: 2, background: 'rgba(255,255,255,0.85)' }} />
         <div style={{ height: 5, width: '90%', borderRadius: 2, background: 'rgba(255,255,255,0.35)' }} />
         <div style={{ height: 5, width: '75%', borderRadius: 2, background: 'rgba(255,255,255,0.35)', marginBottom: 3 }} />
-        <div style={{ display: 'inline-block', alignSelf: 'flex-start', background: '#FFC629', color: '#122B33',
+        <div style={{ display: 'inline-block', alignSelf: 'flex-start', background: 'var(--sun-500)', color: 'var(--teal-900)',
                       fontSize: 7, fontWeight: 700, padding: '3px 9px', borderRadius: t.pilRadius > 10 ? 99 : 3 }}>
           Solicitar presupuesto
         </div>
       </div>
       {/* Mini página */}
       <div style={{ background: t.bgPage, padding: '10px 10px 12px' }}>
-        <div style={{ height: 5, width: '45%', borderRadius: 2, background: '#946A0B', marginBottom: 6 }} />
+        <div style={{ height: 5, width: '45%', borderRadius: 2, background: 'var(--sun-800)', marginBottom: 6 }} />
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 8 }}>
           {[1, 2].map((i) => (
             <div key={i} style={{ background: t.bgCard, borderRadius: t.radius, boxShadow: t.shadow,
-                                  border: '1px solid #E0E5E7', padding: '7px 8px' }}>
-              <div style={{ height: 5, width: '60%', borderRadius: 2, background: '#244B5A', marginBottom: 3 }} />
+                                  border: '1px solid var(--grey-200)', padding: '7px 8px' }}>
+              <div style={{ height: 5, width: '60%', borderRadius: 2, background: 'var(--teal-700)', marginBottom: 3 }} />
               <div style={{ height: 3, width: '85%', borderRadius: 2, background: '#C7CFD2', marginBottom: 2 }} />
               <div style={{ height: 3, width: '65%', borderRadius: 2, background: '#C7CFD2', marginBottom: 6 }} />
               <div style={{ height: 3, width: 36, borderRadius: t.pilRadius > 10 ? 99 : 2,
-                            background: 'rgba(36,75,90,0.2)', border: '1px solid #244B5A' }} />
+                            background: 'rgba(36,75,90,0.2)', border: '1px solid var(--teal-700)' }} />
             </div>
           ))}
         </div>
@@ -153,7 +154,7 @@ export default function AdminSettings() {
     QRCode.toDataURL(siteUrl, {
       width: 280,
       margin: 1,
-      color: { dark: '#244B5A', light: '#FFFFFF' },
+      color: { dark: 'var(--teal-700)', light: '#FFFFFF' },
     })
       .then(setQrDataUrl)
       .catch(() => setQrDataUrl(''));
@@ -409,7 +410,7 @@ export default function AdminSettings() {
             <label className="flex-shrink-0 cursor-pointer">
               <div className="w-32 h-24 rounded-xl border-2 border-dashed border-slate-300 hover:border-primary-700 flex flex-col items-center justify-center text-slate-400 hover:text-primary-700 transition-colors overflow-hidden">
                 {settings.contactPhotoUrl
-                  ? <img src={settings.contactPhotoUrl} alt="" className="w-full h-full object-cover" />
+                  ? <img src={cldOptimized(settings.contactPhotoUrl, 320)} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
                   : <><FiImage size={20} /><span className="text-xs mt-1">Elegir foto</span></>}
               </div>
               <input type="file" accept="image/*" className="hidden" ref={contactPhotoInputRef} onChange={handleContactPhotoChange} />
@@ -432,7 +433,7 @@ export default function AdminSettings() {
             <label className="flex-shrink-0 cursor-pointer">
               <div className="w-32 h-24 rounded-xl border-2 border-dashed border-slate-300 hover:border-primary-700 flex flex-col items-center justify-center text-slate-400 hover:text-primary-700 transition-colors overflow-hidden">
                 {settings.aboutPhotoUrl
-                  ? <img src={settings.aboutPhotoUrl} alt="" className="w-full h-full object-cover" />
+                  ? <img src={cldOptimized(settings.aboutPhotoUrl, 320)} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
                   : <><FiImage size={20} /><span className="text-xs mt-1">Elegir foto</span></>}
               </div>
               <input type="file" accept="image/*" className="hidden" ref={aboutPhotoInputRef} onChange={handleAboutPhotoChange} />
@@ -504,7 +505,7 @@ export default function AdminSettings() {
             <div key={item._id} className="border border-slate-200 rounded-xl p-3 flex items-center justify-between gap-3">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
-                     style={{ background: '#244B5A' }}>
+                     style={{ background: 'var(--teal-700)' }}>
                   {item.name?.[0]?.toUpperCase() ?? 'A'}
                 </div>
                 <div className="min-w-0">
@@ -514,7 +515,7 @@ export default function AdminSettings() {
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 <span className="text-xs font-medium px-2 py-0.5 rounded-full capitalize"
-                      style={{ background: '#F1F7F9', color: '#244B5A' }}>
+                      style={{ background: 'var(--teal-50)', color: 'var(--teal-700)' }}>
                   {item.role || 'admin'}
                 </span>
                 {item._id !== user?._id && (
@@ -645,9 +646,9 @@ export default function AdminSettings() {
       {savedPopup && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(18,43,51,0.45)' }}
              onClick={() => setSavedPopup(false)}>
-          <div className="bg-white rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: '#DCF3E8' }}>
-              <FiCheckCircle size={28} style={{ color: '#2E9E6B' }} />
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full text-center shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'var(--green-100)' }}>
+              <FiCheckCircle size={28} style={{ color: 'var(--green-500)' }} />
             </div>
             <h3 className="text-lg font-bold text-slate-900 mb-1">¡Listo!</h3>
             <p className="text-sm text-slate-500 mb-5">Los cambios ya se aplicaron al sitio público.</p>

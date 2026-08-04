@@ -1,48 +1,16 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
-import { FiAward, FiDroplet, FiUsers, FiClock } from 'react-icons/fi';
 import { productsAPI, projectsAPI, servicesAPI } from '../services/api';
 import ProductCard from '../components/ui/ProductCard';
+import StatsStrip from '../components/sections/StatsStrip';
+import CtaBlock from '../components/sections/CtaBlock';
+import { FALLBACK_SERVICES } from '../data/fallbackServices';
 import { useCart } from '../context/CartContext';
 import { useReveal } from '../hooks/useReveal';
 import { Button } from '../design-system/Button';
 import { Card } from '../design-system/Card';
 import { Badge } from '../design-system/Badge';
 import { Photo } from '../design-system/Photo';
-
-const FALLBACK_SERVICES = [
-  {
-    title: 'Piscinas de obra', tag: 'Diseño y obra', tone: 'sun', variant: 'solid',
-    description: 'Relevamos el terreno, proyectamos la forma y construimos en hormigón gunitado: la técnica que más años de vida le da a una pileta.',
-    bullets: ['Proyecto 3D antes de iniciar la obra', 'Hormigón gunitado, sin uniones ni filtraciones', 'Garantía escrita de 10 años en el vaso'],
-    cta: 'Quiero mi piscina',
-  },
-  {
-    title: 'Reformas', tag: 'Puesta a punto', tone: 'teal', variant: 'soft',
-    description: 'Una pileta envejecida pierde agua, color y seguridad. Recuperamos el vaso, la coronación y la depuración con materiales actuales.',
-    bullets: ['Diagnóstico real antes de presupuestar', 'Cambio de revestimiento sin demoler el vaso', 'Filtros y bombas al día con la normativa'],
-    cta: 'Solicitar presupuesto',
-  },
-  {
-    title: 'Climatización', tag: 'Más temporada', tone: 'sun', variant: 'solid',
-    description: 'Con la bomba de calor correcta y una cubierta bien elegida, el agua se mantiene a temperatura semanas antes y después de la temporada.',
-    bullets: ['Bombas de calor de bajo consumo eléctrico', 'Cubiertas automáticas que cortan la evaporación', 'Hasta dos meses más de baño al año'],
-    cta: 'Asesorarme',
-  },
-  {
-    title: 'Cercos y seguridad', tag: 'Tranquilidad en casa', tone: 'teal', variant: 'soft',
-    description: 'Instalamos barreras físicas certificadas, pensadas para frenar a los más chicos sin tapar la vista de la pileta.',
-    bullets: ['Barreras removibles o fijas, según el espacio', 'Resistentes a impacto y a la intemperie', 'Instalación con cierre de seguridad certificado'],
-    cta: 'Hablar con un especialista',
-  },
-];
-
-const stats = [
-  { Icon: FiAward,   n: '+30 años', l: 'de trayectoria en Villa María' },
-  { Icon: FiDroplet, n: '+500',    l: 'piscinas construidas' },
-  { Icon: FiUsers,   n: '100%',    l: 'atención personalizada' },
-  { Icon: FiClock,   n: '48h',     l: 'para tu presupuesto' },
-];
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -52,11 +20,9 @@ export default function Landing() {
   const [featuredProjects, setFeaturedProjects] = useState([]);
   const [services, setServices] = useState(FALLBACK_SERVICES);
 
-  const statsReveal = useReveal();
   const servicesReveal = useReveal();
   const projectsReveal = useReveal();
   const productsReveal = useReveal();
-  const ctaReveal = useReveal();
 
   const inCartByProductId = useMemo(() => {
     const map = new Map();
@@ -135,26 +101,7 @@ export default function Landing() {
       </section>
 
       {/* TRUST STRIP — confianza y trayectoria, sin protagonismo del amarillo */}
-      <section ref={statsReveal.ref} className={statsReveal.className}
-        style={{ background: 'var(--surface-card)', padding: 'var(--space-8) var(--space-5)',
-                 borderBottom: '1px solid var(--border-subtle)' }}>
-        <div className="ps-stats-grid" style={{ maxWidth: 1120, margin: '0 auto' }}>
-          {stats.map((s) => (
-            <div key={s.l} className="ps-stat-item" style={{ textAlign: 'center', padding: '0 var(--space-5)' }}>
-              <div style={{
-                width: 44, height: 44, borderRadius: '50%', margin: '0 auto var(--space-3)',
-                border: '2px solid var(--brand-accent)', color: 'var(--brand-accent-press)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <s.Icon size={19} />
-              </div>
-              <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 26,
-                            color: 'var(--text-strong)', lineHeight: 1 }}>{s.n}</div>
-              <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 'var(--space-2)', lineHeight: 1.4 }}>{s.l}</div>
-            </div>
-          ))}
-        </div>
-      </section>
+      <StatsStrip />
 
       {/* SERVICES */}
       <section ref={servicesReveal.ref} className={servicesReveal.className} style={{ padding: 'var(--space-9) var(--space-5)' }}>
@@ -257,21 +204,7 @@ export default function Landing() {
       )}
 
       {/* CTA */}
-      <section ref={ctaReveal.ref} className={ctaReveal.className} style={{ padding: '0 var(--space-5) var(--space-9)' }}>
-        <div style={{ maxWidth: 1120, margin: '0 auto' }}>
-          <div className="ps-cta-block"
-            style={{ background: 'var(--teal-800)', borderRadius: 'var(--radius-2xl)', padding: 'var(--space-8) var(--space-8)' }}>
-            <div>
-              <h2 style={{ color: 'var(--text-inverse)', fontSize: 32, marginBottom: 'var(--space-2)',
-                           fontFamily: 'var(--font-display)', fontWeight: 600 }}>¿Listo para tu piscina?</h2>
-              <p style={{ color: 'var(--text-inverse-muted)', fontSize: 16, maxWidth: 460 }}>
-                Contanos tu idea y nos contactamos en 48 horas con un presupuesto sin compromiso.
-              </p>
-            </div>
-            <Button variant="primary" size="lg" onClick={() => navigate('/presupuesto')}>Empezar ahora</Button>
-          </div>
-        </div>
-      </section>
+      <CtaBlock />
     </div>
   );
 }

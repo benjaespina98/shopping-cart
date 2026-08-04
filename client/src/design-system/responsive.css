@@ -146,5 +146,58 @@
 @media (max-width: 767px)  { .ps-products-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; } }
 @media (max-width: 480px)  { .ps-products-grid { grid-template-columns: 1fr; } }
 
+/* ── Tarjeta de producto ────────────────────────────────────
+   Los hover viven acá y no en estilos inline porque son en cadena: al pasar el
+   mouse por la tarjeta reaccionan a la vez la sombra, el borde, la foto, el velo
+   y el título. Con handlers de JS por elemento eso quedaba descoordinado y se
+   notaba: cada parte arrancaba su animación en un momento distinto.
+   ──────────────────────────────────────────────────────────── */
+.ps-product-card {
+  transition:
+    transform var(--duration-normal) var(--ease-out),
+    box-shadow var(--duration-normal) var(--ease-out),
+    border-color var(--duration-normal) var(--ease-out);
+}
+.ps-product-card:hover {
+  transform: var(--lift-sm);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--teal-200);
+}
+.ps-product-card:hover .ps-product-card__img { transform: scale(1.06); }
+.ps-product-card:hover .ps-product-card__veil { opacity: 1; }
+.ps-product-card:hover .ps-product-card__title { color: var(--brand-primary); }
+
+.ps-product-card__img {
+  transition: transform var(--duration-slow) var(--ease-out);
+}
+
+/* El foco por teclado sobre la foto tiene que verse igual de claro que el hover:
+   el anillo solo no alcanza cuando el elemento es una imagen a sangre. */
+.ps-product-card__media:focus-visible {
+  outline-offset: -3px;
+}
+
+/* Stepper: se resalta como un todo cuando el foco entra en cualquiera de sus botones. */
+.ps-stepper:focus-within { border-color: var(--brand-primary); }
+.ps-stepper button:hover:not(:disabled) {
+  background: var(--grey-100);
+  color: var(--brand-primary);
+}
+
+.ps-add-btn:hover:not(:disabled) {
+  background: var(--brand-accent-hover) !important;
+  transform: var(--lift-sm);
+  box-shadow: var(--shadow-lg) !important;
+}
+.ps-add-btn:active:not(:disabled) { transform: translateY(0) scale(0.985); }
+
+@media (prefers-reduced-motion: reduce) {
+  .ps-product-card,
+  .ps-product-card:hover,
+  .ps-product-card__img,
+  .ps-product-card:hover .ps-product-card__img,
+  .ps-add-btn:hover:not(:disabled) { transform: none; }
+}
+
 /* ── Global overflow guard ──────────────────────────────── */
 html, body { overflow-x: hidden; }

@@ -1,62 +1,38 @@
 import { useEffect, useRef, useState } from 'react';
-import { FiMail, FiPhone, FiInstagram, FiFacebook, FiClock, FiSend, FiUser } from 'react-icons/fi';
+import { FiMail, FiPhone, FiInstagram, FiFacebook, FiClock, FiSend, FiUser, FiMapPin, FiNavigation } from 'react-icons/fi';
 import { FaWhatsapp, FaTiktok } from 'react-icons/fa';
 import { toast } from 'react-toastify';
-import { settingsAPI, quotesAPI } from '../services/api';
+import { quotesAPI } from '../services/api';
 import { Button } from '../design-system/Button';
 import { Card } from '../design-system/Card';
 import { Input } from '../design-system/Input';
 import { Photo } from '../design-system/Photo';
 import { useReveal } from '../hooks/useReveal';
+import { useSettings } from '../context/SettingsContext';
 
-const defaultContactSettings = {
-  whatsappNumber: import.meta.env.VITE_WHATSAPP_NUMBER || '5493534224605',
-  phoneNumberDisplay: '3534224605',
-  phoneNumberLink: 'tel:+543534224605',
-  contactEmail: 'piscinas@playaysol.com.ar',
-  secondaryContactLabel: '',
-  secondaryContactWhatsapp: '',
-  contactPhotoUrl: '',
-  businessHours: [
-    { day: 'Lunes a Viernes', hours: '9:00 - 18:00' },
-    { day: 'Sábados', hours: '9:00 - 13:00' },
-    { day: 'Domingos', hours: 'Cerrado' },
-  ],
+// Datos del local, antes en la página /ubicacion. Esa página repetía dirección,
+// horarios y teléfono que ya estaban acá, con un diseño distinto al del resto del
+// sitio; se unificó todo en Contacto y /ubicacion ahora redirige acá.
+const LOCATION = {
+  address: 'Corrientes 1210, Villa María, Córdoba',
+  mapsUrl: 'https://www.google.com/maps/place/Playa+y+Sol+S.A.S./@-32.41136540202374,-63.24136445912394,17z',
+  embedUrl:
+    'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d210.51818044720216!2d-63.24136445912394!3d-32.41136540202374!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95cc42e708785177%3A0x7029a4a01828b49f!2sPlaya%20y%20Sol%20S.A.S.!5e0!3m2!1ses-419!2sar!4v1771459205088!5m2!1ses-419!2sar',
 };
 
 export default function Contact() {
   const reveal = useReveal();
+  const mapReveal = useReveal();
   const [form, setForm] = useState({ name: '', phone: '', email: '', message: '' });
   const [sendingChannel, setSendingChannel] = useState('');
-  const [contactSettings, setContactSettings] = useState(defaultContactSettings);
+  const { settings: contactSettings } = useSettings();
   const sentTimeoutRef = useRef(null);
 
   const WHATSAPP_NUMBER = contactSettings.whatsappNumber;
   const CONTACT_EMAIL = contactSettings.contactEmail;
 
-  useEffect(() => {
-    settingsAPI.getPublic()
-      .then(({ data }) => {
-        setContactSettings({
-          whatsappNumber: data?.whatsappNumber || defaultContactSettings.whatsappNumber,
-          phoneNumberDisplay: data?.phoneNumberDisplay || defaultContactSettings.phoneNumberDisplay,
-          phoneNumberLink: data?.phoneNumberLink || defaultContactSettings.phoneNumberLink,
-          contactEmail: data?.contactEmail || defaultContactSettings.contactEmail,
-          secondaryContactLabel: data?.secondaryContactLabel || '',
-          secondaryContactWhatsapp: data?.secondaryContactWhatsapp || '',
-          contactPhotoUrl: data?.contactPhotoUrl || '',
-          businessHours: Array.isArray(data?.businessHours) && data.businessHours.length > 0
-            ? data.businessHours
-            : defaultContactSettings.businessHours,
-        });
-      })
-      .catch(() => {
-        // Keep fallback defaults if settings are unavailable.
-      });
-
-    return () => {
-      if (sentTimeoutRef.current) clearTimeout(sentTimeoutRef.current);
-    };
+  useEffect(() => () => {
+    if (sentTimeoutRef.current) clearTimeout(sentTimeoutRef.current);
   }, []);
 
   const resetFormWithFeedback = (channel) => {
@@ -274,6 +250,56 @@ export default function Contact() {
             <Button variant="outline" size="lg" fullWidth onClick={handleEmail} iconLeft={<FiSend size={16} />}>
               {sendingChannel === 'email' ? '¡Listo! Abriendo email...' : 'Enviar por email'}
             </Button>
+          </div>
+        </Card>
+      </div>
+
+      {/* DÓNDE ESTAMOS — showroom. Venía de la página /ubicacion, que repetía
+          dirección, horarios y teléfono con un diseño fuera del design system. */}
+      <div ref={mapReveal.ref} className={mapReveal.className}
+           style={{ maxWidth: 1000, margin: 'var(--space-9) auto 0' }}>
+        <div style={{ textAlign: 'center', marginBottom: 'var(--space-6)' }}>
+          <div className="ps-eyebrow" style={{ marginBottom: 'var(--space-2)' }}>Showroom</div>
+          <h2 style={{ fontSize: 'clamp(20px, 4.5vw, 30px)', fontFamily: 'var(--font-display)',
+                       color: 'var(--text-strong)', marginBottom: 'var(--space-2)' }}>
+            Visitanos en persona
+          </h2>
+          <p style={{ fontSize: 15, color: 'var(--text-body)', lineHeight: 1.6 }}>
+            Te esperamos en nuestro local con atención personalizada.
+          </p>
+        </div>
+
+        <Card padding="none" style={{ overflow: 'hidden' }}>
+          <iframe
+            title="Ubicación del local de Playa & Sol Piscinas"
+            src={LOCATION.embedUrl}
+            width="100%"
+            height="360"
+            style={{ border: 0, display: 'block' }}
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          />
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                        gap: 'var(--space-4)', flexWrap: 'wrap', padding: 'var(--space-5)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', minWidth: 0 }}>
+              <span style={{
+                width: 44, height: 44, borderRadius: 'var(--radius-md)', flexShrink: 0,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: 'var(--teal-50)', color: 'var(--brand-primary)',
+              }}>
+                <FiMapPin size={20} />
+              </span>
+              <span>
+                <span style={{ display: 'block', fontSize: 13, color: 'var(--text-muted)', fontWeight: 600 }}>Dirección</span>
+                <span style={{ display: 'block', fontSize: 15, color: 'var(--text-strong)', fontWeight: 700 }}>
+                  {LOCATION.address}
+                </span>
+              </span>
+            </div>
+            <a href={LOCATION.mapsUrl} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>
+              <Button variant="primary" iconLeft={<FiNavigation size={16} />}>Cómo llegar</Button>
+            </a>
           </div>
         </Card>
       </div>

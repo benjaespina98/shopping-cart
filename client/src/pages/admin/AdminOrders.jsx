@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { FiShoppingBag, FiCheck, FiX, FiChevronDown, FiChevronUp, FiTrash2, FiUser } from 'react-icons/fi';
 import { ordersAPI } from '../../services/api';
+import { cldOptimized } from '../../utils/cloudinary';
 import { toast } from 'react-toastify';
 
 const STATUS_LABELS = {
@@ -87,7 +88,7 @@ function OrderRow({ order, onStatusChange, onDelete }) {
               {order.items.map((item, i) => (
                 <div key={i} className="flex items-center gap-3 text-sm">
                   {item.image && (
-                    <img src={item.image} alt={item.name} className="w-8 h-8 rounded-lg object-cover flex-shrink-0" />
+                    <img src={cldOptimized(item.image, 64)} alt={item.name} loading="lazy" decoding="async" className="w-8 h-8 rounded-lg object-cover flex-shrink-0" />
                   )}
                   <span className="font-medium text-slate-700 flex-1">{item.name}</span>
                   <span className="text-slate-400 text-xs">x{item.quantity}</span>

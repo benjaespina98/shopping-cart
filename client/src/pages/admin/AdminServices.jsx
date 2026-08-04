@@ -5,6 +5,7 @@ import {
 } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import { servicesAPI } from '../../services/api';
+import { cldOptimized } from '../../utils/cloudinary';
 
 const TONES = ['teal', 'sun'];
 const VARIANTS = ['soft', 'solid'];
@@ -266,7 +267,7 @@ export default function AdminServices() {
                         {editPreview
                           ? <img src={editPreview} alt="" className="w-full h-full object-cover" />
                           : s.imageUrl
-                            ? <img src={s.imageUrl} alt="" className="w-full h-full object-cover" />
+                            ? <img src={cldOptimized(s.imageUrl, 240)} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
                             : <span>Cambiar foto</span>}
                       </div>
                       <input type="file" accept="image/*" className="hidden" ref={editFileRef} onChange={handleEditFileChange} />
@@ -305,14 +306,14 @@ export default function AdminServices() {
                 <div className="flex items-start gap-4">
                   <div className="w-20 h-16 rounded-lg overflow-hidden bg-slate-100 shrink-0">
                     {s.imageUrl
-                      ? <img src={s.imageUrl} alt={s.title} className="w-full h-full object-cover" />
+                      ? <img src={cldOptimized(s.imageUrl, 240)} alt={s.title} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                       : <div className="w-full h-full flex items-center justify-center text-slate-300"><FiImage size={20} /></div>}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="text-sm font-semibold text-slate-800">{s.title}</p>
                       <span className="text-xs font-bold px-2 py-0.5 rounded-full"
-                            style={{ background: s.tone === 'sun' ? '#FFF4D2' : '#DEEBEF', color: s.tone === 'sun' ? '#946A0B' : '#244B5A' }}>
+                            style={{ background: s.tone === 'sun' ? 'var(--sun-100)' : 'var(--teal-100)', color: s.tone === 'sun' ? 'var(--sun-800)' : 'var(--teal-700)' }}>
                         {s.tag}
                       </span>
                       {!s.active && <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">Oculto</span>}
