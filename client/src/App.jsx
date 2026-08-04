@@ -8,7 +8,6 @@ const Landing = lazy(() => import('./pages/Landing'));
 const Shop = lazy(() => import('./pages/Shop'));
 const About = lazy(() => import('./pages/About'));
 const Contact = lazy(() => import('./pages/Contact'));
-const Location = lazy(() => import('./pages/Location'));
 const Services = lazy(() => import('./pages/Services'));
 const Projects = lazy(() => import('./pages/Projects'));
 const Quote = lazy(() => import('./pages/Quote'));
@@ -26,7 +25,6 @@ const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 const AdminProducts  = lazy(() => import('./pages/admin/AdminProducts'));
 const AdminOrders    = lazy(() => import('./pages/admin/AdminOrders'));
 const AdminQuotes    = lazy(() => import('./pages/admin/AdminQuotes'));
-const AdminMetrics   = lazy(() => import('./pages/admin/AdminMetrics'));
 const AdminSettings  = lazy(() => import('./pages/admin/AdminSettings'));
 const AdminLogs      = lazy(() => import('./pages/admin/AdminLogs'));
 const AdminSite      = lazy(() => import('./pages/admin/AdminSite'));
@@ -54,7 +52,9 @@ export default function App() {
           <Route path="/tienda" element={<Suspense fallback={<PublicFallback />}><Shop /></Suspense>} />
           <Route path="/nosotros" element={<Suspense fallback={<PublicFallback />}><About /></Suspense>} />
           <Route path="/contacto" element={<Suspense fallback={<PublicFallback />}><Contact /></Suspense>} />
-          <Route path="/ubicacion" element={<Suspense fallback={<PublicFallback />}><Location /></Suspense>} />
+          {/* La página de ubicación se fusionó con Contacto (mapa + dirección al pie).
+              La ruta vieja sigue viva para no romper enlaces ya compartidos. */}
+          <Route path="/ubicacion" element={<Navigate to="/contacto" replace />} />
           <Route path="/servicios" element={<Suspense fallback={<PublicFallback />}><Services /></Suspense>} />
           <Route path="/proyectos" element={<Suspense fallback={<PublicFallback />}><Projects /></Suspense>} />
           <Route path="/presupuesto" element={<Suspense fallback={<PublicFallback />}><Quote /></Suspense>} />
@@ -81,7 +81,9 @@ export default function App() {
         <Route path="productos" element={<AdminProducts />} />
         <Route path="pedidos" element={<AdminOrders />} />
         <Route path="presupuestos" element={<AdminQuotes />} />
-        <Route path="metricas" element={<AdminMetrics />} />
+        {/* Métricas mostraba los mismos KPIs que el Dashboard con otro diseño.
+            Quedó todo en Dashboard; la ruta vieja redirige. */}
+        <Route path="metricas" element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="logs" element={<AdminLogs />} />
         <Route path="configuracion" element={<AdminSettings />} />
       </Route>

@@ -1,27 +1,12 @@
-import { useEffect, useState } from 'react';
 import { FaWhatsapp } from 'react-icons/fa';
-import { settingsAPI } from '../../services/api';
-
-const DEFAULT_WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '5493534224605';
+import { useSettings } from '../../context/SettingsContext';
 
 export default function WhatsAppFloat() {
-  const [whatsappNumber, setWhatsappNumber] = useState(DEFAULT_WHATSAPP_NUMBER);
-
-  useEffect(() => {
-    settingsAPI.getPublic()
-      .then(({ data }) => {
-        if (data?.whatsappNumber) {
-          setWhatsappNumber(data.whatsappNumber);
-        }
-      })
-      .catch(() => {
-        // Keep default env number if API is unavailable.
-      });
-  }, []);
+  const { settings } = useSettings();
 
   return (
     <a
-      href={`https://wa.me/${whatsappNumber}`}
+      href={`https://wa.me/${settings.whatsappNumber}`}
       target="_blank"
       rel="noreferrer"
       aria-label="Abrir WhatsApp"

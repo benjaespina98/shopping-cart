@@ -58,7 +58,6 @@ export const authAPI = {
 // ─── Products ────────────────────────────────────────────
 export const productsAPI = {
   getAll: (params) => api.get('/products', { params }),
-  getCategories: () => api.get('/products/categories'),
   getById: (id) => api.get(`/products/${id}`),
   // Admin
   getAllAdmin: (params) => api.get('/products/admin/all', { params }),
@@ -90,18 +89,6 @@ export const ordersAPI = {
 export const metricsAPI = {
   getSummary: () => api.get('/metrics/summary'),
   getOrdersOverTime: (days) => api.get('/metrics/orders-over-time', { params: { days } }),
-  getTopProducts: () => api.get('/metrics/top-products'),
-  getCategoryStats: () => api.get('/metrics/categories'),
-};
-
-// ─── Gallery ─────────────────────────────────────────────
-export const galleryAPI = {
-  getAll: () => api.get('/gallery'),
-  add: (formData) =>
-    api.post('/gallery', formData),
-  update: (id, data) => api.put(`/gallery/${id}`, data),
-  reorder: (items) => api.put('/gallery/reorder', { items }),
-  delete: (id) => api.delete(`/gallery/${id}`),
 };
 
 // ─── Settings ────────────────────────────────────────────
