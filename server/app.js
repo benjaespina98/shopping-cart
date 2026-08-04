@@ -10,7 +10,6 @@ import authRoutes from './routes/authRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import metricsRoutes from './routes/metricsRoutes.js';
-import galleryRoutes from './routes/galleryRoutes.js';
 import settingsRoutes from './routes/settingsRoutes.js';
 import logRoutes from './routes/logRoutes.js';
 import projectRoutes from './routes/projectRoutes.js';
@@ -61,12 +60,34 @@ app.set('trust proxy', 1);
 app.use(helmet());
 app.use(mongoSanitize());
 
-// Global Rate Limiter
-const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 100, // Límite de 100 peticiones por IP por ventana
-  message: 'Demasiadas peticiones desde esta IP, por favor intenta de nuevo en 15 minutos.',
+// Limitador general.
+//
+// Estaba en 100 peticiones cada 15 minutos contando TODOS los métodos. Es muy poco
+// para un sitio de lectura: recorrer inicio, servicios, proyectos y un par de páginas
+// de la tienda ya consume varias decenas, y detrás de una conexión hogareña o de un
+// móvil todos los visitantes comparten la misma IP pública. Al agotarse, el sitio
+// empieza a responder 429 y se ve roto sin ningún motivo.
+//
+// Las lecturas públicas van con un techo alto, y las escrituras (que son las que
+// conviene proteger) conservan un límite estricto aparte.
+const readLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 600,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: 'Demasiadas peticiones desde esta IP. Probá de nuevo en unos minutos.' },
 });
+
+const writeLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: 'Demasiadas peticiones desde esta IP. Probá de nuevo en unos minutos.' },
+});
+
+const apiLimiter = (req, res, next) =>
+  (req.method === 'GET' || req.method === 'HEAD' ? readLimiter : writeLimiter)(req, res, next);
 
 // Login Rate Limiter (stricter)
 const loginLimiter = rateLimit({
@@ -115,7 +136,6 @@ app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/metrics', metricsRoutes);
-app.use('/api/gallery', galleryRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/logs', logRoutes);
 app.use('/api/projects', projectRoutes);
