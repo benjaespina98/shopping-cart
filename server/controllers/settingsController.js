@@ -60,6 +60,9 @@ const toPublicResponse = (settings) => ({
 // GET /api/settings/public
 export const getPublicSettings = asyncHandler(async (req, res) => {
   const settings = await getOrCreateSettings();
+  // SettingsProvider pide esto una vez por visita, en toda página pública — sin caché,
+  // cada visita en frío suma otro cold start + conexión a Mongo a la carga inicial.
+  res.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120');
   res.json(toPublicResponse(settings));
 });
 

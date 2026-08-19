@@ -44,10 +44,24 @@ export const getQuoteRequests = asyncHandler(async (req, res) => {
   res.json(quotes);
 });
 
+const QUOTE_STATUSES = ['new', 'contacted', 'closed'];
+
 // PATCH /api/quotes/:id/status — admin
 export const updateQuoteStatus = asyncHandler(async (req, res) => {
   const { status } = req.body;
-  const quote = await QuoteRequest.findByIdAndUpdate(req.params.id, { status }, { new: true });
+
+  // Igual que en orderController: findByIdAndUpdate no valida contra el enum
+  // del schema por sí solo, así que se chequea a mano antes de escribir.
+  if (!QUOTE_STATUSES.includes(status)) {
+    res.status(400);
+    throw new Error(`Estado inválido. Debe ser uno de: ${QUOTE_STATUSES.join(', ')}`);
+  }
+
+  const quote = await QuoteRequest.findByIdAndUpdate(
+    req.params.id,
+    { status },
+    { new: true, runValidators: true }
+  );
   if (!quote) {
     res.status(404);
     throw new Error('Solicitud no encontrada');

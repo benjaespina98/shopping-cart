@@ -5,6 +5,9 @@ import { cloudinary } from '../config/cloudinary.js';
 // GET /api/services — público (solo activos)
 export const getServices = asyncHandler(async (req, res) => {
   const services = await Service.find({ active: true }).sort({ order: 1, createdAt: 1 });
+  // Mismo motivo que en /api/projects: la home y /servicios usan esto para pintar
+  // fotos, y sin caché cada visita en frío paga cold start + conexión a Mongo.
+  res.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120');
   res.json(services);
 });
 

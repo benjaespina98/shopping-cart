@@ -167,10 +167,26 @@ export const getOrders = asyncHandler(async (req, res) => {
   res.json({ orders, total });
 });
 
+const ORDER_STATUSES = ['whatsapp_sent', 'confirmed', 'cancelled'];
+
 // PATCH /api/orders/:id/status — admin
 export const updateOrderStatus = asyncHandler(async (req, res) => {
   const { status } = req.body;
-  const order = await Order.findByIdAndUpdate(req.params.id, { status }, { new: true });
+
+  // findByIdAndUpdate no corre los validadores del schema salvo que se pidan
+  // explícitamente: sin esto, cualquier string llegaba a la base tal cual y
+  // quedaba un pedido con un estado que las métricas (que comparan contra
+  // 'confirmed'/'cancelled'/'whatsapp_sent') ya no reconocían.
+  if (!ORDER_STATUSES.includes(status)) {
+    res.status(400);
+    throw new Error(`Estado inválido. Debe ser uno de: ${ORDER_STATUSES.join(', ')}`);
+  }
+
+  const order = await Order.findByIdAndUpdate(
+    req.params.id,
+    { status },
+    { new: true, runValidators: true }
+  );
   if (!order) {
     res.status(404);
     throw new Error('Orden no encontrada');
