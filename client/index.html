@@ -2,6 +2,19 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
+    <!-- Arranca los pedidos más urgentes de la portada (proyectos, para saber qué foto
+         va en el hero; settings, para WhatsApp/horarios) apenas el navegador tiene este
+         HTML — antes de que el bundle de React termine de bajar, parsear y montar.
+         React los consume en cuanto arranca (ver src/utils/prefetch.js); si ya no están
+         disponibles (SPA, ruta distinta, o esto falló) cada componente vuelve a pedirlos
+         como antes. En un cold start del backend, esto adelanta el pedido varios cientos
+         de ms — justo el tiempo que la foto del hero se veía como placeholder vacío. -->
+    <script>
+      window.__prefetch = {
+        projects: fetch('/api/projects').then((r) => r.json()).catch(() => null),
+        settings: fetch('/api/settings/public').then((r) => r.json()).catch(() => null),
+      };
+    </script>
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Playa &amp; Sol — Construcción, reforma y mantenimiento de piscinas en Villa María, Córdoba." />

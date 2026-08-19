@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { settingsAPI } from '../services/api';
+import { consumePrefetch } from '../utils/prefetch';
 
 // Un único punto de verdad para los datos de contacto del sitio público.
 //
@@ -49,8 +50,12 @@ export function SettingsProvider({ children }) {
   useEffect(() => {
     let cancelled = false;
 
-    settingsAPI.getPublic()
-      .then(({ data }) => {
+    // Usa el fetch disparado desde index.html si llegó a tiempo (ver
+    // src/utils/prefetch.js); si no hay prefetch o vino vacío, pide como siempre.
+    const prefetched = consumePrefetch('settings');
+    (prefetched ? prefetched : Promise.resolve(null))
+      .then((data) => (data && typeof data === 'object' ? data : settingsAPI.getPublic().then((res) => res.data)))
+      .then((data) => {
         if (!cancelled) setSettings(mergeSettings(data));
       })
       .catch(() => {

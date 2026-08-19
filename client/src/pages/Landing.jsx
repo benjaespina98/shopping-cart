@@ -7,6 +7,7 @@ import CtaBlock from '../components/sections/CtaBlock';
 import { FALLBACK_SERVICES } from '../data/fallbackServices';
 import { useCart } from '../context/CartContext';
 import { useReveal } from '../hooks/useReveal';
+import { consumePrefetch } from '../utils/prefetch';
 import { Button } from '../design-system/Button';
 import { Card } from '../design-system/Card';
 import { Badge } from '../design-system/Badge';
@@ -34,8 +35,13 @@ export default function Landing() {
     productsAPI.getAll({ featured: true, limit: 4 })
       .then(({ data }) => setFeatured(data.products))
       .catch(() => {});
-    projectsAPI.getAll()
-      .then(({ data }) => {
+
+    // Usa el fetch disparado desde index.html si llegó a tiempo (ver
+    // src/utils/prefetch.js); si no hay prefetch o vino vacío, pide como siempre.
+    const prefetched = consumePrefetch('projects');
+    (prefetched ? prefetched : Promise.resolve(null))
+      .then((data) => (Array.isArray(data) ? data : projectsAPI.getAll().then((res) => res.data)))
+      .then((data) => {
         const hero = data.find((p) => p.isHero) || data.find((p) => p.featured) || null;
         setHeroProject(hero);
         setFeaturedProjects(
@@ -43,6 +49,7 @@ export default function Landing() {
         );
       })
       .catch(() => {});
+
     servicesAPI.getAll()
       .then(({ data }) => { if (data?.length > 0) setServices(data.slice(0, 4)); })
       .catch(() => {});
