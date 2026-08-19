@@ -7,6 +7,13 @@ export const getProjects = asyncHandler(async (req, res) => {
   const filter = {};
   if (req.query.featured === 'true') filter.featured = true;
   const projects = await Project.find(filter).sort({ order: 1, createdAt: -1 }).lean();
+
+  // La portada elige la foto del hero a partir de esta respuesta (isHero / featured):
+  // sin cachear, cada visita en frío paga cold start de la función serverless + conexión
+  // a Mongo antes de saber siquiera qué imagen pedirle a Cloudinary. Con esto, sólo la
+  // paga la primera visita cada 60s — el resto lo sirve el borde de Vercel al instante,
+  // igual que ya hacía /api/products.
+  res.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120');
   res.json(projects);
 });
 

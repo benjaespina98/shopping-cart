@@ -198,11 +198,21 @@ export const updateProduct = asyncHandler(async (req, res) => {
 
 // PATCH /api/products/:id/stock — admin
 export const updateStock = asyncHandler(async (req, res) => {
-  const { stock } = req.body;
+  const stockValue = Number(req.body.stock);
+
+  // El panel siempre manda un número >= 0, pero findByIdAndUpdate no corre los
+  // validadores del schema (min: 0) salvo que se pida — así que un stock
+  // negativo llegado por API directa quedaba guardado sin más, y después
+  // rompía la resta atómica de stock en createOrder (que exige $gte: quantity).
+  if (!Number.isFinite(stockValue) || stockValue < 0) {
+    res.status(400);
+    throw new Error('El stock debe ser un número mayor o igual a 0');
+  }
+
   const product = await Product.findByIdAndUpdate(
     req.params.id,
-    { stock: Number(stock) },
-    { new: true }
+    { stock: stockValue },
+    { new: true, runValidators: true }
   );
   if (!product) {
     res.status(404);
