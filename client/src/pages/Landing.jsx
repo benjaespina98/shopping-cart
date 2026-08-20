@@ -12,6 +12,7 @@ import { Button } from '../design-system/Button';
 import { Card } from '../design-system/Card';
 import { Badge } from '../design-system/Badge';
 import { Photo } from '../design-system/Photo';
+import { HERO_BLUR_PLACEHOLDER } from '../data/heroFallback';
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -99,6 +100,10 @@ export default function Landing() {
                 height={460}
                 radius="var(--radius-lg)"
                 src={heroProject?.imageUrl || undefined}
+                // Mientras todavía no llegó la respuesta de /api/projects, muestra una
+                // miniatura borrosa de la foto del hero en vez de la caja lisa color
+                // marca — así nunca se ve "vacío" antes de que aparezca la foto nítida.
+                placeholderDataUrl={!heroProject ? HERO_BLUR_PLACEHOLDER : undefined}
                 priority
                 sizes="(max-width: 767px) calc(100vw - 40px), 540px"
               />
