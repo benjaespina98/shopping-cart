@@ -17,6 +17,11 @@ export function Photo({
   sizes = '100vw',
   className,
   style,
+  // Data URI diminuto (ver src/data/heroFallback.js) que se muestra en vez de la caja
+  // lisa color marca mientras todavía no se sabe qué foto va acá (p.ej. el hero de la
+  // home, antes de que responda GET /api/projects). No pasa por CldImage: ya viene
+  // borroso y no es una URL de Cloudinary, así que no hay nada que optimizar.
+  placeholderDataUrl,
 }) {
   const [hovered, setHovered] = useState(false);
 
@@ -46,6 +51,40 @@ export function Photo({
             width: '100%', height: '100%', objectFit: 'cover', display: 'block',
             transform: zoom && hovered ? 'scale(1.05)' : 'scale(1)',
             transition: 'opacity var(--duration-slow) var(--ease-out), transform var(--duration-normal) var(--ease-out)',
+          }}
+        />
+        {label && (
+          <>
+            <div style={{ position: 'absolute', inset: 0, background: overlayGradient, pointerEvents: 'none' }} />
+            <span style={{
+              position: 'absolute', bottom: 14, left: 16, right: 16,
+              fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 700,
+              letterSpacing: '0.06em', textTransform: 'uppercase',
+              color: 'var(--text-inverse-muted)',
+            }}>{label}</span>
+          </>
+        )}
+      </div>
+    );
+  }
+
+  if (placeholderDataUrl) {
+    const rootClass = ['ps-photo', className].filter(Boolean).join(' ');
+
+    return (
+      <div
+        className={rootClass}
+        style={{ position: 'relative', height, borderRadius: radius, overflow: 'hidden', background: brandGradient, ...style }}
+      >
+        <img
+          src={placeholderDataUrl}
+          alt=""
+          aria-hidden="true"
+          style={{
+            position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover',
+            // Ya viene borrosa desde Cloudinary, pero a 32px estirada al tamaño real
+            // se ve "en bloques" — este blur extra de CSS la suaviza.
+            filter: 'blur(6px)', transform: 'scale(1.1)',
           }}
         />
         {label && (
