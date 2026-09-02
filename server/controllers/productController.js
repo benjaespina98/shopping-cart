@@ -3,6 +3,8 @@ import Product from '../models/Product.js';
 import Category from '../models/Category.js';
 import { cloudinary } from '../config/cloudinary.js';
 import { writeAuditLog } from '../utils/auditLogger.js';
+import { escapeRegExp } from '../utils/regex.js';
+import { toBoolean, parseJsonArray } from '../utils/parsing.js';
 
 // El producto guarda la categoría como texto, no como referencia. Eso funciona (renombrar
 // una categoría propaga el cambio a los productos, y no se puede borrar una en uso),
@@ -17,30 +19,13 @@ const resolveCategoryName = async (rawCategory, res) => {
     throw new Error('La categoría es requerida');
   }
 
-  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const category = await Category.findOne({ name: new RegExp(`^${escaped}$`, 'i') }).lean();
+  const category = await Category.findOne({ name: new RegExp(`^${escapeRegExp(name)}$`, 'i') }).lean();
   if (!category) {
     res.status(400);
     throw new Error(`La categoría "${name}" no existe. Creala primero desde Productos › Categorías.`);
   }
 
   return category.name;
-};
-
-const parseJsonArray = (value, fallback = []) => {
-  if (value === undefined || value === null || value === '') return fallback;
-  if (Array.isArray(value)) return value;
-
-  if (typeof value === 'string') {
-    try {
-      const parsed = JSON.parse(value);
-      return Array.isArray(parsed) ? parsed : fallback;
-    } catch {
-      return fallback;
-    }
-  }
-
-  return fallback;
 };
 
 // GET /api/products — público
@@ -52,7 +37,7 @@ export const getProducts = asyncHandler(async (req, res) => {
   const limitNumber = Math.min(50, Math.max(1, Number(limit) || 20));
 
   if (category) filter.category = category;
-  if (featured === 'true') filter.featured = true;
+  if (toBoolean(featured)) filter.featured = true;
   if (search) filter.$text = { $search: search };
 
   const sortMap = {
@@ -61,7 +46,7 @@ export const getProducts = asyncHandler(async (req, res) => {
     name_asc: { name: 1 },
   };
 
-  const sortQuery = sortMap[sort] || (featured === 'true' ? { featured: -1, createdAt: -1 } : { createdAt: -1 });
+  const sortQuery = sortMap[sort] || (toBoolean(featured) ? { featured: -1, createdAt: -1 } : { createdAt: -1 });
 
   res.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120');
 
@@ -109,7 +94,7 @@ export const createProduct = asyncHandler(async (req, res) => {
       price: Number(price),
       stock: Number(stock),
       category: await resolveCategoryName(category, res),
-      featured: featured === 'true',
+      featured: toBoolean(featured),
       tags: parseJsonArray(tags),
       images,
     });
@@ -161,22 +146,32 @@ export const updateProduct = asyncHandler(async (req, res) => {
     product.images = product.images.filter((img) => !toRemove.includes(img.publicId));
   }
 
-  // Add new images
-  if (req.files?.length > 0) {
-    const newImages = req.files.map((f) => ({ url: f.path, publicId: f.filename }));
+  // Add new images. multer ya las subió a Cloudinary en este punto — si algo más abajo
+  // falla (categoría inexistente, validación del modelo) hay que borrarlas para no dejar
+  // archivos huérfanos, igual que ya se hace en createProduct.
+  const newImages = (req.files || []).map((f) => ({ url: f.path, publicId: f.filename }));
+  if (newImages.length > 0) {
     product.images.push(...newImages);
   }
 
-  if (name !== undefined) product.name = name;
-  if (description !== undefined) product.description = description;
-  if (price !== undefined) product.price = Number(price);
-  if (stock !== undefined) product.stock = Number(stock);
-  if (category !== undefined) product.category = await resolveCategoryName(category, res);
-  if (featured !== undefined) product.featured = featured === 'true';
-  if (active !== undefined) product.active = active === 'true';
-  if (tags !== undefined) product.tags = parseJsonArray(tags);
+  let updated;
+  try {
+    if (name !== undefined) product.name = name;
+    if (description !== undefined) product.description = description;
+    if (price !== undefined) product.price = Number(price);
+    if (stock !== undefined) product.stock = Number(stock);
+    if (category !== undefined) product.category = await resolveCategoryName(category, res);
+    if (featured !== undefined) product.featured = toBoolean(featured);
+    if (active !== undefined) product.active = toBoolean(active);
+    if (tags !== undefined) product.tags = parseJsonArray(tags);
 
-  const updated = await product.save();
+    updated = await product.save();
+  } catch (error) {
+    await Promise.all(
+      newImages.map(({ publicId }) => cloudinary.uploader.destroy(publicId).catch(() => {}))
+    );
+    throw error;
+  }
 
   await writeAuditLog({
     req,

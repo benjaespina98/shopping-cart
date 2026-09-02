@@ -12,14 +12,16 @@ const orderSchema = new mongoose.Schema(
   {
     items: [orderItemSchema],
     total: { type: Number, required: true },
-    customerName: { type: String, default: '' },
-    customerPhone: { type: String, default: '' },
+    // POST /api/orders es público (lo dispara el checkout, sin login) — sin tope, un
+    // request repetido con strings enormes en estos campos infla la colección sin límite.
+    customerName: { type: String, default: '', maxlength: 150 },
+    customerPhone: { type: String, default: '', maxlength: 30 },
     status: {
       type: String,
       enum: ['whatsapp_sent', 'confirmed', 'cancelled'],
       default: 'whatsapp_sent',
     },
-    whatsappMessage: { type: String },
+    whatsappMessage: { type: String, maxlength: 6000 },
   },
   { timestamps: true }
 );

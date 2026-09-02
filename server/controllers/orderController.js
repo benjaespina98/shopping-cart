@@ -156,11 +156,14 @@ export const getOrders = asyncHandler(async (req, res) => {
   const { page = 1, limit = 20, status } = req.query;
   const filter = status ? { status } : {};
 
+  const pageNumber = Math.max(1, Number(page) || 1);
+  const limitNumber = Math.min(100, Math.max(1, Number(limit) || 20));
+
   const total = await Order.countDocuments(filter);
   const orders = await Order.find(filter)
     .sort({ createdAt: -1 })
-    .limit(Number(limit))
-    .skip((Number(page) - 1) * Number(limit))
+    .limit(limitNumber)
+    .skip((pageNumber - 1) * limitNumber)
     .populate('items.product', 'name')
     .lean();
 
