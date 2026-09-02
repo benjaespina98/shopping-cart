@@ -8,9 +8,18 @@ describe('Categories', () => {
   let Product;
   let token;
 
+  let Category;
+
   beforeAll(async () => {
     ({ app, mongod } = await startTestApp());
     ({ default: Product } = await import('../models/Product.js'));
+    ({ default: Category } = await import('../models/Category.js'));
+    // autoIndex está desactivado fuera de development (ver config/db.js) — en el Mongo en
+    // memoria de los tests eso significa que el índice único con collation case-insensitive
+    // del modelo (ver models/Category.js) no se crea solo. Se sincroniza acá a propósito
+    // para poder probar de verdad que ese índice es lo que corta la carrera de nombres
+    // duplicados, no solo el chequeo a nivel app (que una carrera real puede esquivar).
+    await Category.syncIndexes();
   });
 
   beforeEach(async () => {
@@ -45,6 +54,24 @@ describe('Categories', () => {
       .send({ name: 'limpieza' });
 
     expect(res.status).toBe(409);
+  });
+
+  // Regresión del fix: el chequeo previo del controller ("¿ya existe?") es a nivel app, así
+  // que dos requests concurrentes con distinta capitalización pueden pasarlo ambos antes de
+  // que ninguno haya insertado todavía. La defensa real es el índice único con collation
+  // case-insensitive del modelo — sin syncIndexes() en el beforeAll de arriba, este test
+  // fallaría (ambas quedarían creadas) aunque el controller esté "bien".
+  it('el índice único evita que una carrera cree dos categorías que solo difieren en mayúsculas', async () => {
+    const [first, second] = await Promise.all([
+      request(app).post('/api/categories').set('Authorization', `Bearer ${token}`).send({ name: 'Repuestos' }),
+      request(app).post('/api/categories').set('Authorization', `Bearer ${token}`).send({ name: 'REPUESTOS' }),
+    ]);
+
+    const statuses = [first.status, second.status].sort();
+    expect(statuses).toEqual([201, 409]);
+
+    const count = await Category.countDocuments({ name: /^repuestos$/i });
+    expect(count).toBe(1);
   });
 
   it('renombrar una categoría propaga el cambio a los productos que la usan', async () => {
