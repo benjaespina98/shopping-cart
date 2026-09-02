@@ -56,6 +56,7 @@ function OrderRow({ order, onStatusChange, onDelete }) {
               <button
                 onClick={() => onStatusChange(order._id, 'confirmed')}
                 title="Marcar como confirmado"
+                aria-label="Marcar pedido como confirmado"
                 className="p-2 rounded-lg hover:bg-green-50 text-slate-400 hover:text-green-500 transition-colors"
               >
                 <FiCheck size={15} />
@@ -65,6 +66,7 @@ function OrderRow({ order, onStatusChange, onDelete }) {
               <button
                 onClick={() => onStatusChange(order._id, 'cancelled')}
                 title="Cancelar pedido"
+                aria-label="Cancelar pedido"
                 className="p-2 rounded-lg hover:bg-amber-50 text-slate-400 hover:text-amber-600 transition-colors"
               >
                 <FiX size={15} />
@@ -73,6 +75,7 @@ function OrderRow({ order, onStatusChange, onDelete }) {
             <button
               onClick={() => onDelete(order._id)}
               title="Eliminar pedido"
+              aria-label="Eliminar pedido"
               className="p-2 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors"
             >
               <FiTrash2 size={14} />

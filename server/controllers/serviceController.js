@@ -1,6 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import Service from '../models/Service.js';
 import { cloudinary } from '../config/cloudinary.js';
+import { toBoolean, parseJsonArray } from '../utils/parsing.js';
 
 // GET /api/services — público (solo activos)
 export const getServices = asyncHandler(async (req, res) => {
@@ -25,23 +26,15 @@ export const createService = asyncHandler(async (req, res) => {
     throw new Error('title, tag y description son requeridos');
   }
   const count = await Service.countDocuments();
-  let parsedBullets = [];
-  if (bullets) {
-    try {
-      parsedBullets = JSON.parse(bullets);
-    } catch {
-      parsedBullets = String(bullets).split(',').map((b) => b.trim()).filter(Boolean);
-    }
-  }
   const service = await Service.create({
     title,
     tag,
     description,
-    bullets: parsedBullets,
+    bullets: parseJsonArray(bullets),
     tone: tone || 'teal',
     variant: variant || 'soft',
     cta: cta || 'Solicitar presupuesto',
-    active: active === 'true' || active === true || active === undefined,
+    active: toBoolean(active, true),
     imageUrl: req.file?.path || '',
     publicId: req.file?.filename || '',
     order: count,
@@ -64,14 +57,8 @@ export const updateService = asyncHandler(async (req, res) => {
   if (tone !== undefined)        service.tone        = tone;
   if (variant !== undefined)     service.variant     = variant;
   if (cta !== undefined)         service.cta         = cta;
-  if (active !== undefined)      service.active      = active === 'true' || active === true;
-  if (bullets !== undefined) {
-    try {
-      service.bullets = JSON.parse(bullets);
-    } catch {
-      service.bullets = String(bullets).split(',').map((b) => b.trim()).filter(Boolean);
-    }
-  }
+  if (active !== undefined)      service.active      = toBoolean(active);
+  if (bullets !== undefined)     service.bullets     = parseJsonArray(bullets);
 
   if (req.file) {
     if (service.publicId) {

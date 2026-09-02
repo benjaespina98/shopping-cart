@@ -5,7 +5,7 @@ import helmet from 'helmet';
 import mongoSanitize from 'express-mongo-sanitize';
 import rateLimit from 'express-rate-limit';
 import { connectDB } from './config/db.js';
-import { loadServerEnv } from './config/env.js';
+import { loadServerEnv, assertRequiredEnv } from './config/env.js';
 import authRoutes from './routes/authRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
@@ -18,6 +18,7 @@ import quoteRoutes from './routes/quoteRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
 
 loadServerEnv();
+assertRequiredEnv();
 
 const app = express();
 
@@ -164,6 +165,22 @@ app.use((err, req, res, next) => {
     } else if (err.code === 'LIMIT_FILE_COUNT') {
       message = 'Se superó la cantidad máxima de imágenes permitidas.';
     }
+  } else if (err.name === 'CastError') {
+    // ID con formato inválido (ej. un ObjectId malformado en /api/recurso/:id).
+    // Sin este mapeo, Mongoose tira una excepción que caía al 500 genérico.
+    statusCode = 400;
+    message = 'Identificador inválido.';
+  } else if (err.name === 'ValidationError') {
+    // Falla de validación de un schema de Mongoose (ej. password corta, campo requerido).
+    statusCode = 400;
+    message = Object.values(err.errors || {})
+      .map((e) => e.message)
+      .join(' ') || message;
+  } else if (err.code === 11000) {
+    // Choque de índice único (ej. dos categorías con el mismo nombre en una carrera).
+    statusCode = 409;
+    const field = Object.keys(err.keyValue || {})[0];
+    message = field ? `Ya existe un registro con ese ${field}.` : 'El recurso ya existe.';
   }
 
   res.status(statusCode).json({

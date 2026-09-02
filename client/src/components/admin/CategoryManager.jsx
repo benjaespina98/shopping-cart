@@ -124,10 +124,12 @@ export default function CategoryManager({ categories, loading, onChanged }) {
                   <>
                     <span className="flex-1 font-medium text-slate-800">{cat.name}</span>
                     <button onClick={() => beginEdit(cat)}
+                      aria-label={`Renombrar "${cat.name}"`}
                       className="p-2 rounded-lg hover:bg-brand-light text-slate-500 hover:text-brand transition-colors" title="Renombrar">
                       <FiEdit2 size={15} />
                     </button>
                     <button onClick={() => handleDelete(cat)} disabled={deletingId === cat._id}
+                      aria-label={`Eliminar "${cat.name}"`}
                       className="p-2 rounded-lg hover:bg-red-50 text-slate-500 hover:text-red-500 transition-colors disabled:opacity-50" title="Eliminar">
                       <FiTrash2 size={15} />
                     </button>

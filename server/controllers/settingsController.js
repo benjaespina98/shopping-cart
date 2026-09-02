@@ -197,6 +197,42 @@ export const createUser = asyncHandler(async (req, res) => {
   });
 });
 
+// PUT /api/settings/users/me/password — el propio admin cambia su contraseña.
+// No había ninguna forma de rotarla: un token filtrado quedaba válido hasta que expirara
+// (hasta 7 días, ver JWT_EXPIRES_IN) sin que el dueño pudiera invalidarlo cambiando la clave.
+export const changeOwnPassword = asyncHandler(async (req, res) => {
+  const currentPassword = String(req.body?.currentPassword || '');
+  const newPassword = String(req.body?.newPassword || '');
+
+  if (!currentPassword || !newPassword) {
+    res.status(400);
+    throw new Error('La contraseña actual y la nueva son requeridas');
+  }
+  if (newPassword.length < 6) {
+    res.status(400);
+    throw new Error('La nueva contraseña debe tener al menos 6 caracteres');
+  }
+
+  const user = await User.findById(req.user._id);
+  if (!user || !(await user.matchPassword(currentPassword))) {
+    res.status(401);
+    throw new Error('La contraseña actual es incorrecta');
+  }
+
+  user.password = newPassword;
+  await user.save();
+
+  await writeAuditLog({
+    req,
+    action: 'ADMIN_PASSWORD_CHANGED',
+    entity: 'user',
+    entityId: user._id,
+    message: `Contraseña actualizada: ${user.email}`,
+  });
+
+  res.json({ message: 'Contraseña actualizada correctamente' });
+});
+
 // DELETE /api/settings/users/:id
 export const deleteUser = asyncHandler(async (req, res) => {
   const targetId = String(req.params.id || '');

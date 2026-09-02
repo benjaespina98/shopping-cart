@@ -28,6 +28,24 @@ export const getRuntimeEnv = () => {
   return 'development';
 };
 
+// JWT_SECRET y las credenciales de Cloudinary se leen directamente de process.env en cada
+// controller que los usa (authController, config/cloudinary.js), sin ningún chequeo previo.
+// Si faltan, el servidor arranca igual y recién se entera en el primer login o la primera
+// subida de imagen — con un 401/500 opaco que no dice qué variable falta. Se valida solo en
+// producción/preview (deploys reales) para no romper un desarrollo local que todavía no
+// configuró Cloudinary, o los tests, que no usan estas integraciones.
+const REQUIRED_IN_DEPLOY = ['JWT_SECRET', 'CLOUDINARY_CLOUD_NAME', 'CLOUDINARY_API_KEY', 'CLOUDINARY_API_SECRET'];
+
+export const assertRequiredEnv = () => {
+  const runtimeEnv = getRuntimeEnv();
+  if (runtimeEnv !== 'production' && runtimeEnv !== 'preview') return;
+
+  const missing = REQUIRED_IN_DEPLOY.filter((key) => !process.env[key]);
+  if (missing.length > 0) {
+    throw new Error(`Faltan variables de entorno requeridas en ${runtimeEnv}: ${missing.join(', ')}`);
+  }
+};
+
 export const resolveMongoConnection = () => {
   const runtimeEnv = getRuntimeEnv();
 

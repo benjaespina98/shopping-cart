@@ -1,5 +1,6 @@
 import asyncHandler from 'express-async-handler';
 import AuditLog from '../models/AuditLog.js';
+import { escapeRegExp } from '../utils/regex.js';
 
 // GET /api/logs — admin
 export const getAuditLogs = asyncHandler(async (req, res) => {
@@ -13,7 +14,7 @@ export const getAuditLogs = asyncHandler(async (req, res) => {
   if (entity) filter.entity = String(entity);
 
   if (search) {
-    const regex = new RegExp(String(search), 'i');
+    const regex = new RegExp(escapeRegExp(search), 'i');
     filter.$or = [
       { message: regex },
       { entityId: regex },

@@ -102,6 +102,7 @@ export const settingsAPI = {
     api.post('/settings/about-photo', formData),
   getUsers: () => api.get('/settings/users'),
   createUser: (data) => api.post('/settings/users', data),
+  changeOwnPassword: (data) => api.put('/settings/users/me/password', data),
   deleteUser: (id) => api.delete(`/settings/users/${id}`),
 };
 

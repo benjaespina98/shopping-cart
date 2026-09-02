@@ -1,11 +1,12 @@
 import asyncHandler from 'express-async-handler';
 import Project from '../models/Project.js';
 import { cloudinary } from '../config/cloudinary.js';
+import { toBoolean } from '../utils/parsing.js';
 
 // GET /api/projects — público
 export const getProjects = asyncHandler(async (req, res) => {
   const filter = {};
-  if (req.query.featured === 'true') filter.featured = true;
+  if (toBoolean(req.query.featured)) filter.featured = true;
   const projects = await Project.find(filter).sort({ order: 1, createdAt: -1 }).lean();
 
   // La portada elige la foto del hero a partir de esta respuesta (isHero / featured):
@@ -25,14 +26,14 @@ export const createProject = asyncHandler(async (req, res) => {
     throw new Error('title y location son requeridos');
   }
   const count = await Project.countDocuments();
-  const wantsHero = isHero === 'true' || isHero === true;
+  const wantsHero = toBoolean(isHero);
   if (wantsHero) {
     await Project.updateMany({ isHero: true }, { isHero: false });
   }
   const project = await Project.create({
     title,
     location,
-    featured: featured === 'true' || featured === true,
+    featured: toBoolean(featured),
     isHero: wantsHero,
     imageUrl: req.file?.path || '',
     publicId: req.file?.filename || '',
@@ -52,9 +53,9 @@ export const updateProject = asyncHandler(async (req, res) => {
   const { title, location, featured, isHero } = req.body;
   if (title !== undefined)    project.title    = title;
   if (location !== undefined) project.location = location;
-  if (featured !== undefined) project.featured = featured === 'true' || featured === true;
+  if (featured !== undefined) project.featured = toBoolean(featured);
   if (isHero !== undefined) {
-    const wantsHero = isHero === 'true' || isHero === true;
+    const wantsHero = toBoolean(isHero);
     if (wantsHero) {
       await Project.updateMany({ _id: { $ne: project._id }, isHero: true }, { isHero: false });
     }

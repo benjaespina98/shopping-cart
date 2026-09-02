@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import {
   FiUpload, FiTrash2, FiEdit2, FiCheck, FiX, FiImage,
   FiStar, FiArrowUp, FiArrowDown, FiHome,
@@ -6,6 +6,8 @@ import {
 import { toast } from 'react-toastify';
 import { projectsAPI } from '../../services/api';
 import { cldOptimized } from '../../utils/cloudinary';
+import { useImagePicker } from '../../hooks/useImagePicker';
+import { useReorderableList } from '../../hooks/useReorderableList';
 
 const emptyForm = { title: '', location: '', featured: false, isHero: false };
 
@@ -16,16 +18,15 @@ export default function AdminSite() {
 
   // Upload / create form
   const [form, setForm] = useState(emptyForm);
-  const [file, setFile] = useState(null);
-  const [preview, setPreview] = useState(null);
-  const fileRef = useRef();
+  const { file, preview, inputRef: fileRef, handleFileChange, reset: resetFile } = useImagePicker();
 
   // Edit state
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState(emptyForm);
-  const [editFile, setEditFile] = useState(null);
-  const [editPreview, setEditPreview] = useState(null);
-  const editFileRef = useRef();
+  const {
+    file: editFile, preview: editPreview, inputRef: editFileRef,
+    handleFileChange: handleEditFileChange, reset: resetEditFile,
+  } = useImagePicker();
 
   const load = async () => {
     try {
@@ -40,14 +41,14 @@ export default function AdminSite() {
 
   useEffect(() => { load(); }, []);
 
-  // ── Create ──────────────────────────────────────────────
+  const { reordering, handleMove } = useReorderableList({
+    // Envuelto en una función en vez de pasar projectsAPI.reorder directo: así la lectura
+    // de esa propiedad queda diferida a cuando realmente se llama (como en el resto del
+    // archivo, que solo toca projectsAPI dentro de handlers), no en cada render.
+    items: projects, setItems: setProjects, reorderApi: (payload) => projectsAPI.reorder(payload), reload: load,
+  });
 
-  const handleFileChange = (e) => {
-    const f = e.target.files[0];
-    if (!f) return;
-    setFile(f);
-    setPreview(URL.createObjectURL(f));
-  };
+  // ── Create ──────────────────────────────────────────────
 
   const handleCreate = async (e) => {
     e.preventDefault();
@@ -65,9 +66,7 @@ export default function AdminSite() {
       if (file) fd.append('image', file);
       await projectsAPI.create(fd);
       setForm(emptyForm);
-      setFile(null);
-      setPreview(null);
-      if (fileRef.current) fileRef.current.value = '';
+      resetFile();
       await load();
       toast.success('Proyecto agregado.');
     } catch (err) {
@@ -84,21 +83,12 @@ export default function AdminSite() {
     setEditForm({
       title: p.title, location: p.location, featured: p.featured, isHero: !!p.isHero,
     });
-    setEditFile(null);
-    setEditPreview(null);
+    resetEditFile();
   };
 
   const cancelEdit = () => {
     setEditingId(null);
-    setEditFile(null);
-    setEditPreview(null);
-  };
-
-  const handleEditFileChange = (e) => {
-    const f = e.target.files[0];
-    if (!f) return;
-    setEditFile(f);
-    setEditPreview(URL.createObjectURL(f));
+    resetEditFile();
   };
 
   const saveEdit = async (id) => {
@@ -154,23 +144,6 @@ export default function AdminSite() {
       toast.success('Proyecto eliminado.');
     } catch {
       toast.error('Error al eliminar el proyecto.');
-    }
-  };
-
-  // ── Reorder ─────────────────────────────────────────────
-
-  const handleMove = async (index, dir) => {
-    const next = [...projects];
-    const swapIdx = index + dir;
-    if (swapIdx < 0 || swapIdx >= next.length) return;
-    [next[index], next[swapIdx]] = [next[swapIdx], next[index]];
-    const updated = next.map((p, i) => ({ ...p, order: i }));
-    setProjects(updated);
-    try {
-      await projectsAPI.reorder(updated.map(({ _id, order }) => ({ id: _id, order })));
-    } catch {
-      toast.error('Error al reordenar.');
-      await load();
     }
   };
 
@@ -274,11 +247,13 @@ export default function AdminSite() {
                   )}
                 </div>
                 <div className="absolute top-2 right-2 flex gap-1">
-                  <button onClick={() => handleMove(index, -1)} disabled={index === 0}
+                  <button onClick={() => handleMove(index, -1)} disabled={index === 0 || reordering}
+                    title="Subir" aria-label={`Mover "${p.title}" hacia arriba`}
                     className="p-1.5 rounded-lg bg-white/90 hover:bg-white text-slate-600 disabled:opacity-30 shadow-sm transition-colors">
                     <FiArrowUp size={14} />
                   </button>
-                  <button onClick={() => handleMove(index, 1)} disabled={index === projects.length - 1}
+                  <button onClick={() => handleMove(index, 1)} disabled={index === projects.length - 1 || reordering}
+                    title="Bajar" aria-label={`Mover "${p.title}" hacia abajo`}
                     className="p-1.5 rounded-lg bg-white/90 hover:bg-white text-slate-600 disabled:opacity-30 shadow-sm transition-colors">
                     <FiArrowDown size={14} />
                   </button>
@@ -336,11 +311,13 @@ export default function AdminSite() {
                       </button>
                       {!p.isHero && (
                         <button onClick={() => setAsHero(p)} title="Usar como foto principal"
+                          aria-label={`Usar "${p.title}" como foto principal`}
                           className="px-3 py-2 rounded-lg border border-slate-200 text-slate-500 hover:border-primary-700 hover:text-primary-700 hover:bg-primary-50 transition-colors">
                           <FiHome size={14} />
                         </button>
                       )}
                       <button onClick={() => handleDelete(p._id)} title="Eliminar"
+                        aria-label={`Eliminar "${p.title}"`}
                         className="px-3 py-2 rounded-lg border border-slate-200 text-slate-500 hover:border-red-300 hover:text-red-500 hover:bg-red-50 transition-colors">
                         <FiTrash2 size={14} />
                       </button>

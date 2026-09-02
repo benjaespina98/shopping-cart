@@ -1,6 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import Category from '../models/Category.js';
 import Product from '../models/Product.js';
+import { escapeRegExp } from '../utils/regex.js';
 
 // Siembra la colección de categorías a partir de las categorías ya usadas por los
 // productos, la primera vez que se consulta y todavía no hay ninguna. Idempotente:
@@ -89,7 +90,3 @@ export const deleteCategory = asyncHandler(async (req, res) => {
   await category.deleteOne();
   res.json({ message: 'Categoría eliminada' });
 });
-
-function escapeRegExp(str) {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}

@@ -152,6 +152,7 @@ export default function CartDrawer() {
                       <button
                         onClick={() => updateQty(item.productId, item.quantity - 1)}
                         disabled={item.quantity <= 1}
+                        aria-label={`Restar unidad de ${item.name}`}
                         className="px-2 py-1 hover:bg-slate-100 transition-colors text-slate-600 disabled:opacity-40 disabled:cursor-not-allowed"
                       >
                         <FiMinus size={11} />
@@ -160,6 +161,7 @@ export default function CartDrawer() {
                       <button
                         onClick={() => updateQty(item.productId, item.quantity + 1)}
                         disabled={item.quantity >= item.stock}
+                        aria-label={`Sumar unidad de ${item.name}`}
                         className="px-2 py-1 hover:bg-slate-100 transition-colors text-slate-600 disabled:opacity-40 disabled:cursor-not-allowed"
                       >
                         <FiPlus size={11} />
@@ -167,6 +169,7 @@ export default function CartDrawer() {
                     </div>
                     <button
                       onClick={() => removeItem(item.productId)}
+                      aria-label={`Quitar ${item.name} del carrito`}
                       className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                     >
                       <FiTrash2 size={14} />
