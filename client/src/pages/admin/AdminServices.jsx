@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import {
   FiUpload, FiTrash2, FiEdit2, FiCheck, FiX, FiImage,
   FiArrowUp, FiArrowDown, FiEyeOff, FiEye,
@@ -6,6 +6,8 @@ import {
 import { toast } from 'react-toastify';
 import { servicesAPI } from '../../services/api';
 import { cldOptimized } from '../../utils/cloudinary';
+import { useImagePicker } from '../../hooks/useImagePicker';
+import { useReorderableList } from '../../hooks/useReorderableList';
 
 const TONES = ['teal', 'sun'];
 const VARIANTS = ['soft', 'solid'];
@@ -18,15 +20,14 @@ export default function AdminServices() {
   const [uploading, setUploading] = useState(false);
 
   const [form, setForm] = useState(emptyForm);
-  const [file, setFile] = useState(null);
-  const [preview, setPreview] = useState(null);
-  const fileRef = useRef();
+  const { file, preview, inputRef: fileRef, handleFileChange, reset: resetFile } = useImagePicker();
 
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState(emptyForm);
-  const [editFile, setEditFile] = useState(null);
-  const [editPreview, setEditPreview] = useState(null);
-  const editFileRef = useRef();
+  const {
+    file: editFile, preview: editPreview, inputRef: editFileRef,
+    handleFileChange: handleEditFileChange, reset: resetEditFile,
+  } = useImagePicker();
 
   const load = async () => {
     try {
@@ -41,12 +42,11 @@ export default function AdminServices() {
 
   useEffect(() => { load(); }, []);
 
-  const handleFileChange = (e) => {
-    const f = e.target.files[0];
-    if (!f) return;
-    setFile(f);
-    setPreview(URL.createObjectURL(f));
-  };
+  const { reordering, handleMove } = useReorderableList({
+    // Ver comentario equivalente en AdminSite.jsx: se difiere la lectura de
+    // servicesAPI.reorder a cuando se llama, no en cada render.
+    items: services, setItems: setServices, reorderApi: (payload) => servicesAPI.reorder(payload), reload: load,
+  });
 
   const handleCreate = async (e) => {
     e.preventDefault();
@@ -69,9 +69,7 @@ export default function AdminServices() {
       if (file) fd.append('image', file);
       await servicesAPI.create(fd);
       setForm(emptyForm);
-      setFile(null);
-      setPreview(null);
-      if (fileRef.current) fileRef.current.value = '';
+      resetFile();
       await load();
       toast.success('Servicio agregado.');
     } catch (err) {
@@ -88,21 +86,12 @@ export default function AdminServices() {
       bullets: (s.bullets || []).join(', '), tone: s.tone, variant: s.variant,
       cta: s.cta || '', active: s.active,
     });
-    setEditFile(null);
-    setEditPreview(null);
+    resetEditFile();
   };
 
   const cancelEdit = () => {
     setEditingId(null);
-    setEditFile(null);
-    setEditPreview(null);
-  };
-
-  const handleEditFileChange = (e) => {
-    const f = e.target.files[0];
-    if (!f) return;
-    setEditFile(f);
-    setEditPreview(URL.createObjectURL(f));
+    resetEditFile();
   };
 
   const saveEdit = async (id) => {
@@ -151,21 +140,6 @@ export default function AdminServices() {
       toast.success(data.active ? 'Servicio visible en la web' : 'Servicio oculto de la web');
     } catch {
       toast.error('Error al actualizar el servicio.');
-    }
-  };
-
-  const handleMove = async (index, dir) => {
-    const next = [...services];
-    const swapIdx = index + dir;
-    if (swapIdx < 0 || swapIdx >= next.length) return;
-    [next[index], next[swapIdx]] = [next[swapIdx], next[index]];
-    const updated = next.map((s, i) => ({ ...s, order: i }));
-    setServices(updated);
-    try {
-      await servicesAPI.reorder(updated.map(({ _id, order }) => ({ id: _id, order })));
-    } catch {
-      toast.error('Error al reordenar.');
-      await load();
     }
   };
 
@@ -325,19 +299,23 @@ export default function AdminServices() {
                   </div>
                   <div className="flex flex-col gap-2 shrink-0 items-end">
                     <div className="flex gap-1">
-                      <button onClick={() => handleMove(index, -1)} disabled={index === 0} title="Subir"
+                      <button onClick={() => handleMove(index, -1)} disabled={index === 0 || reordering} title="Subir"
+                        aria-label={`Mover "${s.title}" hacia arriba`}
                         className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 disabled:opacity-30 transition-colors">
                         <FiArrowUp size={14} />
                       </button>
-                      <button onClick={() => handleMove(index, 1)} disabled={index === services.length - 1} title="Bajar"
+                      <button onClick={() => handleMove(index, 1)} disabled={index === services.length - 1 || reordering} title="Bajar"
+                        aria-label={`Mover "${s.title}" hacia abajo`}
                         className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 disabled:opacity-30 transition-colors">
                         <FiArrowDown size={14} />
                       </button>
                       <button onClick={() => toggleActive(s)} title={s.active ? 'Ocultar de la web' : 'Mostrar en la web'}
+                        aria-label={s.active ? `Ocultar "${s.title}" de la web` : `Mostrar "${s.title}" en la web`}
                         className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors">
                         {s.active ? <FiEye size={14} /> : <FiEyeOff size={14} />}
                       </button>
                       <button onClick={() => handleDelete(s._id)} title="Eliminar"
+                        aria-label={`Eliminar "${s.title}"`}
                         className="p-1.5 rounded-lg hover:bg-red-50 text-slate-500 hover:text-red-500 transition-colors">
                         <FiTrash2 size={14} />
                       </button>
