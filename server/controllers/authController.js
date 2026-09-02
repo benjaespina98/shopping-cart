@@ -46,6 +46,6 @@ export const login = asyncHandler(async (req, res) => {
 
 // GET /api/auth/me
 export const getMe = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user._id).select('-password');
-  res.json(user);
+  // `protect` ya cargó req.user sin password; no hace falta repetir la query.
+  res.json(req.user);
 });

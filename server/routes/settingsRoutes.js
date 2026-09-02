@@ -9,6 +9,7 @@ import {
   uploadAboutPhoto,
   getUsers,
   createUser,
+  changeOwnPassword,
   deleteUser,
 } from '../controllers/settingsController.js';
 
@@ -23,6 +24,7 @@ router.post('/about-photo', protect, adminOnly, uploadSettings.single('image'), 
 
 router.get('/users', protect, adminOnly, getUsers);
 router.post('/users', protect, adminOnly, createUser);
+router.put('/users/me/password', protect, adminOnly, changeOwnPassword);
 router.delete('/users/:id', protect, adminOnly, deleteUser);
 
 export default router;

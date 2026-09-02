@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { FiSave, FiPlus, FiTrash2, FiUsers, FiClock, FiMail, FiUserMinus, FiDownload, FiLink, FiDroplet, FiImage, FiUpload, FiCheckCircle, FiX, FiEye, FiEyeOff, FiCheck, FiExternalLink } from 'react-icons/fi';
+import { FiSave, FiPlus, FiTrash2, FiUsers, FiClock, FiMail, FiUserMinus, FiDownload, FiLink, FiDroplet, FiImage, FiUpload, FiCheckCircle, FiX, FiEye, FiEyeOff, FiCheck, FiExternalLink, FiLock } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import QRCode from 'qrcode';
 import { settingsAPI } from '../../services/api';
@@ -108,6 +108,9 @@ export default function AdminSettings() {
   const [creatingUser, setCreatingUser] = useState(false);
   const [newUser, setNewUser] = useState({ name: '', email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
   const [siteUrl, setSiteUrl] = useState(typeof window !== 'undefined' ? window.location.origin : '');
   const [qrDataUrl, setQrDataUrl] = useState('');
   const contactPhotoInputRef = useRef();
@@ -255,6 +258,28 @@ export default function AdminSettings() {
       toast.error(error?.response?.data?.message || 'No se pudo crear el usuario');
     } finally {
       setCreatingUser(false);
+    }
+  };
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      toast.error('La nueva contraseña y su confirmación no coinciden');
+      return;
+    }
+    setChangingPassword(true);
+    try {
+      await settingsAPI.changeOwnPassword({
+        currentPassword: passwordForm.currentPassword,
+        newPassword: passwordForm.newPassword,
+      });
+      setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      setShowPasswordForm(false);
+      toast.success('Contraseña actualizada correctamente');
+    } catch (error) {
+      toast.error(error?.response?.data?.message || 'No se pudo actualizar la contraseña');
+    } finally {
+      setChangingPassword(false);
     }
   };
 
@@ -530,6 +555,63 @@ export default function AdminSettings() {
               </div>
             </div>
           ))}
+        </div>
+
+        <div className="border-t border-slate-100 pt-4 mb-5">
+          <button
+            type="button"
+            onClick={() => setShowPasswordForm((v) => !v)}
+            className="inline-flex items-center gap-2 text-sm font-semibold text-primary-700 hover:text-primary-800"
+          >
+            <FiLock size={14} /> Cambiar mi contraseña
+          </button>
+          {showPasswordForm && (
+            <form onSubmit={handleChangePassword} className="grid sm:grid-cols-3 gap-3 items-end mt-3">
+              <div>
+                <label className="label">Contraseña actual</label>
+                <input
+                  className="input"
+                  type="password"
+                  required
+                  value={passwordForm.currentPassword}
+                  onChange={(e) => setPasswordForm((prev) => ({ ...prev, currentPassword: e.target.value }))}
+                />
+              </div>
+              <div>
+                <label className="label">Nueva contraseña</label>
+                <input
+                  className="input"
+                  type="password"
+                  required
+                  minLength={6}
+                  value={passwordForm.newPassword}
+                  onChange={(e) => setPasswordForm((prev) => ({ ...prev, newPassword: e.target.value }))}
+                  placeholder="Mínimo 6 caracteres"
+                />
+              </div>
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <label className="label">Confirmar nueva</label>
+                  <input
+                    className="input"
+                    type="password"
+                    required
+                    minLength={6}
+                    value={passwordForm.confirmPassword}
+                    onChange={(e) => setPasswordForm((prev) => ({ ...prev, confirmPassword: e.target.value }))}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={changingPassword}
+                  className="btn-primary shrink-0 disabled:opacity-50"
+                  style={{ marginBottom: 1 }}
+                >
+                  {changingPassword ? 'Guardando...' : 'Guardar'}
+                </button>
+              </div>
+            </form>
+          )}
         </div>
 
         <form onSubmit={handleCreateUser} className="border-t border-slate-100 pt-4 grid sm:grid-cols-3 gap-3 items-end">
