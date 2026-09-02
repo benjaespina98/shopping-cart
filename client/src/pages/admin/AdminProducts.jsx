@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useRef } from 'react';
+import { useEffect, useId, useMemo, useState, useRef } from 'react';
 import { FiPlus, FiEdit2, FiTrash2, FiX, FiUpload, FiCheck, FiAlertCircle, FiSave, FiSearch, FiPackage, FiTag } from 'react-icons/fi';
 import { productsAPI, categoriesAPI } from '../../services/api';
 import CategoryManager from '../../components/admin/CategoryManager';
@@ -31,6 +31,11 @@ function ProductModal({ product, categories, onClose, onSaved }) {
   const categoryOptions = Array.from(
     new Set([...(categories || []), product?.category].filter(Boolean))
   );
+  // Los <label> de este form eran texto suelto sin htmlFor/id: se leían visualmente pero un
+  // lector de pantalla (o un test que consulta por label, como corresponde) no podía asociarlos
+  // con su input. useId() da un prefijo único aunque el modal se monte varias veces.
+  const uid = useId();
+  const fieldId = (name) => `${uid}-${name}`;
   const [form, setForm] = useState(
     product
       ? { ...product, tags: product.tags?.join(', ') || '', featured: product.featured, active: product.active }
@@ -107,20 +112,20 @@ function ProductModal({ product, categories, onClose, onSaved }) {
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2">
-              <label className="label">Nombre *</label>
-              <input className="input" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required placeholder="Nombre del producto" />
+              <label className="label" htmlFor={fieldId('name')}>Nombre *</label>
+              <input id={fieldId('name')} className="input" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required placeholder="Nombre del producto" />
             </div>
             <div>
-              <label className="label">Precio *</label>
-              <input type="number" min="0" step="0.01" className="input" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} required placeholder="0.00" />
+              <label className="label" htmlFor={fieldId('price')}>Precio *</label>
+              <input id={fieldId('price')} type="number" min="0" step="0.01" className="input" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} required placeholder="0.00" />
             </div>
             <div>
-              <label className="label">Stock *</label>
-              <input type="number" min="0" className="input" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} required placeholder="0" />
+              <label className="label" htmlFor={fieldId('stock')}>Stock *</label>
+              <input id={fieldId('stock')} type="number" min="0" className="input" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} required placeholder="0" />
             </div>
             <div className="col-span-2">
-              <label className="label">Categoría *</label>
-              <select className="input" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} required>
+              <label className="label" htmlFor={fieldId('category')}>Categoría *</label>
+              <select id={fieldId('category')} className="input" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} required>
                 <option value="">Seleccionar categoría...</option>
                 {categoryOptions.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
@@ -129,12 +134,12 @@ function ProductModal({ product, categories, onClose, onSaved }) {
               )}
             </div>
             <div className="col-span-2">
-              <label className="label">Descripción</label>
-              <textarea className="input resize-none" rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Descripción del producto..." />
+              <label className="label" htmlFor={fieldId('description')}>Descripción</label>
+              <textarea id={fieldId('description')} className="input resize-none" rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Descripción del producto..." />
             </div>
             <div className="col-span-2">
-              <label className="label">Tags (separados por coma)</label>
-              <input className="input" value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} placeholder="oferta, nuevo, destacado" />
+              <label className="label" htmlFor={fieldId('tags')}>Tags (separados por coma)</label>
+              <input id={fieldId('tags')} className="input" value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} placeholder="oferta, nuevo, destacado" />
             </div>
           </div>
 
@@ -494,6 +499,7 @@ export default function AdminProducts() {
                             onClick={() => beginStockEdit(p)}
                             className="p-2 rounded-lg bg-slate-100 text-slate-500 hover:bg-slate-200 transition-colors"
                             title="Editar stock"
+                            aria-label={`Editar stock de ${p.name}`}
                           >
                             <FiEdit2 size={14} />
                           </button>
@@ -507,13 +513,20 @@ export default function AdminProducts() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-1">
-                        <button onClick={() => setModal(p)} className="p-2 rounded-lg hover:bg-brand-light text-slate-500 hover:text-brand transition-colors">
+                        <button
+                          onClick={() => setModal(p)}
+                          className="p-2 rounded-lg hover:bg-brand-light text-slate-500 hover:text-brand transition-colors"
+                          title="Editar producto"
+                          aria-label={`Editar ${p.name}`}
+                        >
                           <FiEdit2 size={15} />
                         </button>
                         <button
                           onClick={() => handleDelete(p)}
                           disabled={deleting === p._id}
                           className="p-2 rounded-lg hover:bg-red-50 text-slate-500 hover:text-red-500 transition-colors disabled:opacity-50"
+                          title="Eliminar producto"
+                          aria-label={`Eliminar ${p.name}`}
                         >
                           <FiTrash2 size={15} />
                         </button>
