@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "type": "module",
   "description": "MERN Stack Shopping Cart App",
+  "engines": {
+    "node": ">=22.19.0"
+  },
   "scripts": {
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
     "dev:open": "npm run dev:client:open",
