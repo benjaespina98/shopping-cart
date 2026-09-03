@@ -9,6 +9,7 @@ import { Input } from '../design-system/Input';
 import { Photo } from '../design-system/Photo';
 import { useReveal } from '../hooks/useReveal';
 import { useSettings } from '../context/SettingsContext';
+import { isValidEmail, isValidPhone } from '../utils/validation';
 
 // Datos del local, antes en la página /ubicacion. Esa página repetía dirección,
 // horarios y teléfono que ya estaban acá, con un diseño distinto al del resto del
@@ -24,6 +25,7 @@ export default function Contact() {
   const reveal = useReveal();
   const mapReveal = useReveal();
   const [form, setForm] = useState({ name: '', phone: '', email: '', message: '' });
+  const [fieldErrors, setFieldErrors] = useState({});
   const [sendingChannel, setSendingChannel] = useState('');
   const { settings: contactSettings } = useSettings();
   const sentTimeoutRef = useRef(null);
@@ -40,14 +42,29 @@ export default function Contact() {
     if (sentTimeoutRef.current) clearTimeout(sentTimeoutRef.current);
     sentTimeoutRef.current = setTimeout(() => setSendingChannel(''), 3500);
     setForm({ name: '', phone: '', email: '', message: '' });
+    setFieldErrors({});
   };
 
   const getTextMessage = () =>
     `Hola! Soy ${form.name} (${form.phone}${form.email ? `, ${form.email}` : ''}).\n\n${form.message}`;
 
+  const setField = (field) => (e) => {
+    setForm((f) => ({ ...f, [field]: e.target.value }));
+    setFieldErrors((errs) => ({ ...errs, [field]: undefined }));
+  };
+
+  // Antes solo chequeaba que los campos no estuvieran vacíos: un email "asdf" o un
+  // teléfono de un solo dígito pasaban igual, y el negocio se quedaba con un contacto al
+  // que no podía responder. Ahora valida el mismo formato que /presupuesto.
   const validateForm = () => {
-    if (!form.name.trim() || !form.phone.trim() || !form.email.trim() || !form.message.trim()) {
-      toast.error('Completá nombre, teléfono, email y mensaje para continuar.');
+    const errs = {};
+    if (!form.name.trim()) errs.name = 'Ingresá tu nombre.';
+    if (!isValidPhone(form.phone)) errs.phone = 'Ingresá un teléfono válido.';
+    if (!isValidEmail(form.email)) errs.email = 'Ingresá un email válido.';
+    if (!form.message.trim()) errs.message = 'Contanos brevemente tu consulta.';
+    setFieldErrors(errs);
+    if (Object.keys(errs).length > 0) {
+      toast.error('Revisá los campos marcados.');
       return false;
     }
     return true;
@@ -216,14 +233,14 @@ export default function Contact() {
             <div className="ps-form-row">
               <Input label="Nombre" placeholder="Tu nombre completo" required
                 leading={<FiUser size={16} />}
-                value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+                value={form.name} onChange={setField('name')} error={fieldErrors.name} />
               <Input label="Teléfono" placeholder="600 123 456" required
                 leading={<FiPhone size={16} />}
-                value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+                value={form.phone} onChange={setField('phone')} error={fieldErrors.phone} />
             </div>
             <Input label="Email" type="email" placeholder="tu@email.com" required
               leading={<FiMail size={16} />}
-              value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+              value={form.email} onChange={setField('email')} error={fieldErrors.email} />
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               <label htmlFor="contact-message" style={{ fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 14, color: 'var(--text-strong)' }}>
                 Mensaje
@@ -233,13 +250,17 @@ export default function Contact() {
                 rows={4}
                 placeholder="¿En qué te podemos ayudar?"
                 value={form.message}
-                onChange={(e) => setForm({ ...form, message: e.target.value })}
+                onChange={setField('message')}
                 style={{
-                  padding: '11px 14px', borderRadius: 'var(--radius-md)', border: '2px solid var(--border-default)',
+                  padding: '11px 14px', borderRadius: 'var(--radius-md)',
+                  border: `2px solid ${fieldErrors.message ? 'var(--red-500)' : 'var(--border-default)'}`,
                   fontFamily: 'var(--font-body)', fontSize: '1rem', color: 'var(--text-strong)', resize: 'vertical',
                   background: 'var(--surface-card)',
                 }}
               />
+              {fieldErrors.message && (
+                <span style={{ fontSize: '0.875rem', color: 'var(--red-500)', fontFamily: 'var(--font-body)' }}>{fieldErrors.message}</span>
+              )}
             </div>
           </div>
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FiMail, FiCheck, FiPhone, FiMapPin, FiTag, FiMessageSquare } from 'react-icons/fi';
+import { FiMail, FiCheck, FiPhone, FiMapPin, FiTag, FiMessageSquare, FiRotateCcw } from 'react-icons/fi';
 import { quotesAPI } from '../../services/api';
 import { toast } from 'react-toastify';
 
@@ -122,14 +122,27 @@ export default function AdminQuotes() {
                   </p>
                 </div>
                 <div className="flex gap-1 shrink-0">
+                  {/* Antes solo se podía avanzar (nueva → contactada → cerrada), nunca volver
+                      atrás: un click de más en "Contactada" dejaba la consulta ahí para
+                      siempre, sin forma de revertirlo desde la UI. Ahora se puede pasar a
+                      cualquiera de los otros dos estados desde cualquiera. */}
+                  {q.status !== 'new' && (
+                    <button onClick={() => handleStatus(q._id, 'new')} title="Volver a marcar como nueva"
+                      aria-label={`Volver a marcar como nueva la consulta de ${q.name}`}
+                      className="p-2 rounded-lg hover:bg-primary-50 text-slate-400 hover:text-primary-700 transition-colors">
+                      <FiRotateCcw size={15} />
+                    </button>
+                  )}
                   {q.status !== 'contacted' && (
                     <button onClick={() => handleStatus(q._id, 'contacted')} title="Marcar como contactado"
+                      aria-label={`Marcar como contactada la consulta de ${q.name}`}
                       className="p-2 rounded-lg hover:bg-amber-50 text-slate-400 hover:text-amber-600 transition-colors">
                       <FiPhone size={15} />
                     </button>
                   )}
                   {q.status !== 'closed' && (
                     <button onClick={() => handleStatus(q._id, 'closed')} title="Marcar como cerrada"
+                      aria-label={`Marcar como cerrada la consulta de ${q.name}`}
                       className="p-2 rounded-lg hover:bg-green-50 text-slate-400 hover:text-green-500 transition-colors">
                       <FiCheck size={15} />
                     </button>

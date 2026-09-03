@@ -9,6 +9,7 @@ import { Checkbox } from '../design-system/Checkbox';
 import { useReveal } from '../hooks/useReveal';
 import { servicesAPI, quotesAPI } from '../services/api';
 import { trackEvent } from '../utils/analytics';
+import { isValidEmail, isValidPhone } from '../utils/validation';
 
 const FALLBACK_TYPES = ['Piscina nueva', 'Reforma', 'Cerco / Seguridad'];
 const OTHER_TYPE = 'Otra consulta';
@@ -18,9 +19,6 @@ const STEPS = [
   { Icon: FiClock, text: 'Nos contactamos con vos dentro de 48 horas' },
   { Icon: FiCheck, text: 'Recibís tu presupuesto sin compromiso' },
 ];
-
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const PHONE_RE = /^[\d\s()+-]{6,}$/;
 
 export default function Quote() {
   const navigate = useNavigate();
@@ -32,7 +30,9 @@ export default function Quote() {
   const [types, setTypes] = useState(FALLBACK_TYPES);
   const [tipo, setTipo] = useState('');
   const [form, setForm] = useState({ name: '', phone: '', email: '', location: '', message: '' });
-  const [acceptedPrivacy, setAcceptedPrivacy] = useState(true);
+  // Un checkbox de consentimiento tildado por defecto no es un consentimiento real —
+  // nadie lo nota ni lo lee. Tiene que partir destildado para que aceptarlo signifique algo.
+  const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
 
   useEffect(() => {
     servicesAPI.getAll()
@@ -58,8 +58,8 @@ export default function Quote() {
   const validate = () => {
     const errs = {};
     if (!form.name.trim()) errs.name = 'Ingresá tu nombre.';
-    if (!PHONE_RE.test(form.phone.trim())) errs.phone = 'Ingresá un teléfono válido.';
-    if (!EMAIL_RE.test(form.email.trim())) errs.email = 'Ingresá un email válido.';
+    if (!isValidPhone(form.phone)) errs.phone = 'Ingresá un teléfono válido.';
+    if (!isValidEmail(form.email)) errs.email = 'Ingresá un email válido.';
     setFieldErrors(errs);
     return Object.keys(errs).length === 0;
   };
