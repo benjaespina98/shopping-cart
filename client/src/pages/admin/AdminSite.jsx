@@ -56,6 +56,13 @@ export default function AdminSite() {
       toast.error('Completá título y localidad.');
       return;
     }
+    // Un proyecto sin foto no tiene mucho sentido — es una galería de obras, la foto es
+    // el contenido. Antes se podía crear sin ninguna y quedaba mostrando una caja vacía
+    // en el sitio público en vez de una imagen.
+    if (!file) {
+      toast.error('Elegí una foto para el proyecto.');
+      return;
+    }
     setUploading(true);
     try {
       const fd = new FormData();
@@ -63,7 +70,7 @@ export default function AdminSite() {
       fd.append('location', form.location);
       fd.append('featured', form.featured);
       fd.append('isHero', form.isHero);
-      if (file) fd.append('image', file);
+      fd.append('image', file);
       await projectsAPI.create(fd);
       setForm(emptyForm);
       resetFile();

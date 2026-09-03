@@ -24,6 +24,15 @@ if (!Element.prototype.scrollIntoView) {
   Element.prototype.scrollIntoView = () => {};
 }
 
+// Tampoco implementa URL.createObjectURL/revokeObjectURL (los usa useImagePicker.js para
+// la vista previa local al elegir un archivo, antes de subirlo).
+if (!URL.createObjectURL) {
+  URL.createObjectURL = () => 'blob:mock-url';
+}
+if (!URL.revokeObjectURL) {
+  URL.revokeObjectURL = () => {};
+}
+
 // Tampoco implementa matchMedia (lo consultan algunos componentes vía Tailwind/JS).
 if (!window.matchMedia) {
   window.matchMedia = (query) => ({
