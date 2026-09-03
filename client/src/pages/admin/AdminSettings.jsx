@@ -341,7 +341,7 @@ export default function AdminSettings() {
                 type="button"
                 onClick={() => contactPhotoInputRef.current?.click()}
                 disabled={uploadingContactPhoto}
-                className="btn-secondary inline-flex items-center gap-2 self-start disabled:opacity-50 text-xs"
+                className="btn-secondary btn-sm inline-flex items-center gap-2 self-start disabled:opacity-50"
               >
                 <FiUpload size={13} /> {uploadingContactPhoto ? 'Subiendo...' : settings.contactPhotoUrl ? 'Cambiar' : 'Subir'}
               </button>
@@ -364,7 +364,7 @@ export default function AdminSettings() {
                 type="button"
                 onClick={() => aboutPhotoInputRef.current?.click()}
                 disabled={uploadingAboutPhoto}
-                className="btn-secondary inline-flex items-center gap-2 self-start disabled:opacity-50 text-xs"
+                className="btn-secondary btn-sm inline-flex items-center gap-2 self-start disabled:opacity-50"
               >
                 <FiUpload size={13} /> {uploadingAboutPhoto ? 'Subiendo...' : settings.aboutPhotoUrl ? 'Cambiar' : 'Subir'}
               </button>
