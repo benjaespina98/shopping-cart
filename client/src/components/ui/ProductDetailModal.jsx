@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { FiX, FiShoppingCart, FiPlus, FiMinus, FiCheck, FiAlertTriangle, FiImage } from 'react-icons/fi';
 import { useCart } from '../../context/CartContext';
 import CldImage from './CldImage';
-import { cldOptimized } from '../../utils/cloudinary';
 import { toast } from 'react-toastify';
 
 export default function ProductDetailModal({ product, inCartQuantity = 0, onClose }) {
@@ -95,9 +94,11 @@ export default function ProductDetailModal({ product, inCartQuantity = 0, onClos
                   <button
                     key={img.publicId || i}
                     onClick={() => setActiveImg(i)}
+                    aria-label={`Ver foto ${i + 1} de ${product.name}`}
+                    aria-pressed={i === activeImg}
                     className={`w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${i === activeImg ? 'border-primary-700' : 'border-slate-200 hover:border-slate-300'}`}
                   >
-                    <img src={cldOptimized(img.url, 160)} alt="" className="w-full h-full object-cover" />
+                    <CldImage src={img.url} width={160} className="w-full h-full object-cover" />
                   </button>
                 ))}
               </div>

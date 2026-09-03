@@ -18,6 +18,12 @@ class IntersectionObserverStub {
 }
 globalThis.IntersectionObserver = IntersectionObserverStub;
 
+// Tampoco implementa Element.scrollIntoView (lo usa, por ejemplo, Shop.jsx al cambiar
+// de página de resultados).
+if (!Element.prototype.scrollIntoView) {
+  Element.prototype.scrollIntoView = () => {};
+}
+
 // Tampoco implementa matchMedia (lo consultan algunos componentes vía Tailwind/JS).
 if (!window.matchMedia) {
   window.matchMedia = (query) => ({

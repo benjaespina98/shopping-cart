@@ -2,7 +2,7 @@ import { useEffect, useId, useMemo, useState, useRef } from 'react';
 import { FiPlus, FiEdit2, FiTrash2, FiX, FiUpload, FiCheck, FiAlertCircle, FiSave, FiSearch, FiPackage, FiTag } from 'react-icons/fi';
 import { productsAPI, categoriesAPI } from '../../services/api';
 import CategoryManager from '../../components/admin/CategoryManager';
-import { cldOptimized } from '../../utils/cloudinary';
+import CldImage from '../../components/ui/CldImage';
 import { FALLBACK_CATEGORIES } from '../../data/fallbackCategories';
 import { toast } from 'react-toastify';
 
@@ -161,11 +161,13 @@ function ProductModal({ product, categories, onClose, onSaved }) {
           {/* Existing images */}
           {product?.images?.length > 0 && (
             <div>
-              <label className="label">Imágenes actuales</label>
+              {/* No es el label de un único input — es el título de la grilla de miniaturas
+                  de abajo, cada una con su propio botón de "quitar" — por eso <p>, no <label>. */}
+              <p className="label">Imágenes actuales</p>
               <div className="flex flex-wrap gap-2">
                 {product.images.map((img) => (
                   <div key={img.publicId} className="relative w-20 h-20">
-                    <img src={cldOptimized(img.url, 160)} alt="" loading="lazy" decoding="async" className={`w-full h-full object-cover rounded-xl border-2 transition-all ${removeIds.includes(img.publicId) ? 'opacity-40 border-red-400' : 'border-slate-200'}`} />
+                    <CldImage src={img.url} width={160} className={`w-full h-full object-cover rounded-xl border-2 transition-all ${removeIds.includes(img.publicId) ? 'opacity-40 border-red-400' : 'border-slate-200'}`} />
                     <button type="button" onClick={() => toggleRemoveImage(img.publicId)}
                       className={`absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full text-white flex items-center justify-center text-xs transition-colors ${removeIds.includes(img.publicId) ? 'bg-green-500' : 'bg-red-500'}`}>
                       {removeIds.includes(img.publicId) ? <FiCheck size={10} /> : <FiX size={10} />}
@@ -179,7 +181,7 @@ function ProductModal({ product, categories, onClose, onSaved }) {
 
           {/* New images */}
           <div>
-            <label className="label">Agregar imágenes</label>
+            <label className="label" htmlFor="product-new-images">Agregar imágenes</label>
             <div
               onClick={() => fileRef.current?.click()}
               className="border-2 border-dashed border-slate-300 rounded-xl p-4 text-center cursor-pointer hover:border-brand hover:bg-brand-light/10 transition-colors"
@@ -188,7 +190,7 @@ function ProductModal({ product, categories, onClose, onSaved }) {
               <p className="text-sm text-slate-500">Click para subir imágenes</p>
               <p className="text-xs text-slate-400 mt-0.5">JPG, PNG, WEBP — máx. 5 archivos</p>
             </div>
-            <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={handleFile} />
+            <input id="product-new-images" ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={handleFile} />
             {newFiles.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-2">
                 {newFiles.map((f, i) => (
@@ -450,7 +452,7 @@ export default function AdminProducts() {
                     <td className="px-4 py-3">
                       <div className="w-10 h-10 rounded-lg overflow-hidden bg-slate-100 shrink-0">
                         {p.images?.[0]?.url ? (
-                          <img src={cldOptimized(p.images[0].url, 80)} alt={p.name} loading="lazy" decoding="async" className="w-full h-full object-cover" />
+                          <CldImage src={p.images[0].url} alt={p.name} width={80} className="w-full h-full object-cover" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-slate-300 text-xs">N/A</div>
                         )}

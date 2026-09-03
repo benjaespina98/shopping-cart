@@ -20,6 +20,11 @@ export default function Landing() {
   const [featured, setFeatured] = useState([]);
   const [heroProject, setHeroProject] = useState(null);
   const [featuredProjects, setFeaturedProjects] = useState([]);
+  // `featuredProjects.length === 0` por sí solo no distingue "todavía no respondió
+  // /api/projects" de "ya respondió y no hay ninguno destacado" — con eso, cualquier
+  // visitante veía el texto de "Cargá proyectos desde el admin" (pensado para el
+  // segundo caso) en CADA carga de la home, mientras la respuesta estaba en camino.
+  const [projectsLoading, setProjectsLoading] = useState(true);
   const [services, setServices] = useState(FALLBACK_SERVICES);
 
   const servicesReveal = useReveal();
@@ -49,7 +54,8 @@ export default function Landing() {
           data.filter((p) => p.featured && p._id !== hero?._id).slice(0, 5)
         );
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setProjectsLoading(false));
 
     servicesAPI.getAll()
       .then(({ data }) => { if (data?.length > 0) setServices(data.slice(0, 4)); })
@@ -169,7 +175,16 @@ export default function Landing() {
             <Button variant="outline" onClick={() => navigate('/proyectos')}>Ver galería</Button>
           </div>
 
-          {featuredProjects.length === 0 ? (
+          {projectsLoading ? (
+            <div className="ps-projects-grid">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} style={{
+                  borderRadius: 'var(--radius-lg)', background: 'var(--grey-200)',
+                  ...(i === 0 ? { gridRow: '1 / span 2' } : {}),
+                }} />
+              ))}
+            </div>
+          ) : featuredProjects.length === 0 ? (
             <div className="ps-projects-grid">
               <div style={{ gridRow: '1 / span 2' }}><Photo label="Cargá proyectos desde el admin" height="100%" /></div>
               <Photo label="Panel › Sitio web" height="100%" />

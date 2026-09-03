@@ -5,7 +5,7 @@ import {
 } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import { projectsAPI } from '../../services/api';
-import { cldOptimized } from '../../utils/cloudinary';
+import CldImage from '../../components/ui/CldImage';
 import { useImagePicker } from '../../hooks/useImagePicker';
 import { useReorderableList } from '../../hooks/useReorderableList';
 
@@ -176,13 +176,13 @@ export default function AdminSite() {
 
             <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="label">Título *</label>
-                <input className="input" placeholder="Piscina infinity" value={form.title}
+                <label className="label" htmlFor="project-title">Título *</label>
+                <input id="project-title" className="input" placeholder="Piscina infinity" value={form.title}
                   onChange={(e) => setForm(f => ({ ...f, title: e.target.value }))} />
               </div>
               <div>
-                <label className="label">Localidad *</label>
-                <input className="input" placeholder="Villa Nueva" value={form.location}
+                <label className="label" htmlFor="project-location">Localidad *</label>
+                <input id="project-location" className="input" placeholder="Villa Nueva" value={form.location}
                   onChange={(e) => setForm(f => ({ ...f, location: e.target.value }))} />
               </div>
               <div className="sm:col-span-2 flex flex-wrap gap-5">
@@ -232,7 +232,7 @@ export default function AdminSite() {
               {/* Image */}
               <div className="aspect-video relative bg-slate-100">
                 {p.imageUrl
-                  ? <img src={cldOptimized(p.imageUrl, 480)} alt={p.title} loading="lazy" decoding="async" className="w-full h-full object-cover" />
+                  ? <CldImage src={p.imageUrl} alt={p.title} width={480} className="w-full h-full object-cover" />
                   : <div className="w-full h-full flex items-center justify-center text-slate-300"><FiImage size={32} /></div>}
                 <div className="absolute top-2 left-2 flex flex-col gap-1 items-start">
                   {p.isHero && (

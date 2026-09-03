@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { FiX, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { cldOptimized } from '../../utils/cloudinary';
 
 const navBtnStyle = {
   position: 'absolute', top: '50%', transform: 'translateY(-50%)',
@@ -86,7 +87,10 @@ export function Lightbox({ images, index, onClose }) {
 
       <img
         key={img.src}
-        src={img.src}
+        // Era la única imagen del sitio servida en crudo, sin f_auto/q_auto ni límite de
+        // ancho — el original de Cloudinary puede pesar varios MB, y encima es la que se
+        // ve a pantalla completa. w_1600 alcanza de sobra para cualquier pantalla real.
+        src={cldOptimized(img.src, 1600)}
         alt={img.label || ''}
         onClick={(e) => e.stopPropagation()}
         className="ps-lightbox-img"

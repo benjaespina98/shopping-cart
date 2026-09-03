@@ -3,17 +3,26 @@ import { FiSearch, FiRefreshCw, FiActivity } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import { logsAPI } from '../../services/api';
 
-const ENTITY_OPTIONS = ['', 'auth', 'product', 'order', 'settings', 'user'];
+// Estas dos listas son las únicas formas de filtrar por acción/entidad (la búsqueda de
+// texto no las incluye) — tienen que reflejar EXACTAMENTE los valores que graban los
+// controllers (ver `action:`/`entity:` en server/controllers/*.js), letra por letra.
+// 'PASSWORD_CHANGED' estaba mal (el server graba 'ADMIN_PASSWORD_CHANGED') y faltaban
+// 'quote' y tres acciones de pedidos/presupuestos: elegir esos filtros no rompía nada,
+// simplemente no encontraba jamás ningún resultado.
+const ENTITY_OPTIONS = ['', 'auth', 'product', 'order', 'quote', 'settings', 'user'];
 const ACTION_OPTIONS = [
   '',
   'LOGIN_SUCCESS',
-  'PASSWORD_CHANGED',
+  'ADMIN_PASSWORD_CHANGED',
   'PRODUCT_CREATED',
   'PRODUCT_UPDATED',
   'PRODUCT_STOCK_UPDATED',
   'PRODUCT_DELETED',
   'ORDER_CREATED',
   'ORDER_STATUS_UPDATED',
+  'ORDER_DELETED',
+  'QUOTE_REQUEST_CREATED',
+  'QUOTE_STATUS_UPDATED',
   'SETTINGS_UPDATED',
   'ADMIN_USER_CREATED',
   'ADMIN_USER_DELETED',
