@@ -67,7 +67,7 @@ export default function AdminLogin() {
           <form onSubmit={handleSubmit} autoComplete="off" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {/* Email */}
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, fontFamily: 'var(--font-display)',
+              <label htmlFor="admin-login-email" style={{ display: 'block', fontSize: 12, fontWeight: 600, fontFamily: 'var(--font-display)',
                               color: 'rgba(255,255,255,0.65)', marginBottom: 6, letterSpacing: '0.03em' }}>
                 EMAIL
               </label>
@@ -75,6 +75,7 @@ export default function AdminLogin() {
                 <FiMail size={15} style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)',
                                            color: 'rgba(255,255,255,0.35)', pointerEvents: 'none' }} />
                 <input
+                  id="admin-login-email"
                   type="email"
                   placeholder="admin@ejemplo.com"
                   value={form.email}
@@ -95,7 +96,7 @@ export default function AdminLogin() {
 
             {/* Password */}
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, fontFamily: 'var(--font-display)',
+              <label htmlFor="admin-login-password" style={{ display: 'block', fontSize: 12, fontWeight: 600, fontFamily: 'var(--font-display)',
                               color: 'rgba(255,255,255,0.65)', marginBottom: 6, letterSpacing: '0.03em' }}>
                 CONTRASEÑA
               </label>
@@ -103,6 +104,7 @@ export default function AdminLogin() {
                 <FiLock size={15} style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)',
                                            color: 'rgba(255,255,255,0.35)', pointerEvents: 'none' }} />
                 <input
+                  id="admin-login-password"
                   type={showPw ? 'text' : 'password'}
                   placeholder="••••••••"
                   value={form.password}

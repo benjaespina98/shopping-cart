@@ -71,7 +71,7 @@ export default function Quote() {
       return;
     }
     if (!acceptedPrivacy) {
-      setFormError('Tenés que aceptar la política de privacidad.');
+      setFormError('Tenés que aceptar el uso de tus datos para poder enviar la consulta.');
       return;
     }
     setFormError('');
@@ -218,7 +218,10 @@ export default function Quote() {
                 </div>
               </div>
 
-              <Checkbox label="Acepto la política de privacidad" checked={acceptedPrivacy}
+              {/* Decía "Acepto la política de privacidad" sin que existiera esa página en
+                  ningún lado del sitio — un enlace a nada. Mismo criterio que ya se aplicó
+                  en el Footer (ver su comentario): un dato real en vez de una promesa vacía. */}
+              <Checkbox label="Acepto que usen mis datos para responder esta consulta" checked={acceptedPrivacy}
                 onChange={(e) => setAcceptedPrivacy(e.target.checked)} />
               {formError && (
                 <p style={{ color: 'var(--red-500)', fontSize: 14, fontFamily: 'var(--font-body)' }}>{formError}</p>

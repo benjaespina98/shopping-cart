@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { FiShoppingCart, FiMenu, FiX } from 'react-icons/fi';
 import { useCart } from '../../context/CartContext';
@@ -47,11 +47,31 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const showCart = location.pathname.startsWith('/tienda');
+  const headerRef = useRef(null);
 
   const handleNav = (to) => { navigate(to); setMenuOpen(false); };
 
+  // El resto de los overlays del sitio (carrito, lightbox, modal de producto) se cierran
+  // con Escape o tocando afuera — este menú solo se cerraba eligiendo un link o volviendo
+  // a tocar el hamburger.
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    const onKeyDown = (e) => { if (e.key === 'Escape') setMenuOpen(false); };
+    const onClickOutside = (e) => {
+      if (headerRef.current && !headerRef.current.contains(e.target)) setMenuOpen(false);
+    };
+
+    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener('mousedown', onClickOutside);
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener('mousedown', onClickOutside);
+    };
+  }, [menuOpen]);
+
   return (
-    <header style={{
+    <header ref={headerRef} style={{
       position: 'sticky', top: 0, zIndex: 40,
       background: 'var(--surface-glass)',
       backdropFilter: 'blur(10px)',
