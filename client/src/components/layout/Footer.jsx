@@ -4,8 +4,7 @@ import { FiInstagram, FiFacebook } from 'react-icons/fi';
 import { FaWhatsapp, FaTiktok } from 'react-icons/fa';
 import { servicesAPI } from '../../services/api';
 import { useSettings } from '../../context/SettingsContext';
-
-const FALLBACK_SERVICE_NAMES = ['Piscinas de obra', 'Reformas', 'Climatización', 'Cercos y seguridad'];
+import { FALLBACK_SERVICE_NAMES } from '../../data/fallbackServices';
 
 const empresaLinks = [
   ['/nosotros', 'Nosotros'],
