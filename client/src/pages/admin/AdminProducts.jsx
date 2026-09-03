@@ -161,7 +161,9 @@ function ProductModal({ product, categories, onClose, onSaved }) {
           {/* Existing images */}
           {product?.images?.length > 0 && (
             <div>
-              <label className="label">Imágenes actuales</label>
+              {/* No es el label de un único input — es el título de la grilla de miniaturas
+                  de abajo, cada una con su propio botón de "quitar" — por eso <p>, no <label>. */}
+              <p className="label">Imágenes actuales</p>
               <div className="flex flex-wrap gap-2">
                 {product.images.map((img) => (
                   <div key={img.publicId} className="relative w-20 h-20">
@@ -179,7 +181,7 @@ function ProductModal({ product, categories, onClose, onSaved }) {
 
           {/* New images */}
           <div>
-            <label className="label">Agregar imágenes</label>
+            <label className="label" htmlFor="product-new-images">Agregar imágenes</label>
             <div
               onClick={() => fileRef.current?.click()}
               className="border-2 border-dashed border-slate-300 rounded-xl p-4 text-center cursor-pointer hover:border-brand hover:bg-brand-light/10 transition-colors"
@@ -188,7 +190,7 @@ function ProductModal({ product, categories, onClose, onSaved }) {
               <p className="text-sm text-slate-500">Click para subir imágenes</p>
               <p className="text-xs text-slate-400 mt-0.5">JPG, PNG, WEBP — máx. 5 archivos</p>
             </div>
-            <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={handleFile} />
+            <input id="product-new-images" ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={handleFile} />
             {newFiles.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-2">
                 {newFiles.map((f, i) => (

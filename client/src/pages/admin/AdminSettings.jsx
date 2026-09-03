@@ -368,16 +368,18 @@ export default function AdminSettings() {
         </h2>
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
-            <label className="label">Email de contacto</label>
+            <label className="label" htmlFor="settings-contact-email">Email de contacto</label>
             <input
+              id="settings-contact-email"
               className="input"
               value={settings.contactEmail}
               onChange={(e) => setSettings((prev) => ({ ...prev, contactEmail: e.target.value }))}
             />
           </div>
           <div>
-            <label className="label">Numero de WhatsApp principal (internacional)</label>
+            <label className="label" htmlFor="settings-whatsapp-number">Numero de WhatsApp principal (internacional)</label>
             <input
+              id="settings-whatsapp-number"
               className="input"
               value={settings.whatsappNumber}
               onChange={(e) => setSettings((prev) => ({ ...prev, whatsappNumber: e.target.value }))}
@@ -385,16 +387,18 @@ export default function AdminSettings() {
             />
           </div>
           <div>
-            <label className="label">Telefono visible</label>
+            <label className="label" htmlFor="settings-phone-display">Telefono visible</label>
             <input
+              id="settings-phone-display"
               className="input"
               value={settings.phoneNumberDisplay}
               onChange={(e) => setSettings((prev) => ({ ...prev, phoneNumberDisplay: e.target.value }))}
             />
           </div>
           <div>
-            <label className="label">Link de telefono</label>
+            <label className="label" htmlFor="settings-phone-link">Link de telefono</label>
             <input
+              id="settings-phone-link"
               className="input"
               value={settings.phoneNumberLink}
               onChange={(e) => setSettings((prev) => ({ ...prev, phoneNumberLink: e.target.value }))}
@@ -402,8 +406,9 @@ export default function AdminSettings() {
             />
           </div>
           <div>
-            <label className="label">Etiqueta del contacto secundario (opcional)</label>
+            <label className="label" htmlFor="settings-secondary-label">Etiqueta del contacto secundario (opcional)</label>
             <input
+              id="settings-secondary-label"
               className="input"
               value={settings.secondaryContactLabel}
               onChange={(e) => setSettings((prev) => ({ ...prev, secondaryContactLabel: e.target.value }))}
@@ -411,8 +416,9 @@ export default function AdminSettings() {
             />
           </div>
           <div>
-            <label className="label">WhatsApp del contacto secundario (opcional)</label>
+            <label className="label" htmlFor="settings-secondary-whatsapp">WhatsApp del contacto secundario (opcional)</label>
             <input
+              id="settings-secondary-whatsapp"
               className="input"
               value={settings.secondaryContactWhatsapp}
               onChange={(e) => setSettings((prev) => ({ ...prev, secondaryContactWhatsapp: e.target.value }))}
@@ -568,20 +574,24 @@ export default function AdminSettings() {
           {showPasswordForm && (
             <form onSubmit={handleChangePassword} className="grid sm:grid-cols-3 gap-3 items-end mt-3">
               <div>
-                <label className="label">Contraseña actual</label>
+                <label className="label" htmlFor="settings-current-password">Contraseña actual</label>
                 <input
+                  id="settings-current-password"
                   className="input"
                   type="password"
+                  autoComplete="current-password"
                   required
                   value={passwordForm.currentPassword}
                   onChange={(e) => setPasswordForm((prev) => ({ ...prev, currentPassword: e.target.value }))}
                 />
               </div>
               <div>
-                <label className="label">Nueva contraseña</label>
+                <label className="label" htmlFor="settings-new-password">Nueva contraseña</label>
                 <input
+                  id="settings-new-password"
                   className="input"
                   type="password"
+                  autoComplete="new-password"
                   required
                   minLength={6}
                   value={passwordForm.newPassword}
@@ -591,10 +601,12 @@ export default function AdminSettings() {
               </div>
               <div className="flex gap-2">
                 <div className="flex-1">
-                  <label className="label">Confirmar nueva</label>
+                  <label className="label" htmlFor="settings-confirm-password">Confirmar nueva</label>
                   <input
+                    id="settings-confirm-password"
                     className="input"
                     type="password"
+                    autoComplete="new-password"
                     required
                     minLength={6}
                     value={passwordForm.confirmPassword}
@@ -616,8 +628,9 @@ export default function AdminSettings() {
 
         <form onSubmit={handleCreateUser} className="border-t border-slate-100 pt-4 grid sm:grid-cols-3 gap-3 items-end">
           <div>
-            <label className="label">Nombre</label>
+            <label className="label" htmlFor="new-user-name">Nombre</label>
             <input
+              id="new-user-name"
               className="input"
               required
               value={newUser.name}
@@ -626,10 +639,12 @@ export default function AdminSettings() {
             />
           </div>
           <div>
-            <label className="label">Email</label>
+            <label className="label" htmlFor="new-user-email">Email</label>
             <input
+              id="new-user-email"
               className="input"
               type="email"
+              autoComplete="off"
               required
               value={newUser.email}
               onChange={(e) => setNewUser((prev) => ({ ...prev, email: e.target.value }))}
@@ -638,11 +653,13 @@ export default function AdminSettings() {
           </div>
           <div className="flex gap-2">
             <div className="flex-1">
-              <label className="label">Contraseña</label>
+              <label className="label" htmlFor="new-user-password">Contraseña</label>
               <div className="relative">
                 <input
+                  id="new-user-password"
                   className="input pr-10"
                   type={showPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
                   required
                   minLength={6}
                   value={newUser.password}
@@ -689,8 +706,9 @@ export default function AdminSettings() {
           </div>
           <div className="flex-1 flex flex-col gap-3 w-full">
             <div>
-              <label className="label">URL de destino</label>
+              <label className="label" htmlFor="qr-site-url">URL de destino</label>
               <input
+                id="qr-site-url"
                 className="input"
                 value={siteUrl}
                 onChange={(e) => setSiteUrl(e.target.value)}

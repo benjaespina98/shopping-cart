@@ -176,13 +176,13 @@ export default function AdminSite() {
 
             <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="label">Título *</label>
-                <input className="input" placeholder="Piscina infinity" value={form.title}
+                <label className="label" htmlFor="project-title">Título *</label>
+                <input id="project-title" className="input" placeholder="Piscina infinity" value={form.title}
                   onChange={(e) => setForm(f => ({ ...f, title: e.target.value }))} />
               </div>
               <div>
-                <label className="label">Localidad *</label>
-                <input className="input" placeholder="Villa Nueva" value={form.location}
+                <label className="label" htmlFor="project-location">Localidad *</label>
+                <input id="project-location" className="input" placeholder="Villa Nueva" value={form.location}
                   onChange={(e) => setForm(f => ({ ...f, location: e.target.value }))} />
               </div>
               <div className="sm:col-span-2 flex flex-wrap gap-5">

@@ -172,39 +172,39 @@ export default function AdminServices() {
 
             <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="label">Título *</label>
-                <input className="input" placeholder="Piscinas de obra" value={form.title}
+                <label className="label" htmlFor="service-title">Título *</label>
+                <input id="service-title" className="input" placeholder="Piscinas de obra" value={form.title}
                   onChange={(e) => setForm(f => ({ ...f, title: e.target.value }))} />
               </div>
               <div>
-                <label className="label">Etiqueta *</label>
-                <input className="input" placeholder="Construcción" value={form.tag}
+                <label className="label" htmlFor="service-tag">Etiqueta *</label>
+                <input id="service-tag" className="input" placeholder="Construcción" value={form.tag}
                   onChange={(e) => setForm(f => ({ ...f, tag: e.target.value }))} />
               </div>
               <div className="sm:col-span-2">
-                <label className="label">Descripción *</label>
-                <textarea className="input resize-none" rows={2} placeholder="Descripción del servicio..." value={form.description}
+                <label className="label" htmlFor="service-description">Descripción *</label>
+                <textarea id="service-description" className="input resize-none" rows={2} placeholder="Descripción del servicio..." value={form.description}
                   onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))} />
               </div>
               <div className="sm:col-span-2">
-                <label className="label">Viñetas (separadas por coma)</label>
-                <input className="input" placeholder="Estudio y diseño 3D, Hormigón gunitado" value={form.bullets}
+                <label className="label" htmlFor="service-bullets">Viñetas (separadas por coma)</label>
+                <input id="service-bullets" className="input" placeholder="Estudio y diseño 3D, Hormigón gunitado" value={form.bullets}
                   onChange={(e) => setForm(f => ({ ...f, bullets: e.target.value }))} />
               </div>
               <div className="sm:col-span-2">
-                <label className="label">Texto del botón (CTA)</label>
-                <input className="input" placeholder="Solicitar presupuesto" value={form.cta}
+                <label className="label" htmlFor="service-cta">Texto del botón (CTA)</label>
+                <input id="service-cta" className="input" placeholder="Solicitar presupuesto" value={form.cta}
                   onChange={(e) => setForm(f => ({ ...f, cta: e.target.value }))} />
               </div>
               <div>
-                <label className="label">Color de acento</label>
-                <select className="input" value={form.tone} onChange={(e) => setForm(f => ({ ...f, tone: e.target.value }))}>
+                <label className="label" htmlFor="service-tone">Color de acento</label>
+                <select id="service-tone" className="input" value={form.tone} onChange={(e) => setForm(f => ({ ...f, tone: e.target.value }))}>
                   {TONES.map(t => <option key={t} value={t}>{t === 'teal' ? 'Teal' : 'Sol (amarillo)'}</option>)}
                 </select>
               </div>
               <div>
-                <label className="label">Estilo de etiqueta</label>
-                <select className="input" value={form.variant} onChange={(e) => setForm(f => ({ ...f, variant: e.target.value }))}>
+                <label className="label" htmlFor="service-variant">Estilo de etiqueta</label>
+                <select id="service-variant" className="input" value={form.variant} onChange={(e) => setForm(f => ({ ...f, variant: e.target.value }))}>
                   {VARIANTS.map(v => <option key={v} value={v}>{v === 'soft' ? 'Suave' : 'Sólido'}</option>)}
                 </select>
               </div>
