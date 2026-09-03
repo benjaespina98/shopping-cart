@@ -25,6 +25,13 @@ export const createProject = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error('title y location son requeridos');
   }
+  // Un proyecto sin foto queda mostrando una caja vacía en el sitio público — la galería
+  // es justamente eso, fotos de obras. El cliente ya lo exige; esto es la misma regla
+  // por si alguien llega a este endpoint sin pasar por el formulario.
+  if (!req.file) {
+    res.status(400);
+    throw new Error('La foto del proyecto es requerida');
+  }
   const count = await Project.countDocuments();
   const wantsHero = toBoolean(isHero);
   if (wantsHero) {

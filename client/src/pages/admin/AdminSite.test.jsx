@@ -40,15 +40,34 @@ describe('AdminSite — proyectos', () => {
 
     await user.type(screen.getByPlaceholderText('Piscina infinity'), 'Reforma de borde');
     await user.type(screen.getByPlaceholderText('Villa Nueva'), 'Villa María');
+    const fileInput = document.querySelector('input[type="file"]');
+    await user.upload(fileInput, new File(['foto'], 'obra.jpg', { type: 'image/jpeg' }));
     await user.click(screen.getByRole('button', { name: /agregar proyecto/i }));
 
     await waitFor(() => expect(projectsAPI.create).toHaveBeenCalledTimes(1));
     const fd = projectsAPI.create.mock.calls[0][0];
     expect(fd.get('title')).toBe('Reforma de borde');
     expect(fd.get('location')).toBe('Villa María');
+    expect(fd.get('image').name).toBe('obra.jpg');
     expect(toast.success).toHaveBeenCalledWith('Proyecto agregado.');
     // El form vuelve a estar vacío listo para cargar el siguiente.
     expect(screen.getByPlaceholderText('Piscina infinity')).toHaveValue('');
+  });
+
+  // Regresión: un proyecto sin foto quedaba mostrando una caja vacía en el sitio público
+  // en vez de una imagen — la galería es justamente eso, fotos de obras.
+  it('no deja crear un proyecto sin elegir una foto', async () => {
+    const user = userEvent.setup();
+
+    renderPage();
+    await screen.findByText('Obra A');
+
+    await user.type(screen.getByPlaceholderText('Piscina infinity'), 'Reforma de borde');
+    await user.type(screen.getByPlaceholderText('Villa Nueva'), 'Villa María');
+    await user.click(screen.getByRole('button', { name: /agregar proyecto/i }));
+
+    expect(toast.error).toHaveBeenCalledWith('Elegí una foto para el proyecto.');
+    expect(projectsAPI.create).not.toHaveBeenCalled();
   });
 
   // Regresión del fix de la carrera al reordenar: un solo click dispara un único PUT

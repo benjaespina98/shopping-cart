@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { FiSave, FiPlus, FiTrash2, FiUsers, FiClock, FiMail, FiUserMinus, FiDownload, FiLink, FiDroplet, FiImage, FiUpload, FiCheckCircle, FiX, FiEye, FiEyeOff, FiCheck, FiExternalLink, FiLock } from 'react-icons/fi';
+import { FiSave, FiPlus, FiTrash2, FiUsers, FiClock, FiMail, FiUserMinus, FiDownload, FiLink, FiImage, FiUpload, FiCheckCircle, FiX, FiEye, FiEyeOff, FiExternalLink, FiLock } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import QRCode from 'qrcode';
 import { settingsAPI } from '../../services/api';
@@ -22,79 +22,6 @@ const defaultSettings = {
     { day: 'Domingos', hours: 'Cerrado' },
   ],
 };
-
-const THEMES = [
-  {
-    value: 'default',
-    label: 'Default',
-    hint: 'Arena cálida · bordes medios · sensación acogedora.',
-    bgPage: '#FBF9F5',
-    bgCard: '#FFFFFF',
-    radius: 14,
-    pilRadius: 999,
-    shadow: '0 4px 12px rgba(18,43,51,0.13)',
-  },
-  {
-    value: 'elegante',
-    label: 'Elegante',
-    hint: 'Fondo blanco puro · líneas rectas · aire premium/corporativo.',
-    bgPage: '#FFFFFF',
-    bgCard: '#FAFBFC',
-    radius: 7,
-    pilRadius: 4,
-    shadow: '0 1px 5px rgba(18,43,51,0.07)',
-  },
-  {
-    value: 'moderno',
-    label: 'Moderno',
-    hint: 'Fondo azul-agua suave · formas muy redondeadas · sensación fresca.',
-    bgPage: '#EEF5F7',
-    bgCard: '#FFFFFF',
-    radius: 20,
-    pilRadius: 999,
-    shadow: '0 8px 22px rgba(18,43,51,0.14)',
-  },
-];
-
-// Miniatura fiel del sitio con diferencias de tema claramente visibles
-function ThemePreviewCard({ t }) {
-  return (
-    <div style={{ borderRadius: 10, overflow: 'hidden', border: '1px solid var(--grey-200)', width: '100%' }}>
-      {/* Mini header */}
-      <div style={{ background: 'var(--teal-700)', padding: '7px 10px', display: 'flex', alignItems: 'center', gap: 6 }}>
-        <div style={{ width: 44, height: 7, borderRadius: 3, background: 'rgba(255,198,41,0.9)' }} />
-        <div style={{ flex: 1 }} />
-        <div style={{ width: 26, height: 7, borderRadius: t.pilRadius > 10 ? 99 : 3, background: 'var(--sun-500)' }} />
-      </div>
-      {/* Mini hero */}
-      <div style={{ background: '#1C3D49', padding: '10px', display: 'flex', flexDirection: 'column', gap: 5 }}>
-        <div style={{ height: 7, width: '70%', borderRadius: 2, background: 'rgba(255,255,255,0.85)' }} />
-        <div style={{ height: 5, width: '90%', borderRadius: 2, background: 'rgba(255,255,255,0.35)' }} />
-        <div style={{ height: 5, width: '75%', borderRadius: 2, background: 'rgba(255,255,255,0.35)', marginBottom: 3 }} />
-        <div style={{ display: 'inline-block', alignSelf: 'flex-start', background: 'var(--sun-500)', color: 'var(--teal-900)',
-                      fontSize: 7, fontWeight: 700, padding: '3px 9px', borderRadius: t.pilRadius > 10 ? 99 : 3 }}>
-          Solicitar presupuesto
-        </div>
-      </div>
-      {/* Mini página */}
-      <div style={{ background: t.bgPage, padding: '10px 10px 12px' }}>
-        <div style={{ height: 5, width: '45%', borderRadius: 2, background: 'var(--sun-800)', marginBottom: 6 }} />
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 8 }}>
-          {[1, 2].map((i) => (
-            <div key={i} style={{ background: t.bgCard, borderRadius: t.radius, boxShadow: t.shadow,
-                                  border: '1px solid var(--grey-200)', padding: '7px 8px' }}>
-              <div style={{ height: 5, width: '60%', borderRadius: 2, background: 'var(--teal-700)', marginBottom: 3 }} />
-              <div style={{ height: 3, width: '85%', borderRadius: 2, background: '#C7CFD2', marginBottom: 2 }} />
-              <div style={{ height: 3, width: '65%', borderRadius: 2, background: '#C7CFD2', marginBottom: 6 }} />
-              <div style={{ height: 3, width: 36, borderRadius: t.pilRadius > 10 ? 99 : 2,
-                            background: 'rgba(36,75,90,0.2)', border: '1px solid var(--teal-700)' }} />
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export default function AdminSettings() {
   const { user } = useAuth();
@@ -127,7 +54,7 @@ export default function AdminSettings() {
       const data = settingsRes.data || {};
 
       setSettings({
-        theme: THEMES.some((t) => t.value === data.theme) ? data.theme : defaultSettings.theme,
+        theme: data.theme || defaultSettings.theme,
         contactEmail: data.contactEmail || defaultSettings.contactEmail,
         whatsappNumber: data.whatsappNumber || defaultSettings.whatsappNumber,
         phoneNumberDisplay: data.phoneNumberDisplay || defaultSettings.phoneNumberDisplay,
@@ -307,58 +234,19 @@ export default function AdminSettings() {
 
   return (
     <div className="max-w-5xl space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900 mb-1">Configuración</h1>
-        <p className="text-slate-500 text-sm">Edita datos de contacto, horarios y usuarios administradores.</p>
-      </div>
-
-      <div className="card p-6">
-        <div className="flex items-start justify-between gap-4 mb-1">
-          <h2 className="font-semibold text-slate-800 flex items-center gap-2">
-            <FiDroplet size={16} />
-            Personalización
-          </h2>
-          <a
-            href="/"
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-200 text-slate-500 hover:border-primary-700 hover:text-primary-700 transition-colors flex-shrink-0"
-          >
-            <FiExternalLink size={12} /> Ver sitio
-          </a>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 mb-1">Configuración</h1>
+          <p className="text-slate-500 text-sm">Edita datos de contacto, horarios y usuarios administradores.</p>
         </div>
-        <p className="text-slate-500 text-sm mb-4">
-          Elegí el estilo del sitio público. Los colores de marca y la tipografía no cambian. Guardá para aplicar el cambio.
-        </p>
-        <div className="grid sm:grid-cols-3 gap-3">
-          {THEMES.map((t) => {
-            const active = settings.theme === t.value;
-            return (
-              <button
-                key={t.value}
-                type="button"
-                onClick={() => setSettings((prev) => ({ ...prev, theme: t.value }))}
-                className={`text-left p-3 rounded-xl border-2 transition-all ${active ? 'border-primary-700 bg-primary-50/40 shadow-sm' : 'border-slate-200 hover:border-primary-300 hover:shadow-sm'}`}
-              >
-                <div className="mb-3">
-                  <ThemePreviewCard t={t} />
-                </div>
-                <p className="text-sm font-semibold text-slate-800 flex items-center gap-2">
-                  {t.label}
-                  {active && (
-                    <span className="inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full bg-primary-700 text-white">
-                      <FiCheck size={10} /> Activo
-                    </span>
-                  )}
-                </p>
-                <p className="text-xs text-slate-500 mt-1">{t.hint}</p>
-              </button>
-            );
-          })}
-        </div>
-        <p className="text-xs text-slate-400 mt-3">
-          Hacé click en <strong>"Guardar configuración"</strong> al final para aplicar el cambio en el sitio, luego abrí <strong>"Ver sitio"</strong> arriba para comprobarlo.
-        </p>
+        <a
+          href="/"
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-200 text-slate-500 hover:border-primary-700 hover:text-primary-700 transition-colors flex-shrink-0"
+        >
+          <FiExternalLink size={12} /> Ver sitio
+        </a>
       </div>
 
       <div className="card p-6">

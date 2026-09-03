@@ -26,7 +26,7 @@ const EMPTY_FORM = {
   tags: '',
 };
 
-function ProductModal({ product, categories, onClose, onSaved }) {
+function ProductModal({ product, categories, onClose, onSaved, onCategoryCreated }) {
   // Incluye siempre la categoría actual del producto aunque ya no exista en la lista
   const categoryOptions = Array.from(
     new Set([...(categories || []), product?.category].filter(Boolean))
@@ -43,6 +43,31 @@ function ProductModal({ product, categories, onClose, onSaved }) {
   );
   const [newFiles, setNewFiles] = useState([]);
   const [removeIds, setRemoveIds] = useState([]);
+  // Antes, si la categoría que necesitabas no existía, había que cancelar este formulario,
+  // ir a la pestaña Categorías, crearla, y volver a abrir "Nuevo producto" desde cero para
+  // recién ahí poder elegirla. Con esto se crea sin salir del formulario del producto.
+  const [creatingCategory, setCreatingCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [savingCategory, setSavingCategory] = useState(false);
+
+  const handleCreateCategory = async (e) => {
+    e.preventDefault();
+    const name = newCategoryName.trim();
+    if (!name) return;
+    setSavingCategory(true);
+    try {
+      await categoriesAPI.create({ name });
+      await onCategoryCreated?.();
+      setForm((f) => ({ ...f, category: name }));
+      setNewCategoryName('');
+      setCreatingCategory(false);
+      toast.success('Categoría creada');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Error al crear la categoría');
+    } finally {
+      setSavingCategory(false);
+    }
+  };
   const [saving, setSaving] = useState(false);
   const fileRef = useRef();
 
@@ -124,13 +149,46 @@ function ProductModal({ product, categories, onClose, onSaved }) {
               <input id={fieldId('stock')} type="number" min="0" className="input" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} required placeholder="0" />
             </div>
             <div className="col-span-2">
-              <label className="label" htmlFor={fieldId('category')}>Categoría *</label>
-              <select id={fieldId('category')} className="input" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} required>
-                <option value="">Seleccionar categoría...</option>
-                {categoryOptions.map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
-              {categoryOptions.length === 0 && (
-                <p className="text-xs text-slate-400 mt-1">No hay categorías cargadas. Creá una en la sección Categorías.</p>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="label mb-0" htmlFor={fieldId('category')}>Categoría *</label>
+                <button
+                  type="button"
+                  onClick={() => setCreatingCategory((v) => !v)}
+                  className="text-xs font-semibold text-brand hover:text-brand-dark inline-flex items-center gap-1"
+                >
+                  <FiPlus size={12} /> {creatingCategory ? 'Cancelar' : 'Nueva categoría'}
+                </button>
+              </div>
+              {creatingCategory ? (
+                <div className="flex gap-2">
+                  <input
+                    autoFocus
+                    className="input flex-1"
+                    value={newCategoryName}
+                    onChange={(e) => setNewCategoryName(e.target.value)}
+                    placeholder="Nombre de la categoría"
+                    maxLength={60}
+                    onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleCreateCategory(e); } }}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleCreateCategory}
+                    disabled={savingCategory || !newCategoryName.trim()}
+                    className="btn-primary shrink-0 disabled:opacity-50"
+                  >
+                    {savingCategory ? 'Creando...' : 'Crear'}
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <select id={fieldId('category')} className="input" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} required>
+                    <option value="">Seleccionar categoría...</option>
+                    {categoryOptions.map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                  {categoryOptions.length === 0 && (
+                    <p className="text-xs text-slate-400 mt-1">No hay categorías cargadas todavía — creá la primera con "Nueva categoría" arriba.</p>
+                  )}
+                </>
               )}
             </div>
             <div className="col-span-2">
@@ -551,6 +609,7 @@ export default function AdminProducts() {
           categories={categoryNames}
           onClose={() => setModal(null)}
           onSaved={fetchProducts}
+          onCategoryCreated={fetchCategories}
         />
       )}
     </div>
