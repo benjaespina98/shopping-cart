@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import {
   FiGrid, FiPackage, FiShoppingBag,
@@ -53,6 +53,15 @@ function SidebarLink({ to, label, Icon, onClick }) {
         </>
       )}
     </NavLink>
+  );
+}
+
+function ContentFallback() {
+  return (
+    <div className="flex items-center justify-center py-24">
+      <div className="w-7 h-7 border-4 rounded-full animate-spin"
+           style={{ borderColor: 'var(--teal-200)', borderTopColor: 'var(--teal-700)' }} />
+    </div>
   );
 }
 
@@ -170,9 +179,16 @@ export default function AdminLayout() {
           </div>
         </header>
 
-        {/* Page content */}
+        {/* Page content. Cada sección (Outlet) es su propio lazy() en App.jsx — sin un
+            Suspense acá adentro, el que la atrapaba era el que envuelve a AdminLayout
+            entero en App.jsx, así que cambiar de sección desmontaba todo el layout
+            (sidebar incluida) y tapaba la pantalla con el spinner de carga inicial.
+            Con el boundary acá, solo el contenido muestra el loader; sidebar y header
+            quedan fijos. */}
         <main className="flex-1 overflow-y-auto p-4 sm:p-6">
-          <Outlet />
+          <Suspense fallback={<ContentFallback />}>
+            <Outlet />
+          </Suspense>
         </main>
       </div>
     </div>
