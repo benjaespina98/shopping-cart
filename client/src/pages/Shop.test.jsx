@@ -129,6 +129,21 @@ describe('Shop', () => {
     expect(await screen.findByText('Producto 1')).toBeInTheDocument();
   });
 
+  // Regresión: al pasar de página, la pantalla se quedaba en el pie de la grilla vieja
+  // (donde está la paginación) mientras arriba ya habían cambiado los productos.
+  it('sube el scroll al cambiar de página, pero no al entrar por primera vez', async () => {
+    const user = userEvent.setup();
+    productsAPI.getAll.mockResolvedValue(respuesta([producto(1)], { pages: 3, total: 30 }));
+    renderShop();
+    await screen.findByText('Producto 1');
+
+    const scrollSpy = vi.spyOn(Element.prototype, 'scrollIntoView');
+    expect(scrollSpy).not.toHaveBeenCalled();
+
+    await user.click(screen.getByRole('button', { name: '2' }));
+    await waitFor(() => expect(scrollSpy).toHaveBeenCalled());
+  });
+
   it('vuelve a la primera página al cambiar un filtro', async () => {
     const user = userEvent.setup();
     productsAPI.getAll.mockResolvedValue(respuesta([producto(1)], { pages: 3, total: 30 }));

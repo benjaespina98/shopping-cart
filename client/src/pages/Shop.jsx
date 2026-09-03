@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { FiSearch, FiX, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { productsAPI, categoriesAPI } from '../services/api';
 import ProductCard from '../components/ui/ProductCard';
@@ -60,6 +60,8 @@ export default function Shop() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalProducts, setTotalProducts] = useState(0);
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const resultsRef = useRef(null);
+  const isFirstRender = useRef(true);
 
   const inCartByProductId = useMemo(() => {
     const map = new Map();
@@ -102,6 +104,18 @@ export default function Shop() {
 
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
 
+  // Al pasar de página quedabas viendo el pie de la grilla anterior (donde está la
+  // paginación) mientras arriba ya habían cambiado los productos — había que scrollear
+  // a mano para darte cuenta. Se salta el primer render para no scrollear al entrar
+  // a la tienda desde otra página.
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [page]);
+
   const handleCategory = (cat) => {
     setSelectedCategory(cat === selectedCategory ? '' : cat);
     setPage(1);
@@ -138,7 +152,7 @@ export default function Shop() {
         </div>
 
         {/* Search + Sort */}
-        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center', marginBottom: 28,
+        <div ref={resultsRef} style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center', marginBottom: 28,
                       background: '#fff', borderRadius: 'var(--radius-lg)', padding: '12px 16px',
                       border: '1px solid var(--border-subtle)', boxShadow: 'var(--shadow-sm)' }}>
           <div style={{ flex: '1 1 180px', position: 'relative', minWidth: 0 }}>
