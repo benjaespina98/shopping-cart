@@ -75,6 +75,31 @@ describe('AdminProducts — CRUD', () => {
     await waitFor(() => expect(productsAPI.getAllAdmin).toHaveBeenCalledTimes(2));
   });
 
+  // Regresión: antes, si la categoría que necesitabas no existía, había que cancelar el
+  // formulario, ir a la pestaña Categorías, crearla ahí, y volver a abrir "Nuevo producto"
+  // desde cero para poder elegirla. Ahora se crea sin salir del formulario del producto.
+  it('permite crear una categoría nueva sin salir del formulario de producto', async () => {
+    const user = userEvent.setup();
+    categoriesAPI.create.mockResolvedValue({ data: { _id: 'c2', name: 'Bombas y filtros' } });
+    categoriesAPI.getAll
+      .mockResolvedValueOnce({ data: [{ _id: 'c1', name: 'Limpieza' }] })
+      .mockResolvedValueOnce({ data: [{ _id: 'c1', name: 'Limpieza' }, { _id: 'c2', name: 'Bombas y filtros' }] });
+
+    renderPage();
+    await screen.findByText('Cloro granulado 5kg');
+
+    await user.click(screen.getByRole('button', { name: /nuevo producto/i }));
+    await user.click(screen.getByRole('button', { name: /nueva categoría/i }));
+    await user.type(screen.getByPlaceholderText('Nombre de la categoría'), 'Bombas y filtros');
+    await user.click(screen.getByRole('button', { name: /^crear$/i }));
+
+    await waitFor(() => expect(categoriesAPI.create).toHaveBeenCalledWith({ name: 'Bombas y filtros' }));
+    expect(toast.success).toHaveBeenCalledWith('Categoría creada');
+    // Vuelve a pedir las categorías del padre y deja la nueva ya seleccionada en el form.
+    await waitFor(() => expect(categoriesAPI.getAll).toHaveBeenCalledTimes(2));
+    expect(screen.getByLabelText(/categoría \*/i)).toHaveValue('Bombas y filtros');
+  });
+
   it('edita un producto existente precargando sus datos en el formulario', async () => {
     const user = userEvent.setup();
     productsAPI.update.mockResolvedValue({ data: producto({ name: 'Cloro granulado 10kg' }) });
