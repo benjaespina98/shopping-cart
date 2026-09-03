@@ -5,7 +5,7 @@ import {
 } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import { projectsAPI } from '../../services/api';
-import { cldOptimized } from '../../utils/cloudinary';
+import CldImage from '../../components/ui/CldImage';
 import { useImagePicker } from '../../hooks/useImagePicker';
 import { useReorderableList } from '../../hooks/useReorderableList';
 
@@ -232,7 +232,7 @@ export default function AdminSite() {
               {/* Image */}
               <div className="aspect-video relative bg-slate-100">
                 {p.imageUrl
-                  ? <img src={cldOptimized(p.imageUrl, 480)} alt={p.title} loading="lazy" decoding="async" className="w-full h-full object-cover" />
+                  ? <CldImage src={p.imageUrl} alt={p.title} width={480} className="w-full h-full object-cover" />
                   : <div className="w-full h-full flex items-center justify-center text-slate-300"><FiImage size={32} /></div>}
                 <div className="absolute top-2 left-2 flex flex-col gap-1 items-start">
                   {p.isHero && (

@@ -3,7 +3,7 @@ import { FiSave, FiPlus, FiTrash2, FiUsers, FiClock, FiMail, FiUserMinus, FiDown
 import { toast } from 'react-toastify';
 import QRCode from 'qrcode';
 import { settingsAPI } from '../../services/api';
-import { cldOptimized } from '../../utils/cloudinary';
+import CldImage from '../../components/ui/CldImage';
 import { useAuth } from '../../context/AuthContext';
 
 const defaultSettings = {
@@ -435,7 +435,7 @@ export default function AdminSettings() {
             <label className="flex-shrink-0 cursor-pointer">
               <div className="w-32 h-24 rounded-xl border-2 border-dashed border-slate-300 hover:border-primary-700 flex flex-col items-center justify-center text-slate-400 hover:text-primary-700 transition-colors overflow-hidden">
                 {settings.contactPhotoUrl
-                  ? <img src={cldOptimized(settings.contactPhotoUrl, 320)} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
+                  ? <CldImage src={settings.contactPhotoUrl} width={320} className="w-full h-full object-cover" />
                   : <><FiImage size={20} /><span className="text-xs mt-1">Elegir foto</span></>}
               </div>
               <input type="file" accept="image/*" className="hidden" ref={contactPhotoInputRef} onChange={handleContactPhotoChange} />
@@ -458,7 +458,7 @@ export default function AdminSettings() {
             <label className="flex-shrink-0 cursor-pointer">
               <div className="w-32 h-24 rounded-xl border-2 border-dashed border-slate-300 hover:border-primary-700 flex flex-col items-center justify-center text-slate-400 hover:text-primary-700 transition-colors overflow-hidden">
                 {settings.aboutPhotoUrl
-                  ? <img src={cldOptimized(settings.aboutPhotoUrl, 320)} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
+                  ? <CldImage src={settings.aboutPhotoUrl} width={320} className="w-full h-full object-cover" />
                   : <><FiImage size={20} /><span className="text-xs mt-1">Elegir foto</span></>}
               </div>
               <input type="file" accept="image/*" className="hidden" ref={aboutPhotoInputRef} onChange={handleAboutPhotoChange} />

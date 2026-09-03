@@ -5,7 +5,7 @@ import {
 } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import { servicesAPI } from '../../services/api';
-import { cldOptimized } from '../../utils/cloudinary';
+import CldImage from '../../components/ui/CldImage';
 import { useImagePicker } from '../../hooks/useImagePicker';
 import { useReorderableList } from '../../hooks/useReorderableList';
 
@@ -241,7 +241,7 @@ export default function AdminServices() {
                         {editPreview
                           ? <img src={editPreview} alt="" className="w-full h-full object-cover" />
                           : s.imageUrl
-                            ? <img src={cldOptimized(s.imageUrl, 240)} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
+                            ? <CldImage src={s.imageUrl} width={240} className="w-full h-full object-cover" />
                             : <span>Cambiar foto</span>}
                       </div>
                       <input type="file" accept="image/*" className="hidden" ref={editFileRef} onChange={handleEditFileChange} />
@@ -280,7 +280,7 @@ export default function AdminServices() {
                 <div className="flex items-start gap-4">
                   <div className="w-20 h-16 rounded-lg overflow-hidden bg-slate-100 shrink-0">
                     {s.imageUrl
-                      ? <img src={cldOptimized(s.imageUrl, 240)} alt={s.title} loading="lazy" decoding="async" className="w-full h-full object-cover" />
+                      ? <CldImage src={s.imageUrl} alt={s.title} width={240} className="w-full h-full object-cover" />
                       : <div className="w-full h-full flex items-center justify-center text-slate-300"><FiImage size={20} /></div>}
                   </div>
                   <div className="flex-1 min-w-0">
