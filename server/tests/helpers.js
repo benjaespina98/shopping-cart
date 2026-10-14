@@ -39,6 +39,24 @@ export async function startTestApp() {
   process.env.STORE_NAME = 'Playa y Sol Test';
   process.env.CLIENT_URL = 'http://localhost:5173';
 
+  // Mismo patrón que las URIs de Mongo: server/.env (uso local) puede traer credenciales
+  // reales de SMTP y Cloudinary, y dotenv completa las variables que falten. Sin esto, los
+  // tests que crean consultas mandarían mails de verdad a QUOTE_NOTIFY_EMAIL, y cualquier
+  // subida o borrado de imagen pegaría contra el Cloudinary real. Vacías, el mailer queda
+  // deshabilitado (getTransporter devuelve null) y Cloudinary sin cloud_name.
+  for (const key of [
+    'SMTP_HOST',
+    'SMTP_PORT',
+    'SMTP_USER',
+    'SMTP_PASS',
+    'QUOTE_NOTIFY_EMAIL',
+    'CLOUDINARY_CLOUD_NAME',
+    'CLOUDINARY_API_KEY',
+    'CLOUDINARY_API_SECRET',
+  ]) {
+    process.env[key] = '';
+  }
+
   const { default: app } = await import('../app.js');
 
   // app.js sólo conecta a Mongo de forma perezosa, dentro del middleware que
