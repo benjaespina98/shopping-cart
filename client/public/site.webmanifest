@@ -1,0 +1,15 @@
+{
+  "name": "Playa & Sol Piscinas",
+  "short_name": "Playa & Sol",
+  "description": "Construcción, reforma y mantenimiento de piscinas en Villa María, Córdoba.",
+  "lang": "es-AR",
+  "start_url": "/",
+  "scope": "/",
+  "display": "browser",
+  "theme_color": "#244B5A",
+  "background_color": "#FBF9F5",
+  "icons": [
+    { "src": "/favicon.png", "sizes": "748x748", "type": "image/png", "purpose": "any" },
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
