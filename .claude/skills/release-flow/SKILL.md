@@ -21,7 +21,8 @@ y reportá si cambió.
 - Nunca `git push` a `main` ni variantes (`HEAD:main`, `+`, `--force`, `--delete`, `--all`, `--mirror`);
   están denegadas en `.claude/settings.json`. Las reglas de patrón **no son una barrera completa**: la
   barrera definitiva es el ruleset de GitHub.
-- Nunca `squash` ni `rebase` al mergear: siempre merge commit. Nunca `gh pr merge --admin`.
+- Nunca `squash` ni `rebase` al mergear: siempre merge commit. Nunca `gh pr merge --admin` ni
+  `--delete-branch` (con `develop → main` pediría borrar `develop`, la rama por defecto).
 - Nunca `gh api` con `-X`, `-f`, `-F`, `--input` ni `graphql` (solo GET de lectura).
 - Nunca leer `.env*`, correr el seed ni imprimir tokens (`gh auth token`, `--show-token`).
 - No cambies de rama con trabajo sin commitear ni uses `git switch` hacia `develop`/`main` (borra
@@ -32,7 +33,8 @@ y reportá si cambió.
 ## 0. Requisitos
 1. `gh --version` y `gh auth status` (el token no se imprime). Si falta `gh` o no hay sesión, parate y dá
    los pasos manuales: instalar desde https://cli.github.com y correr `gh auth login`.
-2. `git status --short` vacío y rama actual distinta de `main`/`develop`.
+2. `git status --short` vacío y rama actual distinta de `main`/`develop`. Para revisar el diff que va a
+   producción usá siempre `git worktree add` (fuera del repo), nunca `git switch`.
 
 ## 1. Condiciones de subida (todo en verde; si no, no se sube)
 | Check | Comando |
@@ -134,7 +136,9 @@ de prueba y las violaciones de CSP en la consola del navegador.
    aparte (`revert/<release>`). Si `develop` ya tiene commits sin liberar, el PR `develop → main` los
    llevaría a producción junto con el revert: en ese caso armá el revert **desde `origin/main`** (con
    `git worktree add <ruta fuera del repo> -b revert/<release> origin/main`, no con `git switch`) y abrí
-   el PR a `main` con la misma confirmación; después llevá el revert a `develop`. No mergear nada más a
+   el PR a `main` con la misma confirmación, adaptando la verificación del paso 4: `headRefName` =
+   `revert/<release>` (no `develop`) y `headRefOid` comparado con `git rev-parse origin/revert/<release>`;
+   el `<sha7>` de la frase es el de ese commit. Después llevá el revert a `develop`. No mergear nada más a
    `main` hasta que el revert esté en `main`, o se volvería a desplegar el código defectuoso.
 3. **Volver a aplicar el release más adelante:** git ya considera esos commits "mergeados", así que
    re-mergear la rama no los trae de nuevo. Hay que **revertir el revert**: `git revert <sha-del-revert>`
@@ -158,6 +162,8 @@ de prueba y las violaciones de CSP en la consola del navegador.
 | Build | `npm run build` | |
 
 ## Revisión de agentes (sobre origin/main...origin/develop)
+SHA revisado: <headRefOid completo de develop>
+
 | Agente | Hallazgos Alta/Crítica | Estado |
 |---|---|---|
 | security-reviewer | | |

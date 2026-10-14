@@ -6,7 +6,7 @@ Sitio público + panel admin de una empresa de piscinas (Villa María, Córdoba)
 - `client/` — SPA React 18 + Vite 5 + Tailwind 3 + React Router 6 (CSR, sin SSR). Tests con Vitest + Testing Library.
 - `server/` — API Express 4 + Mongoose 8, JWT, multer + Cloudinary, nodemailer. Tests con Vitest + Supertest + mongodb-memory-server.
 - `api/index.js` — entrada serverless de Vercel (reexporta `server/app.js`). `vercel.json` (raíz) define build y rewrites.
-- CI: `.github/workflows/vercel-build-check.yml` (tests de client y server + build en PRs a `main`).
+- CI: `.github/workflows/vercel-build-check.yml` (lint, `npm audit`, tests de client y server y build en PRs a `main` y `develop`).
 - Node `>=22.19.0`. JavaScript puro: **no introducir TypeScript**.
 
 ## Comandos (desde la raíz)
@@ -54,4 +54,4 @@ Sitio público + panel admin de una empresa de piscinas (Villa María, Córdoba)
 
 ## Configuración de Claude en este repo
 - `.claude/settings.json` — permisos denegados y hooks (`guard-secrets.sh` antes de Read/Edit/Write; `format-edited.sh` lintea el archivo editado si ESLint está instalado).
-- `.claude/agents/` — revisores de solo lectura. `.claude/skills/` — `security-audit`, `pre-release-check`.
+- `.claude/agents/` — revisores de solo lectura. `.claude/skills/` — `security-audit`, `pre-release-check`, `release-flow`.

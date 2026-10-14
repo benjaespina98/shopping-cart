@@ -54,6 +54,7 @@ Cada regla existe con la forma `Bash(...)` y con la forma `PowerShell(...)`.
 - La herramienta PowerShell figura como *preview* en la documentación y no indica desde qué versión de
   Claude Code existe: no pude confirmar si tu versión la tiene habilitada.
 - En un repo público, `gh pr create --body-file <ruta>` publica el contenido del archivo: por eso la skill
-  `release-flow` exige cuerpo inline o un archivo generado en un directorio temporal.
+  `release-flow` exige un archivo generado con la herramienta Write en el scratchpad (nunca inline por
+  línea de comandos ni una ruta arbitraria).
 - Los permisos son locales a esta máquina. El control que no depende de ella es un ruleset de GitHub
   sobre `main`, que **hoy no existe** (ver `docs/RELEASE.md`).
