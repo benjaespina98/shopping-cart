@@ -142,7 +142,7 @@ export default function Quote() {
         <Card padding="lg">
           {sent ? (
             <div style={{ textAlign: 'center', padding: '32px 10px' }}>
-              <img src="/brand/logo-icon.png" alt="" style={{ height: 88, width: 'auto', display: 'block', margin: '0 auto 20px' }} />
+              <img src="/brand/logo-icon.png" alt="" width={99} height={88} loading="lazy" decoding="async" style={{ height: 88, width: 'auto', display: 'block', margin: '0 auto 20px' }} />
               <h2 style={{ fontSize: 26, marginBottom: 10, fontFamily: 'var(--font-display)',
                            color: 'var(--text-strong)' }}>¡Gracias!</h2>
               <p style={{ color: 'var(--text-muted)', marginBottom: 28, fontSize: 15, lineHeight: 1.6 }}>
