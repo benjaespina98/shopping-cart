@@ -18,7 +18,7 @@ Leyenda: ✅ debe estar seteada · ⚪ opcional · ❌ no setear · 🔑 marcar 
 | Variable | Production | Preview | Local | Secreto | Notas |
 |---|---|---|---|---|---|
 | `JWT_SECRET` | ✅ ≠ 🔑 | ✅ ≠ 🔑 | ✅ | Sí | La app no arranca sin ella en Production/Preview (`assertRequiredEnv`). |
-| `JWT_EXPIRES_IN` | ⚪ | ⚪ | ⚪ | No | Por defecto `7d`. |
+| `JWT_EXPIRES_IN` | ⚪ | ⚪ | ⚪ | No | Por defecto `7d`. También es el `Max-Age` de la cookie de sesión del panel (ver `docs/adr/0001-admin-session-cookie.md`). |
 | `MONGODB_URI_PRODUCTION` | ✅ 🔑 | ❌ | ❌ | Sí | Solo Production. |
 | `MONGODB_URI_PREVIEW` | ❌ | ✅ ≠ 🔑 | ⚪ | Sí | Obligatoria en Preview; base distinta de producción. |
 | `MONGODB_URI_DEVELOPMENT` | ❌ | ❌ | ✅ | Sí | Base de desarrollo. |

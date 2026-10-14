@@ -29,6 +29,7 @@ Sitio público + panel admin de una empresa de piscinas (Villa María, Córdoba)
 ## Checklist de seguridad (aplicar en cada cambio)
 - Validación **server-side** de todo input (tipo, formato, longitud); el precio y el total se calculan en el servidor (ver `orderController`).
 - Rutas de escritura y de admin con `protect` + `adminOnly`; sin mass assignment (lista blanca de campos).
+- Sesión del panel: cookie httpOnly (`ps_admin_session`), nunca el token en `localStorage` ni en el cuerpo; `protect` ya exige el header `X-Requested-With` y un `Origin` permitido en POST/PUT/PATCH/DELETE (ADR en `docs/adr/`).
 - Sin secretos en código, logs, tests, README ni bundle del cliente. Variables solo en `.env` (ignorado) y documentadas en `server/.env.example`. Nada con prefijo `VITE_` que sea secreto.
 - Sin fallbacks literales de contraseñas o secretos (`process.env.X || '...'`).
 - `target="_blank"` siempre con `rel="noopener noreferrer"`.
