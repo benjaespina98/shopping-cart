@@ -252,16 +252,42 @@
    Se usa :focus-visible para que el anillo aparezca al tabular pero no al
    hacer click con el mouse.
    ============================================================ */
-:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+:where(a, button, input, select, textarea, summary, [tabindex], [role="button"], [role="link"]):focus-visible {
   outline: 3px solid var(--focus-ring);
   outline-offset: 2px;
+  /* Anillo interno de marca: el amarillo solo tiene ~1.5:1 contra blanco y fondo claro (WCAG
+     pide 3:1 para indicadores de foco). El teal pegado al elemento sí lo cumple y no se quita
+     ningún color: son los mismos tokens, en dos capas. */
+  box-shadow: 0 0 0 2px var(--brand-primary);
   border-radius: var(--radius-xs);
 }
 
 /* Sobre fondos teal oscuros el amarillo de foco pierde contraste contra el
    propio acento de marca; ahí el anillo va blanco. */
-.ps-on-dark :where(a, button, input, select, textarea, [tabindex]):focus-visible {
+.ps-on-dark :where(a, button, input, select, textarea, summary, [tabindex], [role="button"], [role="link"]):focus-visible {
   outline-color: var(--text-inverse);
+  box-shadow: 0 0 0 2px var(--brand-primary-press);
+}
+
+/* Enlace "Saltar al contenido": primer elemento enfocable de la página, visible solo con foco. */
+.ps-skip-link {
+  position: absolute;
+  top: var(--space-3);
+  left: var(--space-4);
+  z-index: 1000;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--brand-primary);
+  color: var(--text-inverse);
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-250%);
+}
+.ps-skip-link:focus,
+.ps-skip-link:focus-visible {
+  transform: translateY(0);
 }
 
 /* Superficie interactiva: eleva y profundiza la sombra al pasar el mouse.

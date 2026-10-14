@@ -20,8 +20,20 @@ export default function PublicLayout() {
   return (
     <SettingsProvider>
       <div className="flex flex-col min-h-screen">
+        {/* Primer elemento enfocable: lleva el foco al contenido sin recorrer la barra. Se
+            maneja con onClick (y no con el hash) para no ensuciar la URL de la SPA. */}
+        <a
+          href="#contenido"
+          className="ps-skip-link"
+          onClick={(e) => {
+            e.preventDefault();
+            document.getElementById('contenido')?.focus();
+          }}
+        >
+          Saltar al contenido
+        </a>
         <Navbar />
-        <main className="flex-1">
+        <main id="contenido" tabIndex={-1} className="flex-1">
           <Outlet />
         </main>
         <Footer />
