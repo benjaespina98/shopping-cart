@@ -8,13 +8,10 @@
          React los consume en cuanto arranca (ver src/utils/prefetch.js); si ya no están
          disponibles (SPA, ruta distinta, o esto falló) cada componente vuelve a pedirlos
          como antes. En un cold start del backend, esto adelanta el pedido varios cientos
-         de ms — justo el tiempo que la foto del hero se veía como placeholder vacío. -->
-    <script>
-      window.__prefetch = {
-        projects: fetch('/api/projects').then((r) => r.json()).catch(() => null),
-        settings: fetch('/api/settings/public').then((r) => r.json()).catch(() => null),
-      };
-    </script>
+         de ms — justo el tiempo que la foto del hero se veía como placeholder vacío.
+         Vive en /prefetch.js (y no inline) para que la CSP pueda exigir script-src 'self'
+         sin 'unsafe-inline'. -->
+    <script src="/prefetch.js"></script>
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Playa &amp; Sol — Construcción, reforma y mantenimiento de piscinas en Villa María, Córdoba." />
@@ -24,12 +21,12 @@
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Playa &amp; Sol Piscinas" />
     <meta property="og:description" content="Construcción, reforma y mantenimiento de piscinas en Villa María, Córdoba. +30 años de experiencia." />
-    <meta property="og:image" content="/brand/logo-stacked.png" />
+    <meta property="og:image" content="https://playaysol.vercel.app/brand/logo-stacked.png" />
     <meta property="og:image:width" content="1032" />
     <meta property="og:image:height" content="840" />
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:title" content="Playa &amp; Sol Piscinas" />
-    <meta property="twitter:image" content="/brand/logo-stacked.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Playa &amp; Sol Piscinas" />
+    <meta name="twitter:image" content="https://playaysol.vercel.app/brand/logo-stacked.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <!-- La imagen del Hero se sirve desde Cloudinary; abrimos la conexión cuanto antes

@@ -148,6 +148,8 @@ app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
+const GENERIC_SERVER_ERROR = 'Error interno del servidor. Intentá de nuevo en unos minutos.';
+
 app.use((err, req, res, next) => {
   // Mostrar el error en consola para debugging
   console.error('Express error:', err);
@@ -183,10 +185,15 @@ app.use((err, req, res, next) => {
     message = field ? `Ya existe un registro con ese ${field}.` : 'El recurso ya existe.';
   }
 
-  res.status(statusCode).json({
-    message,
-    stack: process.env.NODE_ENV === 'production' ? null : err.stack,
-  });
+  // Los 5xx son fallas del servidor (Mongo caído, un bug, config faltante). El detalle ya
+  // quedó en el console.error de arriba; al visitante no le sirve y a un atacante sí
+  // (nombres de colecciones, rutas, versiones). Para 5xx va un mensaje genérico y el
+  // stack no viaja nunca en la respuesta, en ningún entorno.
+  if (statusCode >= 500) {
+    message = GENERIC_SERVER_ERROR;
+  }
+
+  res.status(statusCode).json({ message });
 });
 
 export default app;

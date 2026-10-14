@@ -2,11 +2,21 @@ import mongoose from 'mongoose';
 import User from '../models/User.js';
 import Product from '../models/Product.js';
 import Service from '../models/Service.js';
-import { loadServerEnv, resolveMongoConnection } from '../config/env.js';
+import { loadServerEnv, resolveMongoConnection, resolveAdminCredentials } from '../config/env.js';
 
 loadServerEnv();
 
 const seed = async () => {
+  // Credenciales del admin: obligatorias y sin valores por defecto. Se validan ANTES de
+  // conectar, así un entorno mal configurado no toca la base.
+  let admin;
+  try {
+    admin = resolveAdminCredentials(process.env);
+  } catch (err) {
+    console.error(`❌ ${err.message}`);
+    process.exit(1);
+  }
+
   // Optional: SEED_ENV=production | preview | testing | development
   if (process.env.SEED_ENV) {
     process.env.APP_ENV = process.env.SEED_ENV;
@@ -17,12 +27,12 @@ const seed = async () => {
   console.log(`MongoDB connected for seeding (${label})...`);
 
   // Create admin user
-  const existingAdmin = await User.findOne({ email: process.env.ADMIN_EMAIL });
+  const existingAdmin = await User.findOne({ email: admin.email });
   if (!existingAdmin) {
     await User.create({
       name: 'Administrador',
-      email: process.env.ADMIN_EMAIL || 'admin@mitienda.com',
-      password: process.env.ADMIN_PASSWORD || 'Admin123!',
+      email: admin.email,
+      password: admin.password,
       role: 'admin',
     });
     console.log('✅ Admin user created');
