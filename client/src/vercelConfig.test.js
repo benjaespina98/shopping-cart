@@ -70,8 +70,14 @@ describe('vercel.json — Content-Security-Policy', () => {
   });
 
   it('index.html no tiene scripts inline (la CSP exige script-src self)', () => {
+    // Solo cuentan los scripts ejecutables: un bloque de datos (type="application/ld+json")
+    // no se ejecuta y no lo restringe script-src.
+    const executable = (attrs) => {
+      const type = /\btype\s*=\s*["']([^"']*)["']/i.exec(attrs)?.[1]?.toLowerCase();
+      return !type || type === 'module' || type === 'text/javascript' || type === 'application/javascript';
+    };
     const inline = [...indexHtml.matchAll(/<script\b([^>]*)>/gi)].filter(
-      (m) => !/\bsrc\s*=/.test(m[1])
+      (m) => executable(m[1]) && !/\bsrc\s*=/.test(m[1])
     );
     expect(inline).toHaveLength(0);
   });
