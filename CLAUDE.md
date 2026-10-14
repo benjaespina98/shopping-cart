@@ -15,7 +15,7 @@ Sitio público + panel admin de una empresa de piscinas (Villa María, Córdoba)
 - `npm run build` — build del cliente (`client/dist`). Vercel usa `npm run build:vercel`.
 - `npm --prefix client test` / `npm --prefix server test` — suites completas (`vitest run`).
 - Un archivo: `npm --prefix client exec vitest run src/pages/Contact.test.jsx`.
-- Lint: **todavía no hay ESLint**. Cuando se agregue, `npm run lint` debe cubrir client y server.
+- `npm run lint` — ESLint (flat config) en client y server. Errores = 0; los warnings son deuda medida (ver `docs/LINT.md`).
 - `npm run seed` — **NUNCA contra producción** (ver seguridad). Está denegado en `.claude/settings.json`.
 
 ## Convenciones
@@ -46,7 +46,7 @@ Sitio público + panel admin de una empresa de piscinas (Villa María, Córdoba)
 
 ## Flujo de trabajo
 - Un PR por tema, desde una rama propia (la base es `main`; `develop` es la rama de trabajo actual).
-- Antes de pedir revisión: lint (cuando exista), tests de client y server, y `npm run build` en verde. La skill `pre-release-check` lo automatiza.
+- Antes de pedir revisión: `npm run lint`, tests de client y server, y `npm run build` en verde. La skill `pre-release-check` lo automatiza.
 - Antes de cambios sensibles: skill `security-audit` o el agente `security-reviewer`. Para UI: `ux-a11y-reviewer`; para metadatos/rendimiento: `seo-perf-reviewer`.
 - Reportá siempre qué verificaste (comando + resultado) y qué **no** pudiste verificar.
 
