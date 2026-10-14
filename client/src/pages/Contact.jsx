@@ -7,6 +7,7 @@ import { Button } from '../design-system/Button';
 import { Card } from '../design-system/Card';
 import { Input } from '../design-system/Input';
 import { Photo } from '../design-system/Photo';
+import Honeypot from '../components/ui/Honeypot';
 import { useReveal } from '../hooks/useReveal';
 import { useSettings } from '../context/SettingsContext';
 import { isValidEmail, isValidPhone } from '../utils/validation';
@@ -25,6 +26,8 @@ export default function Contact() {
   const reveal = useReveal();
   const mapReveal = useReveal();
   const [form, setForm] = useState({ name: '', phone: '', email: '', message: '' });
+  // Campo trampa anti-spam: una persona nunca lo completa (ver components/ui/Honeypot.jsx).
+  const [hp, setHp] = useState('');
   const [fieldErrors, setFieldErrors] = useState({});
   const [sendingChannel, setSendingChannel] = useState('');
   const { settings: contactSettings } = useSettings();
@@ -82,6 +85,7 @@ export default function Contact() {
         email: form.email,
         message: form.message,
         source: 'contact',
+        website: hp,
       });
     } catch {
       // No bloqueamos el envío por WhatsApp/email si el guardado falla.
@@ -228,6 +232,8 @@ export default function Contact() {
           <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 'var(--space-5)' }}>
             Armamos el mensaje automáticamente con tus datos.
           </p>
+
+          <Honeypot value={hp} onChange={(e) => setHp(e.target.value)} />
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', marginBottom: 'var(--space-5)' }}>
             <div className="ps-form-row">

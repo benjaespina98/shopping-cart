@@ -71,7 +71,30 @@ describe('Contact — validación del formulario', () => {
 
     expect(quotesAPI.create).toHaveBeenCalledWith(expect.objectContaining({
       name: 'Juan', phone: '3534224605', email: 'juan@test.com', message: 'Consulta de prueba', source: 'contact',
+      website: '',
     }));
     expect(screen.queryByText(/ingresá un/i)).not.toBeInTheDocument();
+  });
+
+  // El honeypot es un campo oculto que un bot rellena y una persona no: debe viajar en el
+  // payload (el server lo descarta), no debe poder alcanzarse con Tab y no debe leerse.
+  it('incluye el campo trampa oculto, fuera del tab y de los lectores de pantalla', async () => {
+    const user = userEvent.setup();
+    quotesAPI.create.mockResolvedValue({});
+    vi.spyOn(window, 'open').mockReturnValue({ closed: false, location: { href: '' } });
+
+    const { container } = renderContact();
+    const trap = container.querySelector('input[name="website"]');
+
+    expect(trap).toBeInTheDocument();
+    expect(trap).toHaveAttribute('tabindex', '-1');
+    expect(trap).toHaveAttribute('autocomplete', 'off');
+    expect(trap.closest('[aria-hidden="true"]')).not.toBeNull();
+
+    await llenarCampos(user, { name: 'Bot', phone: '3534224605', email: 'bot@test.com', message: 'spam' });
+    await user.type(trap, 'http://spam.example');
+    await user.click(screen.getByRole('button', { name: /enviar por whatsapp/i }));
+
+    expect(quotesAPI.create).toHaveBeenCalledWith(expect.objectContaining({ website: 'http://spam.example' }));
   });
 });

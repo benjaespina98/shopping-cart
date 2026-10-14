@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { FiX, FiTrash2, FiPlus, FiMinus, FiMessageCircle, FiShoppingCart } from 'react-icons/fi';
 import { useCart } from '../../context/CartContext';
 import CldImage from './CldImage';
+import Honeypot from './Honeypot';
 import { ordersAPI } from '../../services/api';
 import { toast } from 'react-toastify';
 
@@ -9,6 +10,8 @@ export default function CartDrawer() {
   const { items, removeItem, updateQty, clearCart, totalItems, totalPrice, isOpen, toggleCart } =
     useCart();
   const [sending, setSending] = useState(false);
+  // Campo trampa anti-spam: una persona nunca lo completa (ver components/ui/Honeypot.jsx).
+  const [hp, setHp] = useState('');
 
   useEffect(() => {
     if (!isOpen) return;
@@ -36,6 +39,7 @@ export default function CartDrawer() {
     try {
       const { data } = await ordersAPI.create({
         items: items.map(({ productId, quantity }) => ({ productId, quantity })),
+        website: hp,
       });
 
       if (popup && !popup.closed) {
@@ -190,6 +194,7 @@ export default function CartDrawer() {
                 ${totalPrice.toLocaleString('es-AR')}
               </span>
             </div>
+            <Honeypot value={hp} onChange={(e) => setHp(e.target.value)} />
             {/* Tenía un shimmer permanente encima: un CTA que titila solo distrae y
                 da impresión de que algo está cargando. La jerarquía la da el color. */}
             <button
