@@ -1,6 +1,7 @@
 # Flujo de release
 
-1. Trabajar en una rama propia; `git status` limpio. Nada va directo a `main` (protegida por un ruleset de GitHub).
+1. Trabajar en una rama propia; `git status` limpio. Nada va directo a `main`. Ojo: el ruleset actual protege
+   `develop` (rama por defecto), **no `main`**; verificar con `gh api repos/{owner}/{repo}/rules/branches/main`.
 2. En verde: `npm run lint`, `npm --prefix client test`, `npm --prefix server test`, `npm run build`.
 3. `security-reviewer` (obligatorio) sobre `git diff origin/develop...HEAD`; sin hallazgos Alta/Crítica.
 4. `git push -u origin <rama>` y `gh pr create --base develop` con el cuerpo **inline** (o un archivo generado
@@ -25,4 +26,4 @@
 14. Prohibido: push a `main` (y variantes `+`, `--force`, `--delete`), `gh api` con métodos de escritura,
     deploy manual (`vercel --prod`) y el seed contra producción.
 15. Las reglas de `.claude/settings.json` (`deny`/`ask`) **ayudan** a cumplirlo; son de patrón y eludibles
-    (ver `docs/PERMISSIONS.md`). La barrera definitiva es el ruleset. Flujo: `.claude/skills/release-flow/SKILL.md`.
+    (ver `docs/PERMISSIONS.md`). La barrera definitiva sería un ruleset sobre `main`. Flujo: `.claude/skills/release-flow/SKILL.md`.

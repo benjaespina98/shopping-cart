@@ -1,7 +1,8 @@
 # Permisos de Claude Code en este repo
 
 Reglas de `.claude/settings.json` (`deny` / `ask` / `allow`). Sirven para **evitar errores**, no como
-barrera de seguridad: la barrera real de producción es el ruleset de GitHub y el control humano del merge.
+barrera de seguridad: la barrera real de producción es un ruleset de GitHub sobre `main` (hoy el ruleset
+`protect-main` aplica a `develop`, la rama por defecto; `main` no tiene reglas) y el control humano del merge.
 
 ## Qué cubren
 
@@ -46,5 +47,5 @@ Cada regla existe con la forma `Bash(...)` y con la forma `PowerShell(...)`.
   Claude Code existe: no pude confirmar si tu versión la tiene habilitada.
 - En un repo público, `gh pr create --body-file <ruta>` publica el contenido del archivo: por eso la skill
   `release-flow` exige cuerpo inline o un archivo generado en un directorio temporal.
-- Los permisos son locales a esta máquina. El control que no depende de ella es el ruleset de GitHub
-  (ver `docs/RELEASE.md`).
+- Los permisos son locales a esta máquina. El control que no depende de ella es un ruleset de GitHub
+  sobre `main`, que **hoy no existe** (ver `docs/RELEASE.md`).

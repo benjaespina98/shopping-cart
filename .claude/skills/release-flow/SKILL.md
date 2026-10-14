@@ -5,10 +5,16 @@ description: Flujo de publicación de este repo — rama → PR a develop → PR
 
 # release-flow
 
-Producción es la rama `main` y Vercel despliega **solo al mergear a `main`**. `main` está protegida en
-GitHub (ruleset: PR obligatorio, checks requeridos, sin force push); aun así nada va directo a `main`:
+Producción es la rama `main` y Vercel despliega **solo al mergear a `main`**. Nada va directo a `main`:
 ni push, ni force push, ni deploy manual. Reportá cada paso con el comando ejecutado y su resultado
 real; lo que no pudiste comprobar va a **No verificado**.
+
+**Estado de la protección en GitHub (verificado el 2026-10-14 con `gh api`, solo lectura):** el ruleset
+`protect-main` apunta a `~DEFAULT_BRANCH` y la rama por defecto del repo es `develop`, así que protege
+**`develop`** (PR obligatorio, sin force push; 0 aprobaciones; sin checks requeridos). **`main` no tiene
+ninguna regla** (`gh api repos/{owner}/{repo}/rules/branches/main` devuelve `[]`). Hasta que el dueño
+cambie el ruleset para incluir `main`, el único control sobre `main` es esta skill y los permisos
+locales. Re-verificalo en cada release y reportá si cambió.
 
 ## Reglas duras
 - Nunca `git push` a `main` ni variantes (`HEAD:main`, `+`, `--force`, `--delete`, `--all`, `--mirror`);
