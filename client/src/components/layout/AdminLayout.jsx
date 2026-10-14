@@ -92,13 +92,14 @@ export default function AdminLayout() {
         <div className="flex items-center justify-between px-5 py-4"
              style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
           <div className="flex flex-col gap-1.5">
-            <img src="/brand/logo-horizontal.png" alt="Playa & Sol" className="ps-logo-inverse" style={{ height: 22, width: 'auto', display: 'block' }} />
+            <img src="/brand/logo-horizontal.png" alt="Playa & Sol" width={128} height={22} className="ps-logo-inverse" style={{ height: 22, width: 'auto', display: 'block' }} />
             <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase',
                           color: 'var(--sun-500)', marginLeft: 2 }}>
               Panel admin
             </div>
           </div>
           <button className="lg:hidden p-1.5 rounded-lg text-white/60 hover:text-white hover:bg-white/10"
+                  aria-label="Cerrar menú"
                   onClick={() => setSideOpen(false)}>
             <FiX size={18} />
           </button>
@@ -160,6 +161,7 @@ export default function AdminLayout() {
         <header className="h-14 flex items-center gap-4 px-4 sm:px-6 bg-white"
                 style={{ borderBottom: '1px solid var(--grey-200)' }}>
           <button className="lg:hidden p-2 rounded-lg hover:bg-slate-100 text-slate-600"
+                  aria-label="Abrir menú"
                   onClick={() => setSideOpen(true)}>
             <FiMenu size={20} />
           </button>
@@ -173,7 +175,7 @@ export default function AdminLayout() {
             <a href="/" target="_blank" rel="noreferrer"
                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors hover:bg-primary-50"
                style={{ color: 'var(--teal-700)', border: '1px solid var(--teal-200)' }}>
-              <img src="/brand/logo-icon.png" alt="" style={{ height: 14, width: 'auto', display: 'block' }} />
+              <img src="/brand/logo-icon.png" alt="" width={16} height={14} style={{ height: 14, width: 'auto', display: 'block' }} />
               Ver sitio
             </a>
           </div>

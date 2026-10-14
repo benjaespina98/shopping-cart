@@ -129,7 +129,7 @@ function ProductModal({ product, categories, onClose, onSaved, onCategoryCreated
           <h2 className="font-semibold text-slate-800 text-lg">
             {product ? 'Editar producto' : 'Nuevo producto'}
           </h2>
-          <button onClick={onClose} className="p-2 rounded-xl hover:bg-slate-100 transition-colors">
+          <button onClick={onClose} aria-label="Cerrar" className="p-2 rounded-xl hover:bg-slate-100 transition-colors">
             <FiX size={18} />
           </button>
         </div>
@@ -227,6 +227,7 @@ function ProductModal({ product, categories, onClose, onSaved, onCategoryCreated
                   <div key={img.publicId} className="relative w-20 h-20">
                     <CldImage src={img.url} width={160} className={`w-full h-full object-cover rounded-xl border-2 transition-all ${removeIds.includes(img.publicId) ? 'opacity-40 border-red-400' : 'border-slate-200'}`} />
                     <button type="button" onClick={() => toggleRemoveImage(img.publicId)}
+                      aria-label={removeIds.includes(img.publicId) ? 'Conservar imagen' : 'Marcar imagen para eliminar'}
                       className={`absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full text-white flex items-center justify-center text-xs transition-colors ${removeIds.includes(img.publicId) ? 'bg-green-500' : 'bg-red-500'}`}>
                       {removeIds.includes(img.publicId) ? <FiCheck size={10} /> : <FiX size={10} />}
                     </button>
@@ -253,8 +254,9 @@ function ProductModal({ product, categories, onClose, onSaved, onCategoryCreated
               <div className="flex flex-wrap gap-2 mt-2">
                 {newFiles.map((f, i) => (
                   <div key={i} className="relative w-20 h-20 bg-slate-100 rounded-xl overflow-hidden">
-                    <img src={URL.createObjectURL(f)} alt="" className="w-full h-full object-cover" />
+                    <img src={URL.createObjectURL(f)} alt="Vista previa de la imagen nueva" className="w-full h-full object-cover" />
                     <button type="button" onClick={() => removeNewFile(i)}
+                      aria-label="Quitar imagen nueva"
                       className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 rounded-full text-white flex items-center justify-center">
                       <FiX size={10} />
                     </button>

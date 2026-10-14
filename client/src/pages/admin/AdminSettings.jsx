@@ -225,7 +225,7 @@ export default function AdminSettings() {
   if (loading) {
     return (
       <div>
-        <h1 className="text-2xl font-bold text-slate-900 mb-1">Configuración</h1>
+        <p className="text-2xl font-bold text-slate-900 mb-1">Configuración</p>
         <p className="text-slate-500 text-sm mb-8">Ajustes generales del negocio y administradores.</p>
         <div className="card p-6 animate-pulse h-48" />
       </div>

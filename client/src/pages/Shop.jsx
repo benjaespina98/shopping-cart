@@ -170,7 +170,7 @@ export default function Shop() {
                        background: 'var(--bg-page)', outline: 'none', boxSizing: 'border-box' }}
             />
             {search && (
-              <button onClick={() => { setSearch(''); setPage(1); }}
+              <button type="button" aria-label="Borrar búsqueda" onClick={() => { setSearch(''); setPage(1); }}
                 style={{ position: 'absolute', right: 9, top: '50%', transform: 'translateY(-50%)',
                          background: 'none', border: 'none', cursor: 'pointer',
                          color: 'var(--text-muted)', display: 'flex', alignItems: 'center' }}>

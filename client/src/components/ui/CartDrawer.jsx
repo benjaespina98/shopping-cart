@@ -109,6 +109,7 @@ export default function CartDrawer() {
             )}
             <button
               onClick={toggleCart}
+              aria-label="Cerrar carrito"
               className="p-2 rounded-xl hover:bg-slate-100 transition-colors text-slate-600"
             >
               <FiX size={20} />
