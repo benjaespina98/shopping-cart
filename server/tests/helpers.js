@@ -1,5 +1,6 @@
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
+import { resetFormLimiters } from '../middleware/formLimiter.js';
 
 // Infraestructura común para los tests de integración: un Mongo real en
 // memoria (no un mock) para que las validaciones de schema, los índices
@@ -86,6 +87,9 @@ export async function startTestApp() {
 }
 
 export async function clearDb() {
+  // Los limiters de formularios públicos guardan contadores en memoria: sin esto, los tests
+  // de un mismo archivo se van quitando cupo entre sí.
+  resetFormLimiters();
   const { collections } = mongoose.connection;
   await Promise.all(Object.values(collections).map((c) => c.deleteMany({})));
 }
