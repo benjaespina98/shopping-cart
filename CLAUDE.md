@@ -6,7 +6,7 @@ Sitio público + panel admin de una empresa de piscinas (Villa María, Córdoba)
 - `client/` — SPA React 18 + Vite 5 + Tailwind 3 + React Router 6 (CSR, sin SSR). Tests con Vitest + Testing Library.
 - `server/` — API Express 4 + Mongoose 8, JWT, multer + Cloudinary, nodemailer. Tests con Vitest + Supertest + mongodb-memory-server.
 - `api/index.js` — entrada serverless de Vercel (reexporta `server/app.js`). `vercel.json` (raíz) define build y rewrites.
-- CI: `.github/workflows/vercel-build-check.yml` (tests de client y server + build en PRs a `main`).
+- CI: `.github/workflows/vercel-build-check.yml` (lint, `npm audit`, tests de client y server y build en PRs a `main` y `develop`).
 - Node `>=22.19.0`. JavaScript puro: **no introducir TypeScript**.
 
 ## Comandos (desde la raíz)
@@ -46,11 +46,12 @@ Sitio público + panel admin de una empresa de piscinas (Villa María, Córdoba)
 - No borres ni muevas archivos ignorados (`.env.local`, `.env`): no están en git y no se recuperan.
 
 ## Flujo de trabajo
-- Un PR por tema, desde una rama propia (la base es `main`; `develop` es la rama de trabajo actual).
+- Un PR por tema, desde una rama propia hacia `develop`; `develop → main` solo por el flujo de release
+  (`docs/RELEASE.md`, skill `release-flow`). Nada se pushea a `main`.
 - Antes de pedir revisión: `npm run lint`, tests de client y server, y `npm run build` en verde. La skill `pre-release-check` lo automatiza.
 - Antes de cambios sensibles: skill `security-audit` o el agente `security-reviewer`. Para UI: `ux-a11y-reviewer`; para metadatos/rendimiento: `seo-perf-reviewer`.
 - Reportá siempre qué verificaste (comando + resultado) y qué **no** pudiste verificar.
 
 ## Configuración de Claude en este repo
 - `.claude/settings.json` — permisos denegados y hooks (`guard-secrets.sh` antes de Read/Edit/Write; `format-edited.sh` lintea el archivo editado si ESLint está instalado).
-- `.claude/agents/` — revisores de solo lectura. `.claude/skills/` — `security-audit`, `pre-release-check`.
+- `.claude/agents/` — revisores de solo lectura. `.claude/skills/` — `security-audit`, `pre-release-check`, `release-flow`.
