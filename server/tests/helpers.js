@@ -1,6 +1,7 @@
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
 import { resetFormLimiters } from '../middleware/formLimiter.js';
+import { SESSION_COOKIE } from '../config/session.js';
 
 // Infraestructura común para los tests de integración: un Mongo real en
 // memoria (no un mock) para que las validaciones de schema, los índices
@@ -86,6 +87,20 @@ export async function startTestApp() {
   return { app, mongod };
 }
 
+// Headers de un request autenticado del panel: la cookie de sesión más el header
+// X-Requested-With que exige el guard CSRF en los métodos que cambian estado. Se usa con
+// supertest: .set(adminAuth(token)).
+export const adminAuth = (token) => ({
+  Cookie: `${SESSION_COOKIE}=${token}`,
+  'X-Requested-With': 'XMLHttpRequest',
+});
+
+// Extrae el valor de la cookie de sesión de la respuesta de un login.
+export const sessionTokenFrom = (res) => {
+  const header = (res.headers['set-cookie'] || []).find((c) => c.startsWith(`${SESSION_COOKIE}=`));
+  return header ? header.split(';')[0].slice(SESSION_COOKIE.length + 1) : undefined;
+};
+
 export async function clearDb() {
   // Los limiters de formularios públicos guardan contadores en memoria: sin esto, los tests
   // de un mismo archivo se van quitando cupo entre sí.
@@ -112,7 +127,7 @@ export async function createAdminAndLogin(request, app) {
   await User.create({ name: 'Admin Test', email, password, role: 'admin' });
 
   const res = await request(app).post('/api/auth/login').send({ email, password });
-  return res.body.token;
+  return sessionTokenFrom(res);
 }
 
 // Crea un admin y firma su JWT directamente (mismo secreto y formato que

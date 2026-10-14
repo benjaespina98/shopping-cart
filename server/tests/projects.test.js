@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll, afterEach, beforeEach } from 'vitest';
 import request from 'supertest';
-import { startTestApp, stopTestApp, clearDb, createAdminToken } from './helpers.js';
+import { startTestApp, stopTestApp, clearDb, createAdminToken, adminAuth } from './helpers.js';
 
 describe('Projects', () => {
   let app;
@@ -33,7 +33,7 @@ describe('Projects', () => {
   it('rechaza crear un proyecto sin título o localidad', async () => {
     const res = await request(app)
       .post('/api/projects')
-      .set('Authorization', `Bearer ${token}`)
+      .set(adminAuth(token))
       .field('title', 'Piscina infinity');
 
     expect(res.status).toBe(400);
@@ -44,7 +44,7 @@ describe('Projects', () => {
   it('rechaza crear un proyecto sin ninguna foto adjunta', async () => {
     const res = await request(app)
       .post('/api/projects')
-      .set('Authorization', `Bearer ${token}`)
+      .set(adminAuth(token))
       .field('title', 'Piscina infinity')
       .field('location', 'Villa Nueva');
 

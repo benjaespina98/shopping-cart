@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll, afterEach, beforeEach } from 'vitest';
 import request from 'supertest';
-import { startTestApp, stopTestApp, clearDb, createAdminToken } from './helpers.js';
+import { startTestApp, stopTestApp, clearDb, createAdminToken, adminAuth } from './helpers.js';
 
 describe('Products', () => {
   let app;
@@ -49,7 +49,7 @@ describe('Products', () => {
   it('crea un producto validando la categoría contra la colección', async () => {
     const res = await request(app)
       .post('/api/products')
-      .set('Authorization', `Bearer ${token}`)
+      .set(adminAuth(token))
       .field('name', 'Cloro')
       .field('price', '500')
       .field('stock', '10')
@@ -62,7 +62,7 @@ describe('Products', () => {
   it('rechaza crear un producto con una categoría inexistente', async () => {
     const res = await request(app)
       .post('/api/products')
-      .set('Authorization', `Bearer ${token}`)
+      .set(adminAuth(token))
       .field('name', 'Cloro')
       .field('price', '500')
       .field('stock', '10')
@@ -89,7 +89,7 @@ describe('Products', () => {
 
     const res = await request(app)
       .patch(`/api/products/${product._id}/stock`)
-      .set('Authorization', `Bearer ${token}`)
+      .set(adminAuth(token))
       .send({ stock: 20 });
 
     expect(res.status).toBe(200);
@@ -105,7 +105,7 @@ describe('Products', () => {
 
     const res = await request(app)
       .patch(`/api/products/${product._id}/stock`)
-      .set('Authorization', `Bearer ${token}`)
+      .set(adminAuth(token))
       .send({ stock: -5 });
 
     expect(res.status).toBe(400);
@@ -121,7 +121,7 @@ describe('Products', () => {
 
     const res = await request(app)
       .patch(`/api/products/${product._id}/stock`)
-      .set('Authorization', `Bearer ${token}`)
+      .set(adminAuth(token))
       .send({ stock: 'no-es-un-numero' });
 
     expect(res.status).toBe(400);

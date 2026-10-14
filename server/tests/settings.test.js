@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll, afterEach, beforeEach } from 'vitest';
 import request from 'supertest';
-import { startTestApp, stopTestApp, clearDb, createAdminToken } from './helpers.js';
+import { startTestApp, stopTestApp, clearDb, createAdminToken, adminAuth } from './helpers.js';
 
 describe('Settings — cambio de contraseña propia', () => {
   let app;
@@ -33,7 +33,7 @@ describe('Settings — cambio de contraseña propia', () => {
   it('rechaza si falta la contraseña actual o la nueva', async () => {
     const res = await request(app)
       .put('/api/settings/users/me/password')
-      .set('Authorization', `Bearer ${token}`)
+      .set(adminAuth(token))
       .send({ newPassword: 'NuevaClave123' });
 
     expect(res.status).toBe(400);
@@ -42,7 +42,7 @@ describe('Settings — cambio de contraseña propia', () => {
   it('rechaza una contraseña nueva demasiado corta', async () => {
     const res = await request(app)
       .put('/api/settings/users/me/password')
-      .set('Authorization', `Bearer ${token}`)
+      .set(adminAuth(token))
       .send({ currentPassword: 'Admin123!Segura', newPassword: '123' });
 
     expect(res.status).toBe(400);
@@ -51,7 +51,7 @@ describe('Settings — cambio de contraseña propia', () => {
   it('rechaza si la contraseña actual es incorrecta', async () => {
     const res = await request(app)
       .put('/api/settings/users/me/password')
-      .set('Authorization', `Bearer ${token}`)
+      .set(adminAuth(token))
       .send({ currentPassword: 'no-es-esta', newPassword: 'NuevaClave123' });
 
     expect(res.status).toBe(401);
@@ -60,7 +60,7 @@ describe('Settings — cambio de contraseña propia', () => {
   it('cambia la contraseña y permite loguearse con la nueva', async () => {
     const res = await request(app)
       .put('/api/settings/users/me/password')
-      .set('Authorization', `Bearer ${token}`)
+      .set(adminAuth(token))
       .send({ currentPassword: 'Admin123!Segura', newPassword: 'NuevaClave123' });
 
     expect(res.status).toBe(200);
@@ -79,14 +79,14 @@ describe('Settings — cambio de contraseña propia', () => {
   it('rechaza una contraseña nueva de 11 caracteres y acepta una de 12', async () => {
     const corta = await request(app)
       .put('/api/settings/users/me/password')
-      .set('Authorization', `Bearer ${token}`)
+      .set(adminAuth(token))
       .send({ currentPassword: 'Admin123!Segura', newPassword: 'a'.repeat(11) });
     expect(corta.status).toBe(400);
     expect(corta.body.message).toMatch(/al menos 12/);
 
     const ok = await request(app)
       .put('/api/settings/users/me/password')
-      .set('Authorization', `Bearer ${token}`)
+      .set(adminAuth(token))
       .send({ currentPassword: 'Admin123!Segura', newPassword: 'a'.repeat(12) });
     expect(ok.status).toBe(200);
   });
@@ -94,7 +94,7 @@ describe('Settings — cambio de contraseña propia', () => {
   it('createUser rechaza una contraseña de 11 caracteres', async () => {
     const res = await request(app)
       .post('/api/settings/users')
-      .set('Authorization', `Bearer ${token}`)
+      .set(adminAuth(token))
       .send({ name: 'Otro Admin', email: 'otro@test.com', password: 'a'.repeat(11) });
     expect(res.status).toBe(400);
     expect(res.body.message).toMatch(/al menos 12/);
@@ -103,7 +103,7 @@ describe('Settings — cambio de contraseña propia', () => {
   it('createUser acepta una de 12 y permite iniciar sesión', async () => {
     const res = await request(app)
       .post('/api/settings/users')
-      .set('Authorization', `Bearer ${token}`)
+      .set(adminAuth(token))
       .send({ name: 'Otro Admin', email: 'otro@test.com', password: 'a'.repeat(12) });
     expect(res.status).toBe(201);
 
