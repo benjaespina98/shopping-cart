@@ -6,6 +6,7 @@ import mongoSanitize from 'express-mongo-sanitize';
 import rateLimit from 'express-rate-limit';
 import { connectDB } from './config/db.js';
 import { loadServerEnv, assertRequiredEnv } from './config/env.js';
+import { isAllowedOrigin, isSameHostOrigin } from './config/origins.js';
 import authRoutes from './routes/authRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
@@ -21,39 +22,6 @@ loadServerEnv();
 assertRequiredEnv();
 
 const app = express();
-
-const normalizeOrigin = (origin) => origin.trim().replace(/\/+$/, '');
-
-const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173,http://127.0.0.1:5173')
-  .split(',')
-  .map((origin) => normalizeOrigin(origin))
-  .filter(Boolean);
-
-const originPatternRegexList = allowedOrigins
-  .filter((origin) => origin.includes('*'))
-  .map((pattern) => {
-    const escaped = pattern.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*');
-    return new RegExp(`^${escaped}$`, 'i');
-  });
-
-const exactOrigins = allowedOrigins.filter((origin) => !origin.includes('*'));
-
-const localDevOriginPattern = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i;
-
-const isAllowedOrigin = (origin) => {
-  if (!origin) return true;
-
-  const normalizedOrigin = normalizeOrigin(origin);
-  if (exactOrigins.includes(normalizedOrigin)) return true;
-  if (originPatternRegexList.some((regex) => regex.test(normalizedOrigin))) return true;
-
-  // Allow any localhost/127.0.0.1 port in development to avoid Vite port drift issues.
-  if (process.env.NODE_ENV !== 'production' && localDevOriginPattern.test(normalizedOrigin)) {
-    return true;
-  }
-
-  return false;
-};
 
 // Trust proxy if we are behind Vercel/proxies
 app.set('trust proxy', 1);
@@ -97,16 +65,19 @@ const loginLimiter = rateLimit({
   message: 'Demasiados intentos de inicio de sesión, intenta de nuevo en 15 minutos.',
 });
 
+// CORS con credenciales (cookie de sesión): el origen se REFLEJA solo si está en la allowlist
+// (CLIENT_URL) o es el mismo host que sirve la API; nunca "*". Un origen ajeno recibe 403 (antes
+// caía en un 500 genérico).
 app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (isAllowedOrigin(origin)) {
-        callback(null, true);
-        return;
-      }
-      callback(new Error('Not allowed by CORS'));
-    },
-    credentials: true,
+  cors((req, callback) => {
+    const origin = req.header('Origin');
+    if (isAllowedOrigin(origin) || isSameHostOrigin(origin, req)) {
+      callback(null, { origin: true, credentials: true });
+      return;
+    }
+    const error = new Error('Origen no permitido');
+    error.statusCode = 403;
+    callback(error);
   })
 );
 app.use(express.json());
