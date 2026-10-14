@@ -70,8 +70,8 @@ export default function AdminLayout() {
   const navigate = useNavigate();
   const [sideOpen, setSideOpen] = useState(false);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate('/admin/login');
   };
 

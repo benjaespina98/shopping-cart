@@ -1,71 +1,79 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { authAPI } from '../services/api';
 
 const AuthContext = createContext(null);
 
+const isAdminPath = (pathname) => pathname === '/admin' || pathname.startsWith('/admin/');
+
+// Antes el token y el usuario se guardaban en localStorage (legible por cualquier script de la
+// página). Ahora la sesión es una cookie httpOnly que el JavaScript no puede leer, así que el
+// cliente ya no guarda nada: pregunta al server (GET /api/auth/me) quién es. Estas claves viejas
+// se borran una vez para no dejar un token huérfano en el navegador de quien ya tenía sesión.
+const LEGACY_KEYS = ['admin_token', 'admin_user'];
+
 export function AuthProvider({ children }) {
+  const { pathname } = useLocation();
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // `checked`: ya se le preguntó al server por la sesión (haya o no usuario).
+  const [checked, setChecked] = useState(false);
 
-  // Restore session from localStorage, luego revalidarla contra el backend: el token puede
-  // haber sido revocado, expirado o pertenecer a un usuario que ya no existe, y localStorage
-  // por sí solo no nos entera de eso. Se usa el usuario cacheado como estado inicial (evita el
-  // parpadeo a "no logueado" mientras responde el servidor) y se corrige o limpia según /auth/me.
   useEffect(() => {
-    const stored = localStorage.getItem('admin_user');
-    const token = localStorage.getItem('admin_token');
-
-    if (!stored || !token) {
-      setLoading(false);
-      return;
-    }
-
     try {
-      setUser(JSON.parse(stored));
+      LEGACY_KEYS.forEach((key) => localStorage.removeItem(key));
     } catch {
-      localStorage.removeItem('admin_token');
-      localStorage.removeItem('admin_user');
-      setLoading(false);
-      return;
+      // localStorage puede no estar disponible (modo privado, bloqueado): no es un error.
     }
+  }, []);
 
-    // El usuario cacheado ya alcanza para que ProtectedRoute deje pasar (no bloqueamos la
-    // navegación esperando la red); la revalidación contra /auth/me sigue en segundo plano
-    // y se autocorrige si el token resulta inválido.
-    setLoading(false);
+  const inAdmin = isAdminPath(pathname);
 
-    authAPI
-      .me()
+  // La sesión se consulta recién al entrar al panel: un visitante del sitio público no genera
+  // ningún pedido de autenticación (ni el 401 que devolvería).
+  useEffect(() => {
+    if (!inAdmin || checked) return undefined;
+
+    let cancelled = false;
+    Promise.resolve()
+      .then(() => authAPI.me())
       .then(({ data }) => {
-        localStorage.setItem('admin_user', JSON.stringify(data));
-        setUser(data);
+        if (!cancelled) setUser(data);
       })
       .catch(() => {
-        // El interceptor de la API ya limpia localStorage y redirige en un 401;
-        // acá solo nos aseguramos de que el estado en memoria quede consistente.
-        setUser(null);
+        if (!cancelled) setUser(null);
+      })
+      .finally(() => {
+        if (!cancelled) setChecked(true);
       });
-  }, []);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [inAdmin, checked]);
+
+  // Mientras se verifica la sesión en una ruta del panel, ProtectedRoute espera en vez de
+  // mandar al login.
+  const loading = inAdmin && !checked;
 
   const login = async (email, password) => {
     const { data } = await authAPI.login({ email, password });
-    localStorage.setItem('admin_token', data.token);
-    localStorage.setItem('admin_user', JSON.stringify({ _id: data._id, name: data.name, email: data.email, role: data.role }));
+    // El server deja la cookie; el cuerpo trae solo los datos del usuario (sin token).
     setUser({ _id: data._id, name: data.name, email: data.email, role: data.role });
+    setChecked(true);
     return data;
   };
 
-  const logout = () => {
-    localStorage.removeItem('admin_token');
-    localStorage.removeItem('admin_user');
+  const logout = async () => {
+    try {
+      await authAPI.logout();
+    } catch {
+      // Si el server no responde igual se cierra la sesión local: la cookie vence sola.
+    }
     setUser(null);
+    setChecked(true);
   };
 
-  return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={{ user, loading, login, logout }}>{children}</AuthContext.Provider>;
 }
 
 export const useAuth = () => {
