@@ -1,13 +1,14 @@
 import jwt from 'jsonwebtoken';
 import asyncHandler from 'express-async-handler';
 import User from '../models/User.js';
+import { parseCookies } from '../utils/cookies.js';
+import { SESSION_COOKIE } from '../config/session.js';
+import { csrfGuard } from './csrf.js';
 
 export const protect = asyncHandler(async (req, res, next) => {
-  let token;
-
-  if (req.headers.authorization?.startsWith('Bearer')) {
-    token = req.headers.authorization.split(' ')[1];
-  }
+  // Un solo camino de autenticación: la cookie httpOnly. El header Authorization ya no se
+  // acepta, así que un token filtrado o pegado a mano no sirve.
+  const token = parseCookies(req.headers.cookie)[SESSION_COOKIE];
 
   if (!token) {
     res.status(401);
@@ -21,11 +22,14 @@ export const protect = asyncHandler(async (req, res, next) => {
       res.status(401);
       throw new Error('Usuario no encontrado');
     }
-    next();
   } catch {
     res.status(401);
     throw new Error('No autorizado, token inválido');
   }
+
+  // Autenticado por cookie: los métodos que cambian estado exigen además el header
+  // X-Requested-With y un Origin/Referer permitido (ver middleware/csrf.js).
+  csrfGuard(req, res, next);
 });
 
 export const adminOnly = (req, res, next) => {

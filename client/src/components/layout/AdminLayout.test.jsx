@@ -20,15 +20,15 @@ const SeccionQueNuncaCarga = lazy(() => new Promise(() => {}));
 describe('AdminLayout — Suspense boundary', () => {
   it('mantiene la sidebar montada aunque la sección todavía esté cargando su chunk', async () => {
     render(
-      <AuthProvider>
-        <MemoryRouter initialEntries={['/admin/seccion-lenta']}>
+      <MemoryRouter initialEntries={['/admin/seccion-lenta']}>
+        <AuthProvider>
           <Routes>
             <Route path="/admin" element={<AdminLayout />}>
               <Route path="seccion-lenta" element={<SeccionQueNuncaCarga />} />
             </Route>
           </Routes>
-        </MemoryRouter>
-      </AuthProvider>
+        </AuthProvider>
+      </MemoryRouter>
     );
 
     // La sidebar (nav + logout) tiene que estar visible ya, sin esperar a que la sección

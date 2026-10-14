@@ -1,5 +1,7 @@
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
+import { resetFormLimiters } from '../middleware/formLimiter.js';
+import { SESSION_COOKIE } from '../config/session.js';
 
 // Infraestructura común para los tests de integración: un Mongo real en
 // memoria (no un mock) para que las validaciones de schema, los índices
@@ -39,6 +41,24 @@ export async function startTestApp() {
   process.env.STORE_NAME = 'Playa y Sol Test';
   process.env.CLIENT_URL = 'http://localhost:5173';
 
+  // Mismo patrón que las URIs de Mongo: server/.env (uso local) puede traer credenciales
+  // reales de SMTP y Cloudinary, y dotenv completa las variables que falten. Sin esto, los
+  // tests que crean consultas mandarían mails de verdad a QUOTE_NOTIFY_EMAIL, y cualquier
+  // subida o borrado de imagen pegaría contra el Cloudinary real. Vacías, el mailer queda
+  // deshabilitado (getTransporter devuelve null) y Cloudinary sin cloud_name.
+  for (const key of [
+    'SMTP_HOST',
+    'SMTP_PORT',
+    'SMTP_USER',
+    'SMTP_PASS',
+    'QUOTE_NOTIFY_EMAIL',
+    'CLOUDINARY_CLOUD_NAME',
+    'CLOUDINARY_API_KEY',
+    'CLOUDINARY_API_SECRET',
+  ]) {
+    process.env[key] = '';
+  }
+
   const { default: app } = await import('../app.js');
 
   // app.js sólo conecta a Mongo de forma perezosa, dentro del middleware que
@@ -67,7 +87,24 @@ export async function startTestApp() {
   return { app, mongod };
 }
 
+// Headers de un request autenticado del panel: la cookie de sesión más el header
+// X-Requested-With que exige el guard CSRF en los métodos que cambian estado. Se usa con
+// supertest: .set(adminAuth(token)).
+export const adminAuth = (token) => ({
+  Cookie: `${SESSION_COOKIE}=${token}`,
+  'X-Requested-With': 'XMLHttpRequest',
+});
+
+// Extrae el valor de la cookie de sesión de la respuesta de un login.
+export const sessionTokenFrom = (res) => {
+  const header = (res.headers['set-cookie'] || []).find((c) => c.startsWith(`${SESSION_COOKIE}=`));
+  return header ? header.split(';')[0].slice(SESSION_COOKIE.length + 1) : undefined;
+};
+
 export async function clearDb() {
+  // Los limiters de formularios públicos guardan contadores en memoria: sin esto, los tests
+  // de un mismo archivo se van quitando cupo entre sí.
+  resetFormLimiters();
   const { collections } = mongoose.connection;
   await Promise.all(Object.values(collections).map((c) => c.deleteMany({})));
 }
@@ -86,11 +123,11 @@ export async function stopTestApp(mongod) {
 export async function createAdminAndLogin(request, app) {
   const { default: User } = await import('../models/User.js');
   const email = 'admin@test.com';
-  const password = 'Admin123!';
+  const password = 'Admin123!Segura';
   await User.create({ name: 'Admin Test', email, password, role: 'admin' });
 
   const res = await request(app).post('/api/auth/login').send({ email, password });
-  return res.body.token;
+  return sessionTokenFrom(res);
 }
 
 // Crea un admin y firma su JWT directamente (mismo secreto y formato que
@@ -105,7 +142,7 @@ export async function createAdminToken() {
   const user = await User.create({
     name: 'Admin Test',
     email: 'admin@test.com',
-    password: 'Admin123!',
+    password: 'Admin123!Segura',
     role: 'admin',
   });
 

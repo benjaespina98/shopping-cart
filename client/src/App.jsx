@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import PublicLayout from './components/layout/PublicLayout';
 import ErrorBoundary from './components/ErrorBoundary';
+import usePageMeta from './hooks/usePageMeta';
 
 const Landing = lazy(() => import('./pages/Landing'));
 const Shop = lazy(() => import('./pages/Shop'));
@@ -11,6 +12,7 @@ const Contact = lazy(() => import('./pages/Contact'));
 const Services = lazy(() => import('./pages/Services'));
 const Projects = lazy(() => import('./pages/Projects'));
 const Quote = lazy(() => import('./pages/Quote'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 const PublicFallback = () => (
   <div className="flex items-center justify-center min-h-[50vh]">
@@ -43,6 +45,9 @@ function ProtectedRoute({ children }) {
 }
 
 export default function App() {
+  // Título, description, canonical y robots por ruta (ver seo/pageMeta.js).
+  usePageMeta();
+
   return (
     <ErrorBoundary>
       <Routes>
@@ -58,6 +63,9 @@ export default function App() {
           <Route path="/servicios" element={<Suspense fallback={<PublicFallback />}><Services /></Suspense>} />
           <Route path="/proyectos" element={<Suspense fallback={<PublicFallback />}><Projects /></Suspense>} />
           <Route path="/presupuesto" element={<Suspense fallback={<PublicFallback />}><Quote /></Suspense>} />
+          {/* Ruta inexistente: página con enlace a la home y noindex (el status HTTP sigue
+              siendo 200: es una SPA). Antes redirigía a la home sin avisar. */}
+          <Route path="*" element={<Suspense fallback={<PublicFallback />}><NotFound /></Suspense>} />
         </Route>
 
       {/* Admin login (no layout) */}
@@ -88,8 +96,6 @@ export default function App() {
         <Route path="configuracion" element={<AdminSettings />} />
       </Route>
 
-      {/* Catch-all */}
-      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
     </ErrorBoundary>
   );

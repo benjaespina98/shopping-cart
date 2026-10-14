@@ -61,7 +61,7 @@ describe('CartDrawer — checkout por WhatsApp', () => {
     await user.click(screen.getByRole('button', { name: /finalizar compra/i }));
 
     await waitFor(() => expect(ordersAPI.create).toHaveBeenCalledTimes(1));
-    expect(ordersAPI.create).toHaveBeenCalledWith({ items: [{ productId: 'p1', quantity: 2 }] });
+    expect(ordersAPI.create).toHaveBeenCalledWith({ items: [{ productId: 'p1', quantity: 2 }], website: '' });
 
     // Reserva la pestaña ANTES de esperar la respuesta del server (para que el navegador no
     // la trate como popup bloqueado) y recién ahí la redirige a la URL de WhatsApp.

@@ -15,7 +15,7 @@ Sitio público + panel admin de una empresa de piscinas (Villa María, Córdoba)
 - `npm run build` — build del cliente (`client/dist`). Vercel usa `npm run build:vercel`.
 - `npm --prefix client test` / `npm --prefix server test` — suites completas (`vitest run`).
 - Un archivo: `npm --prefix client exec vitest run src/pages/Contact.test.jsx`.
-- Lint: **todavía no hay ESLint**. Cuando se agregue, `npm run lint` debe cubrir client y server.
+- `npm run lint` — ESLint (flat config) en client y server. Errores = 0; los warnings son deuda medida (ver `docs/LINT.md`).
 - `npm run seed` — **NUNCA contra producción** (ver seguridad). Está denegado en `.claude/settings.json`.
 
 ## Convenciones
@@ -29,6 +29,7 @@ Sitio público + panel admin de una empresa de piscinas (Villa María, Córdoba)
 ## Checklist de seguridad (aplicar en cada cambio)
 - Validación **server-side** de todo input (tipo, formato, longitud); el precio y el total se calculan en el servidor (ver `orderController`).
 - Rutas de escritura y de admin con `protect` + `adminOnly`; sin mass assignment (lista blanca de campos).
+- Sesión del panel: cookie httpOnly (`ps_admin_session`), nunca el token en `localStorage` ni en el cuerpo; `protect` ya exige el header `X-Requested-With` y un `Origin` permitido en POST/PUT/PATCH/DELETE (ADR en `docs/adr/`).
 - Sin secretos en código, logs, tests, README ni bundle del cliente. Variables solo en `.env` (ignorado) y documentadas en `server/.env.example`. Nada con prefijo `VITE_` que sea secreto.
 - Sin fallbacks literales de contraseñas o secretos (`process.env.X || '...'`).
 - `target="_blank"` siempre con `rel="noopener noreferrer"`.
@@ -39,9 +40,14 @@ Sitio público + panel admin de una empresa de piscinas (Villa María, Córdoba)
 - No leer ni editar `.env*` (salvo `.env.example`) ni claves privadas: un hook lo bloquea (Read/Edit/Write y Grep/Glob con `path` o `glob` que los nombren).
 - Límite conocido del hook: un `Grep` sobre un directorio sin `glob` puede leer líneas de un `.env`; no hay forma de detectarlo. Excluí `.env*` en el glob y no pongas secretos reales en el árbol.
 
+## Git seguro (reglas duras)
+- Nunca cambies de rama con trabajo sin commitear, ni uses `git switch`/`checkout` para medir otras ramas: git borra del disco los archivos que son tracked en una rama y no en la otra (así se perdió `client/.env.local`).
+- Para ver o probar otra versión: `git worktree add` en una carpeta fuera del repo y borrala al terminar (`git worktree remove`).
+- No borres ni muevas archivos ignorados (`.env.local`, `.env`): no están en git y no se recuperan.
+
 ## Flujo de trabajo
 - Un PR por tema, desde una rama propia (la base es `main`; `develop` es la rama de trabajo actual).
-- Antes de pedir revisión: lint (cuando exista), tests de client y server, y `npm run build` en verde. La skill `pre-release-check` lo automatiza.
+- Antes de pedir revisión: `npm run lint`, tests de client y server, y `npm run build` en verde. La skill `pre-release-check` lo automatiza.
 - Antes de cambios sensibles: skill `security-audit` o el agente `security-reviewer`. Para UI: `ux-a11y-reviewer`; para metadatos/rendimiento: `seo-perf-reviewer`.
 - Reportá siempre qué verificaste (comando + resultado) y qué **no** pudiste verificar.
 

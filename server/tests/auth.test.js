@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll, afterEach } from 'vitest';
 import request from 'supertest';
-import { startTestApp, stopTestApp, clearDb, createAdminAndLogin } from './helpers.js';
+import { startTestApp, stopTestApp, clearDb, createAdminAndLogin, adminAuth } from './helpers.js';
 
 describe('Auth', () => {
   let app;
@@ -33,7 +33,7 @@ describe('Auth', () => {
     const token = await createAdminAndLogin(request, app);
     expect(token).toBeTruthy();
 
-    const me = await request(app).get('/api/auth/me').set('Authorization', `Bearer ${token}`);
+    const me = await request(app).get('/api/auth/me').set(adminAuth(token));
     expect(me.status).toBe(200);
     expect(me.body.email).toBe('admin@test.com');
     expect(me.body.password).toBeUndefined();
@@ -45,7 +45,7 @@ describe('Auth', () => {
   });
 
   it('rechaza /me con token inválido', async () => {
-    const res = await request(app).get('/api/auth/me').set('Authorization', 'Bearer basura');
+    const res = await request(app).get('/api/auth/me').set('Cookie', 'ps_admin_session=basura');
     expect(res.status).toBe(401);
   });
 });

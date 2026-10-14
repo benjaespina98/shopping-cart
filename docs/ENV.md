@@ -18,7 +18,7 @@ Leyenda: ✅ debe estar seteada · ⚪ opcional · ❌ no setear · 🔑 marcar 
 | Variable | Production | Preview | Local | Secreto | Notas |
 |---|---|---|---|---|---|
 | `JWT_SECRET` | ✅ ≠ 🔑 | ✅ ≠ 🔑 | ✅ | Sí | La app no arranca sin ella en Production/Preview (`assertRequiredEnv`). |
-| `JWT_EXPIRES_IN` | ⚪ | ⚪ | ⚪ | No | Por defecto `7d`. |
+| `JWT_EXPIRES_IN` | ⚪ | ⚪ | ⚪ | No | Por defecto `7d`. También es el `Max-Age` de la cookie de sesión del panel (ver `docs/adr/0001-admin-session-cookie.md`). |
 | `MONGODB_URI_PRODUCTION` | ✅ 🔑 | ❌ | ❌ | Sí | Solo Production. |
 | `MONGODB_URI_PREVIEW` | ❌ | ✅ ≠ 🔑 | ⚪ | Sí | Obligatoria en Preview; base distinta de producción. |
 | `MONGODB_URI_DEVELOPMENT` | ❌ | ❌ | ✅ | Sí | Base de desarrollo. |
@@ -33,8 +33,8 @@ Leyenda: ✅ debe estar seteada · ⚪ opcional · ❌ no setear · 🔑 marcar 
 | `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` | ✅ | ❌ | ❌ | No | Sin SMTP, la consulta se guarda y solo se omite el email. |
 | `SMTP_PASS` | ✅ 🔑 | ❌ | ❌ | Sí | |
 | `QUOTE_NOTIFY_EMAIL` | ✅ | ❌ | ❌ | No | Destino de las notificaciones. |
-| `ADMIN_EMAIL` | ❌ | ❌ | ⚪ | No | Solo el seed. Ver "ADMIN_PASSWORD". |
-| `ADMIN_PASSWORD` | ❌ | ❌ | ⚪ | Sí | Solo el seed, local, contra una base de desarrollo. |
+| `ADMIN_EMAIL` | ❌ | ❌ | ⚪ | No | Solo el seed; obligatorio y con formato de email válido, sin valor por defecto. Ver "ADMIN_PASSWORD". |
+| `ADMIN_PASSWORD` | ❌ | ❌ | ⚪ | Sí | Solo el seed, local, contra una base de desarrollo. Mínimo 12 caracteres. |
 | `SEED_ENV` | ❌ | ❌ | ⚪ | No | Solo el seed; puede redirigirlo a otra base. |
 | `NODE_ENV` | (lo pone Vercel) | (lo pone Vercel) | `development` | No | No setear a mano en Vercel. |
 | `APP_ENV` | ❌ | ❌ | ⚪ | No | En Vercel manda `VERCEL_ENV`. |
@@ -57,9 +57,17 @@ Nunca pongas un secreto con prefijo `VITE_`.
 
 El servidor en ejecución **no** la lee: solo `server/scripts/seed.js` (vía `resolveAdminCredentials`).
 El login compara contra el hash bcrypt guardado en la base, y el cambio de contraseña desde el panel
-(`PUT /api/settings/users/me/password`) escribe ese hash. Por eso no debe existir en Vercel: no la
+(`PUT /api/settings/users/me/password`) escribe ese hash. El mínimo de 12 caracteres lo aplican el modelo `User`, el alta de administradores y el cambio de contraseña (`MIN_PASSWORD_LENGTH`); las cuentas ya creadas no se ven afectadas porque solo se valida al modificar la contraseña. Por eso no debe existir en Vercel: no la
 necesita ninguna ruta, y tenerla ahí solo agrega un secreto más para filtrar. Si se rota la contraseña
 en la base, un valor viejo en el entorno no la pisa.
+
+## Tests
+
+`startTestApp()` (`server/tests/helpers.js`) vacía `SMTP_*`, `QUOTE_NOTIFY_EMAIL` y `CLOUDINARY_*`, igual que las URIs de Mongo: un `server/.env` con credenciales reales no hace que los tests manden mails ni toquen Cloudinary (verificado en `server/tests/mailerIsolation.test.js`).
+
+## CI
+
+`.github/workflows/vercel-build-check.yml` corre en PRs a `main` y `develop` y ejecuta `npm audit --omit=dev --audit-level=critical` en `client/` y `server/`.
 
 ## Política
 

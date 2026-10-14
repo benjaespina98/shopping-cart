@@ -6,6 +6,7 @@ import { Card } from '../design-system/Card';
 import { Badge } from '../design-system/Badge';
 import { Input } from '../design-system/Input';
 import { Checkbox } from '../design-system/Checkbox';
+import Honeypot from '../components/ui/Honeypot';
 import { useReveal } from '../hooks/useReveal';
 import { servicesAPI, quotesAPI } from '../services/api';
 import { trackEvent } from '../utils/analytics';
@@ -26,6 +27,8 @@ export default function Quote() {
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
   const [formError, setFormError] = useState('');
+  // Campo trampa anti-spam: una persona nunca lo completa (ver components/ui/Honeypot.jsx).
+  const [hp, setHp] = useState('');
   const [fieldErrors, setFieldErrors] = useState({});
   const [types, setTypes] = useState(FALLBACK_TYPES);
   const [tipo, setTipo] = useState('');
@@ -84,6 +87,7 @@ export default function Quote() {
         email: form.email,
         location: form.location,
         message: form.message,
+        website: hp,
       });
       trackEvent('generate_lead', { project_type: tipo });
       setSent(true);
@@ -138,7 +142,7 @@ export default function Quote() {
         <Card padding="lg">
           {sent ? (
             <div style={{ textAlign: 'center', padding: '32px 10px' }}>
-              <img src="/brand/logo-icon.png" alt="" style={{ height: 88, width: 'auto', display: 'block', margin: '0 auto 20px' }} />
+              <img src="/brand/logo-icon.png" alt="" width={99} height={88} loading="lazy" decoding="async" style={{ height: 88, width: 'auto', display: 'block', margin: '0 auto 20px' }} />
               <h2 style={{ fontSize: 26, marginBottom: 10, fontFamily: 'var(--font-display)',
                            color: 'var(--text-strong)' }}>¡Gracias!</h2>
               <p style={{ color: 'var(--text-muted)', marginBottom: 28, fontSize: 15, lineHeight: 1.6 }}>
@@ -150,6 +154,7 @@ export default function Quote() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+              <Honeypot value={hp} onChange={(e) => setHp(e.target.value)} />
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 'var(--space-1)' }}>
                   <FiShield size={14} style={{ color: 'var(--brand-accent-press)' }} />

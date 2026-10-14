@@ -3,6 +3,7 @@ import Settings from '../models/Settings.js';
 import User from '../models/User.js';
 import { cloudinary } from '../config/cloudinary.js';
 import { writeAuditLog } from '../utils/auditLogger.js';
+import { MIN_PASSWORD_LENGTH } from '../utils/validation.js';
 
 const VALID_THEMES = ['default', 'elegante', 'moderno'];
 
@@ -166,6 +167,10 @@ export const createUser = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error('Nombre, email y contrasena son requeridos');
   }
+  if (password.length < MIN_PASSWORD_LENGTH) {
+    res.status(400);
+    throw new Error(`La contraseña debe tener al menos ${MIN_PASSWORD_LENGTH} caracteres`);
+  }
 
   const exists = await User.findOne({ email });
   if (exists) {
@@ -208,9 +213,9 @@ export const changeOwnPassword = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error('La contraseña actual y la nueva son requeridas');
   }
-  if (newPassword.length < 6) {
+  if (newPassword.length < MIN_PASSWORD_LENGTH) {
     res.status(400);
-    throw new Error('La nueva contraseña debe tener al menos 6 caracteres');
+    throw new Error(`La nueva contraseña debe tener al menos ${MIN_PASSWORD_LENGTH} caracteres`);
   }
 
   const user = await User.findById(req.user._id);

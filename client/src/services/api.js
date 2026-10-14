@@ -9,18 +9,22 @@ const initialBaseUrl = isProduction ? '/api' : configuredApiUrl || '/api';
 // arme el multipart CON boundary. Fijar 'application/json' acá rompía los uploads:
 // axios serializaba el FormData a JSON y descartaba el archivo; y fijar
 // 'multipart/form-data' a mano lo enviaba sin boundary ("Boundary not found").
+//
+// Autenticación: la sesión del panel vive en una cookie httpOnly que emite el server (el
+// JavaScript no la ve ni la guarda). `withCredentials` hace que el navegador la mande; el
+// header X-Requested-With es la segunda capa anti-CSRF que el server exige en los métodos que
+// cambian estado (ver server/middleware/csrf.js).
 const api = axios.create({
   baseURL: initialBaseUrl,
+  withCredentials: true,
+  headers: { 'X-Requested-With': 'XMLHttpRequest' },
 });
 
-// Attach JWT token automatically
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('admin_token');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
+// Estas rutas "sondean" la sesión: un 401 ahí es una respuesta esperada, no una sesión vencida
+// en medio de una pantalla del panel, así que no debe redirigir.
+const AUTH_PROBES = ['/auth/me', '/auth/login', '/auth/logout'];
 
-// Auto-logout on 401
+// Sesión vencida en el panel: volver al login
 api.interceptors.response.use(
   (res) => res,
   async (err) => {
@@ -40,9 +44,13 @@ api.interceptors.response.use(
       return api.request(originalConfig);
     }
 
-    if (err.response?.status === 401) {
-      localStorage.removeItem('admin_token');
-      localStorage.removeItem('admin_user');
+    const path = window.location.pathname;
+    if (
+      err.response?.status === 401 &&
+      !AUTH_PROBES.includes(originalConfig.url) &&
+      path.startsWith('/admin') &&
+      path !== '/admin/login'
+    ) {
       window.location.href = '/admin/login';
     }
     return Promise.reject(err);
@@ -52,6 +60,7 @@ api.interceptors.response.use(
 // ─── Auth ────────────────────────────────────────────────
 export const authAPI = {
   login: (data) => api.post('/auth/login', data),
+  logout: () => api.post('/auth/logout'),
   me: () => api.get('/auth/me'),
 };
 

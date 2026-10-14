@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
 import AdminSettings from './AdminSettings';
 import { AuthProvider } from '../../context/AuthContext';
 import { authAPI, settingsAPI } from '../../services/api';
@@ -21,9 +22,11 @@ import QRCode from 'qrcode';
 
 const renderPage = () =>
   render(
-    <AuthProvider>
-      <AdminSettings />
-    </AuthProvider>
+    <MemoryRouter>
+      <AuthProvider>
+        <AdminSettings />
+      </AuthProvider>
+    </MemoryRouter>
   );
 
 describe('AdminSettings — cambiar mi contraseña', () => {

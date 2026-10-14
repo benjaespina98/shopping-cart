@@ -77,8 +77,8 @@ export default function Footer() {
         {/* Brand */}
         <div>
           <div style={{ marginBottom: 14 }}>
-            <img src="/brand/logo-horizontal.png" alt="Playa & Sol" className="ps-logo-inverse"
-                 style={{ height: 30, width: 'auto', display: 'block' }} />
+            <img src="/brand/logo-horizontal.png" alt="Playa & Sol" width={174} height={30} loading="lazy" decoding="async"
+                 className="ps-logo-inverse" style={{ height: 30, width: 'auto', display: 'block' }} />
           </div>
           <p style={{ fontSize: 14, lineHeight: 1.6, maxWidth: 240, marginBottom: 18 }}>
             Diseño, construcción y mantenimiento de piscinas en Villa María y la región, con más de 30 años de trayectoria.

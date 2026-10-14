@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll, afterEach, beforeEach } from 'vitest';
 import request from 'supertest';
-import { startTestApp, stopTestApp, clearDb, createAdminToken } from './helpers.js';
+import { startTestApp, stopTestApp, clearDb, createAdminToken, adminAuth } from './helpers.js';
 
 describe('Quotes', () => {
   let app;
@@ -59,7 +59,7 @@ describe('Quotes', () => {
     const created = await request(app).post('/api/quotes').send(payload);
     const res = await request(app)
       .patch(`/api/quotes/${created.body._id}/status`)
-      .set('Authorization', `Bearer ${token}`)
+      .set(adminAuth(token))
       .send({ status: 'contacted' });
 
     expect(res.status).toBe(200);
@@ -72,7 +72,7 @@ describe('Quotes', () => {
     const created = await request(app).post('/api/quotes').send(payload);
     const res = await request(app)
       .patch(`/api/quotes/${created.body._id}/status`)
-      .set('Authorization', `Bearer ${token}`)
+      .set(adminAuth(token))
       .send({ status: 'no-existe' });
 
     expect(res.status).toBe(400);

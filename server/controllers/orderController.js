@@ -2,15 +2,73 @@ import asyncHandler from 'express-async-handler';
 import Order from '../models/Order.js';
 import Product from '../models/Product.js';
 import { writeAuditLog } from '../utils/auditLogger.js';
+import { hasControlChars } from '../utils/validation.js';
+import { isHoneypotTripped, recordHoneypotHit } from '../utils/antiSpam.js';
+
+const PHONE_RE = /^[\d\s()+-]{6,30}$/;
+const MAX_ORDER_LINES = 50;
+const MAX_LINE_QUANTITY = 999;
+
+// Valida los datos que manda el visitante en POST /api/orders. Nombre y teléfono son
+// opcionales (el carrito hoy solo manda items). Devuelve { customerName, customerPhone } o
+// { error }.
+export const parseOrderBody = (body) => {
+  const input = body && typeof body === 'object' ? body : {};
+
+  if (!Array.isArray(input.items) || input.items.length === 0) {
+    return { error: 'No hay productos en el carrito' };
+  }
+  if (input.items.length > MAX_ORDER_LINES) {
+    return { error: `El carrito supera el máximo de ${MAX_ORDER_LINES} productos distintos.` };
+  }
+  for (const item of input.items) {
+    const quantity = Number(item?.quantity);
+    if (
+      !item ||
+      typeof item !== 'object' ||
+      typeof item.productId !== 'string' ||
+      !Number.isInteger(quantity) ||
+      quantity < 1 ||
+      quantity > MAX_LINE_QUANTITY
+    ) {
+      return { error: 'Hay un producto del carrito con datos no válidos.' };
+    }
+  }
+
+  const customer = {};
+  for (const [field, label, max] of [
+    ['customerName', 'El nombre', 150],
+    ['customerPhone', 'El teléfono', 30],
+  ]) {
+    const raw = input[field];
+    if (raw !== undefined && raw !== null && typeof raw !== 'string') {
+      return { error: `${label} no es válido.` };
+    }
+    const value = (raw || '').trim();
+    if (value.length > max) {
+      return { error: `${label} es demasiado largo (máximo ${max} caracteres).` };
+    }
+    if (hasControlChars(value)) {
+      return { error: `${label} contiene caracteres no permitidos.` };
+    }
+    customer[field] = value;
+  }
+  if (customer.customerPhone && !PHONE_RE.test(customer.customerPhone)) {
+    return { error: 'Ingresá un teléfono válido.' };
+  }
+
+  return customer;
+};
 
 // POST /api/orders — público (se llama cuando el usuario hace click en WhatsApp)
 export const createOrder = asyncHandler(async (req, res) => {
-  const { items, customerName, customerPhone } = req.body;
-
-  if (!items || items.length === 0) {
+  const parsed = parseOrderBody(req.body);
+  if (parsed.error) {
     res.status(400);
-    throw new Error('No hay productos en el carrito');
+    throw new Error(parsed.error);
   }
+  const { items } = req.body;
+  const { customerName, customerPhone } = parsed;
 
   // Validate WhatsApp configuration
   const whatsappNumber = (process.env.WHATSAPP_NUMBER || '').trim();
@@ -86,6 +144,19 @@ export const createOrder = asyncHandler(async (req, res) => {
     'Gracias \u{1F64C}',
   ].join('\n');
 
+  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+
+  // Honeypot: se responde igual que un éxito real, sin tocar el stock ni guardar el pedido.
+  if (isHoneypotTripped(req.body)) {
+    recordHoneypotHit('orders');
+    const fake = new Order({ items: orderItems, total, customerName, customerPhone, whatsappMessage }).toObject();
+    fake.createdAt = new Date();
+    fake.updatedAt = fake.createdAt;
+    fake.__v = 0;
+    res.status(201).json({ order: fake, whatsappUrl });
+    return;
+  }
+
   // Atomic per-product stock decrement with conditional check.
   const discounted = [];
   for (const item of orderItems) {
@@ -118,8 +189,8 @@ export const createOrder = asyncHandler(async (req, res) => {
     order = await Order.create({
       items: orderItems,
       total,
-      customerName: customerName || '',
-      customerPhone: customerPhone || '',
+      customerName,
+      customerPhone,
       whatsappMessage,
     });
   } catch (error) {
@@ -147,7 +218,7 @@ export const createOrder = asyncHandler(async (req, res) => {
 
   res.status(201).json({
     order,
-    whatsappUrl: `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`,
+    whatsappUrl,
   });
 });
 

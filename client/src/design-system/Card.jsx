@@ -32,8 +32,23 @@ export function Card({ children, padding = 'md', accent = 'none', interactive = 
     },
   } : {};
 
+  // Con onClick la tarjeta es un control: se anuncia como botón, entra en el orden de tab y
+  // se activa con Enter o Espacio (solo si el foco está en la tarjeta misma, para no robarle
+  // las teclas a un input o enlace que esté adentro). El foco visible lo da tokens.css.
+  const keyboardProps = typeof onClick === 'function' ? {
+    role: 'button',
+    tabIndex: 0,
+    onKeyDown: (e) => {
+      if (e.target !== e.currentTarget) return;
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        onClick(e);
+      }
+    },
+  } : {};
+
   return (
-    <div style={base} onClick={onClick} {...hoverHandlers} {...rest}>
+    <div style={base} onClick={onClick} {...keyboardProps} {...hoverHandlers} {...rest}>
       {children}
     </div>
   );
