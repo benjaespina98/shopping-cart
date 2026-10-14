@@ -39,6 +39,11 @@ Sitio público + panel admin de una empresa de piscinas (Villa María, Córdoba)
 - No leer ni editar `.env*` (salvo `.env.example`) ni claves privadas: un hook lo bloquea (Read/Edit/Write y Grep/Glob con `path` o `glob` que los nombren).
 - Límite conocido del hook: un `Grep` sobre un directorio sin `glob` puede leer líneas de un `.env`; no hay forma de detectarlo. Excluí `.env*` en el glob y no pongas secretos reales en el árbol.
 
+## Git seguro (reglas duras)
+- Nunca cambies de rama con trabajo sin commitear, ni uses `git switch`/`checkout` para medir otras ramas: git borra del disco los archivos que son tracked en una rama y no en la otra (así se perdió `client/.env.local`).
+- Para ver o probar otra versión: `git worktree add` en una carpeta fuera del repo y borrala al terminar (`git worktree remove`).
+- No borres ni muevas archivos ignorados (`.env.local`, `.env`): no están en git y no se recuperan.
+
 ## Flujo de trabajo
 - Un PR por tema, desde una rama propia (la base es `main`; `develop` es la rama de trabajo actual).
 - Antes de pedir revisión: lint (cuando exista), tests de client y server, y `npm run build` en verde. La skill `pre-release-check` lo automatiza.
