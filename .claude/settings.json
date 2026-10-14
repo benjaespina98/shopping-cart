@@ -20,7 +20,18 @@
       "Bash(git push -f:*)",
       "Bash(vercel --prod:*)",
       "Bash(vercel deploy:*)",
-      "Bash(npm run seed:*)"
+      "Bash(npm run seed:*)",
+      "Bash(git push origin main:*)",
+      "Bash(git push origin HEAD:main:*)"
+    ],
+    "allow": [
+      "Bash(gh pr create:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr checks:*)",
+      "Bash(gh pr list:*)"
+    ],
+    "ask": [
+      "Bash(gh pr merge:*)"
     ]
   },
   "hooks": {
