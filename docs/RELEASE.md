@@ -4,8 +4,9 @@
    `develop` (rama por defecto), **no `main`**; verificar con `gh api repos/{owner}/{repo}/rules/branches/main`.
 2. En verde: `npm run lint`, `npm --prefix client test`, `npm --prefix server test`, `npm run build`.
 3. `security-reviewer` (obligatorio) sobre `git diff origin/develop...HEAD`; sin hallazgos Alta/Crítica.
-4. `git push -u origin <rama>` y `gh pr create --base develop` con el cuerpo **inline** (o un archivo generado
-   en un directorio temporal; nunca una ruta arbitraria ni `.env*`: `--body-file` publica el contenido).
+4. `git push -u origin <rama>` y `gh pr create --base develop --body-file <temporal>`: el cuerpo se genera con
+   la herramienta Write en un directorio temporal (no por línea de comandos: tiene backticks); nunca una
+   ruta arbitraria ni `.env*` (el repo es público y `--body-file` publica el contenido).
 5. Esperar el CI (`gh pr checks <n> --watch`) y mergear con **merge commit** (nunca squash/rebase/`--admin`).
 6. Antes del PR a `main`: confirmar con el dueño que hay un **backup reciente** de la base (`mongodump`); no
    se ejecuta desde el flujo. Se pide en cada release.

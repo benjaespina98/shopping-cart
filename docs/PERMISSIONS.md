@@ -37,8 +37,16 @@ Cada regla existe con la forma `Bash(...)` y con la forma `PowerShell(...)`.
 
 ## Limitaciones conocidas
 
+- **Falsos positivos:** `git push*main*` bloquea cualquier rama con "main" en el nombre (`maintenance`,
+  `domain-x`) y `git push*+*` cualquier rama con "+". Si hace falta, renombrá la rama.
+- **`--body-file`:** `gh pr create` está en `allow`; solo se deniegan las rutas `.env*`. Una ruta
+  arbitraria dentro del repo sigue siendo posible: la regla es conductual (ver la skill `release-flow`).
+- **Borrado recursivo:** `Remove-Item*-Recurse*` y `rm -rf` cubren esas formas, no `rm -fr`, `ri -r`,
+  `del /s` ni `rd /s`; no es una equivalencia completa.
 - **No cubre** `git -C . push origin main`, `sh -c '...'`, rutas absolutas (`/usr/bin/git push`),
-  `git -c k=v push` ni un `git push` pelado estando parado en `main`. La documentación indica que el
+  `git -c k=v push`, `git.exe push`, alias de git, comillas partidas, variables ni un `git push` pelado
+  estando parado en `main`. Tampoco deniega `vercel alias`, `vercel env add/rm` ni `pnpm dlx`/`bunx`
+  `vercel`; esos caen en el prompt por defecto. La documentación indica que el
   matching no ve a través de esos envoltorios.
 - **No hay forma documentada de probar una regla offline** (no existe un `claude permissions test`). Las
   reglas se probaron con un simulador local de la semántica documentada, no con el matcher oficial. Usá

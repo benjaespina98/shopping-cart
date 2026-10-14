@@ -46,7 +46,8 @@ Sitio público + panel admin de una empresa de piscinas (Villa María, Córdoba)
 - No borres ni muevas archivos ignorados (`.env.local`, `.env`): no están en git y no se recuperan.
 
 ## Flujo de trabajo
-- Un PR por tema, desde una rama propia (la base es `main`; `develop` es la rama de trabajo actual).
+- Un PR por tema, desde una rama propia hacia `develop`; `develop → main` solo por el flujo de release
+  (`docs/RELEASE.md`, skill `release-flow`). Nada se pushea a `main`.
 - Antes de pedir revisión: `npm run lint`, tests de client y server, y `npm run build` en verde. La skill `pre-release-check` lo automatiza.
 - Antes de cambios sensibles: skill `security-audit` o el agente `security-reviewer`. Para UI: `ux-a11y-reviewer`; para metadatos/rendimiento: `seo-perf-reviewer`.
 - Reportá siempre qué verificaste (comando + resultado) y qué **no** pudiste verificar.
