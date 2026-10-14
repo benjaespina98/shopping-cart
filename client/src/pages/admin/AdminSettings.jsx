@@ -481,10 +481,10 @@ export default function AdminSettings() {
                   type="password"
                   autoComplete="new-password"
                   required
-                  minLength={6}
+                  minLength={12}
                   value={passwordForm.newPassword}
                   onChange={(e) => setPasswordForm((prev) => ({ ...prev, newPassword: e.target.value }))}
-                  placeholder="Mínimo 6 caracteres"
+                  placeholder="Mínimo 12 caracteres"
                 />
               </div>
               <div className="flex gap-2">
@@ -496,7 +496,7 @@ export default function AdminSettings() {
                     type="password"
                     autoComplete="new-password"
                     required
-                    minLength={6}
+                    minLength={12}
                     value={passwordForm.confirmPassword}
                     onChange={(e) => setPasswordForm((prev) => ({ ...prev, confirmPassword: e.target.value }))}
                   />
@@ -549,10 +549,10 @@ export default function AdminSettings() {
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="new-password"
                   required
-                  minLength={6}
+                  minLength={12}
                   value={newUser.password}
                   onChange={(e) => setNewUser((prev) => ({ ...prev, password: e.target.value }))}
-                  placeholder="Mínimo 6 caracteres"
+                  placeholder="Mínimo 12 caracteres"
                 />
                 <button
                   type="button"

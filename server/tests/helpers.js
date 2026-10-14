@@ -104,7 +104,7 @@ export async function stopTestApp(mongod) {
 export async function createAdminAndLogin(request, app) {
   const { default: User } = await import('../models/User.js');
   const email = 'admin@test.com';
-  const password = 'Admin123!';
+  const password = 'Admin123!Segura';
   await User.create({ name: 'Admin Test', email, password, role: 'admin' });
 
   const res = await request(app).post('/api/auth/login').send({ email, password });
@@ -123,7 +123,7 @@ export async function createAdminToken() {
   const user = await User.create({
     name: 'Admin Test',
     email: 'admin@test.com',
-    password: 'Admin123!',
+    password: 'Admin123!Segura',
     role: 'admin',
   });
 
