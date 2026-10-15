@@ -126,7 +126,7 @@ disponible, ver `docs/PERMISSIONS.md`).
 | `x-frame-options` | `DENY` |
 | `referrer-policy` | `strict-origin-when-cross-origin` |
 | `permissions-policy` | presente (camera, microphone, geolocation, payment, usb vacíos) |
-| `content-security-policy-report-only` | presente |
+| `content-security-policy` | presente (enforcement; no debe existir `content-security-policy-report-only`) |
 | `strict-transport-security` | presente (lo agrega Vercel) |
 | `/robots.txt` → status y `content-type` | `200` y `text/plain` (no `text/html`) |
 
