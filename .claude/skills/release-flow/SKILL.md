@@ -75,7 +75,11 @@ Si el PR queda bloqueado por el ruleset (check requerido o revisión), reportá 
 2. `git fetch origin` y revisión de lo que **realmente va a producción**: `git diff origin/main...origin/develop`
    con **security-reviewer**, **ux-a11y-reviewer** y **seo-perf-reviewer**. El árbol de trabajo debe
    coincidir con `origin/develop`; si no, usá `git worktree add <ruta fuera del repo> origin/develop` y
-   borralo al terminar. Cualquier hallazgo **Alto o Crítico bloquea**: no pidas la confirmación.
+   borralo al terminar.
+   **Criterio de bloqueo:** un hallazgo Alto o Crítico **nuevo** respecto de `origin/main` (comprobá con
+   `git show origin/main:<archivo>` si ya existía), o **cualquier** hallazgo de **seguridad** Alto o Crítico.
+   Los preexistentes no bloquean: se listan en `docs/BACKLOG.md` y los acepta el dueño. Si hay algo que
+   bloquea, no pidas la confirmación.
 3. Abrí el PR con el cuerpo estándar, incluyendo la tabla de checks y los resultados de los tres
    reviewers (severidad y estado):
 ```bash

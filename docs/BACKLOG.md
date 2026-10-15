@@ -1,0 +1,25 @@
+# Backlog diferido
+
+Hallazgos preexistentes (ya estaban en `main`) o fuera del alcance de un release, que el dueño aceptó
+diferir. Origen: revisión de los agentes sobre `origin/main...origin/develop` (PR #39). Severidad según
+el agente que lo reportó. Cuando un ítem se corrige, se borra de acá.
+
+| # | Ítem | Sev. | Por qué se difiere | Corrección propuesta |
+|---|---|---|---|---|
+| 1 | **SEO: metas por ruta solo vía JS.** El HTML inicial de las 7 rutas es el de la home (título, canonical, `og:*`); las metas por ruta se aplican al ejecutar JS | Alto (SEO) | No es regresión (en `main` no había metas por ruta). Google renderiza JS; el efecto real es en scrapers sociales y crawlers sin render. Requiere un paso de build | Prerender por ruta: script post-build que copie `dist/index.html` a `dist/<ruta>/index.html` con las metas de `PAGE_META`. Evaluar antes de adoptar |
+| 2 | **Admin: interruptores "Destacado/Activo" y subida de imágenes no operables con teclado** (`AdminProducts.jsx`: `div onClick` y `input type=file` con `display:none`) | Alto (a11y) | Preexistente. Solo afecta al panel; usa un usuario único | Interruptores con `input role="switch"` y botón que dispare el selector de archivos |
+| 3 | **Contraste de tokens:** 18 de 34 pares bajo umbral (`--text-muted`, `--text-faint`, verde/ámbar/rojo de estado, bordes) | Medio (a11y) | Decisión de marca del dueño; no se cambian colores sin su aprobación. Detalle en `docs/A11Y.md` | Oscurecer `--text-muted`/`--text-faint` y los estados; propuesta en la tabla de A11Y |
+| 4 | **Turnstile / captcha** en `/api/quotes`, `/api/orders` y login | Medio (seg.) | Requiere claves de una cuenta del dueño (Cloudflare) | Turnstile verificado en el server; ver `docs/ANTI-SPAM.md` |
+| 5 | **Limiter no compartido en serverless:** el contador vive en la memoria de cada instancia | Medio (seg.) | Un store compartido es un servicio externo (KV/Redis) que no se agregó a propósito | Vercel KV / Upstash detrás de la interfaz de store ya existente |
+| 6 | **Deuda de lint:** 50 warnings (client) + 1 (server): 15 `click-events-have-key-events`, 12 `no-static-element-interactions`, 10 `no-unescaped-entities`, 5 `no-unused-vars`, 3 `no-noninteractive-element-interactions`, 2 `no-autofocus`, 2 `exhaustive-deps`, 1 `no-unknown-property` | Bajo | Se midió al introducir ESLint; no frena el CI | Saldar por regla y subirla a `error` al llegar a 0 (`docs/LINT.md`) |
+| 7 | **JWT no revocable:** cambiar la contraseña o cerrar sesión no invalida un token ya emitido (7 días por defecto) | Medio (seg.) | Diseño stateless documentado en el ADR 0001 | `tokenVersion` o `passwordChangedAt` en `User`, comparado en `protect`; bajar la expiración |
+| 8 | **`POST /api/orders` descuenta stock sin autenticación ni pago** (hasta 50 líneas × 999 unidades por request) | Medio (seg.) | Es el diseño del checkout por WhatsApp; el limiter lo acota parcialmente | Reservas con TTL o descontar al confirmar el admin; Turnstile (#4) |
+| 9 | **multer 1.x deprecado** (avisos de DoS por multipart); solo alcanzable con sesión admin | Medio (seg.) | Migrar a 2.x implica revisar `multer-storage-cloudinary` (también deprecado) | multer 2.x o subida firmada a Cloudinary; subir el umbral de `npm audit` en CI a `high` |
+| 10 | **`JWT_SECRET` posiblemente real en el historial del README** (commits `3841be0`, `a9340e8`) | Medio (cond.) | No se pudo confirmar sin leer secretos | **Rotar `JWT_SECRET` en producción** (acción del dueño) |
+| 11 | Menores de seguridad: `jwt.verify` sin `algorithms` fijado; IP del audit log desde `x-forwarded-for`; `phoneNumberLink` del admin sin validar esquema; mínimo de 12 solo al cambiar la contraseña; enumeración por timing en login; `.gitignore` sin `.env.*`; CI sin `permissions:` | Bajo | Sin explotación realista hoy | Ver el reporte del security-reviewer del PR #39 |
+| 12 | Menores de SEO/performance: `prefetch.js` síncrono en `<head>`; Google Fonts render-blocking; sin `Cache-Control` para assets; `/ubicacion` redirige solo en cliente; íconos del manifest 192/512; og:image 1200×630 | Medio/Bajo | Mejoras de performance, no correcciones | Self-host de fuentes, headers de caché, `redirects` en `vercel.json` |
+| 13 | Menores de a11y: navegación con `<button>` en vez de `<Link>` (logo, "Solicitar presupuesto"); `aria-expanded` del menú; contraste fuera de los tokens (`text-slate-400`, textos con alfa); modales y sidebar del admin sin trampa/Escape; `autocomplete` del login | Medio/Bajo | Preexistentes; la mayoría en el panel admin | Componente `Modal` compartido y revisión del login |
+
+## Cómo se usa
+- Un hallazgo **nuevo** Alto o Crítico (respecto de `origin/main`) o **cualquier** hallazgo de seguridad Alto o
+  Crítico bloquea el release. Los preexistentes se listan acá y los acepta el dueño (`docs/RELEASE.md`).

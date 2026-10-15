@@ -11,7 +11,9 @@
 6. Antes del PR a `main`: confirmar con el dueño que hay un **backup reciente** de la base (`mongodump`); no
    se ejecuta desde el flujo. Se pide en cada release.
 7. Revisar con `security-reviewer`, `ux-a11y-reviewer` y `seo-perf-reviewer` el diff
-   `git diff origin/main...origin/develop` (lo que va a producción); Alto o Crítico bloquea. Adjuntar al PR.
+   `git diff origin/main...origin/develop` (lo que va a producción). **Bloquea** un hallazgo Alto o Crítico
+   **nuevo** respecto de `origin/main`, o cualquier hallazgo de **seguridad** Alto o Crítico. Los preexistentes
+   se listan en `docs/BACKLOG.md` y los acepta el dueño. Adjuntar los resultados al PR.
 8. Abrir el PR `develop → main`. **No se mergea** hasta que el dueño escriba exactamente
    `MERGEAR A MAIN #<número> <sha7>`; se verifica que el número sea ese PR (develop → main, abierto) y que
    el sha7 sea el HEAD actual de `develop`. Si no coincide, se aborta. Merge con `--match-head-commit`.
