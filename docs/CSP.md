@@ -31,9 +31,17 @@ Definida en `vercel.json` (bloque `headers` para `/(.*)`). Desde `feat/csp-enfor
    `Refused to ...` o escuchar `securitypolicyviolation`.
 
 ## Verificado y no verificado
+- Evidencia previa: consola de producción sin violaciones con la política en modo Report-Only (observado por el dueño).
 - Verificado en un navegador real con la CSP **aplicada** (build local, API real, sin GA): rutas públicas, iframe de Maps y
   8 pantallas del panel, sin violaciones.
 - No verificado: gtag con un ID real (endpoints de GA más allá de los listados), gráfico de Recharts con datos, QR descargado,
   vista previa `blob:` con un archivo real, y el comportamiento en Safari/Firefox.
 - Reversión rápida: volver la clave a `Content-Security-Policy-Report-Only` en `vercel.json` (por PR) o promover el
   deployment anterior en Vercel.
+
+## Notas
+- `connect-src 'self'` alcanza porque en producción el cliente usa `/api` fijo (`client/src/services/api.js:3-5`; `VITE_API_URL` solo
+  rige en desarrollo). Si la API pasara a otro origen habría que agregarlo a `connect-src` y revisar CORS y la cookie de sesión.
+- `frame-src https://www.google.com` permite cualquier ruta de ese host; el único uso es `/maps/embed` (`Contact.jsx`). Acotarlo
+  a esa ruta es posible y queda como mejora.
+- `helmet()` en `server/app.js` emite su propia CSP en las respuestas JSON de `/api`; es inerte porque no se renderizan.

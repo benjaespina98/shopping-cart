@@ -93,17 +93,18 @@ describe('vercel.json — Content-Security-Policy', () => {
     );
   });
 
-  it("contiene object-src 'none', base-uri 'self' y frame-ancestors 'none'", () => {
-    expect(directive(csp(), 'object-src')).toBe("object-src 'none'");
-    expect(directive(csp(), 'base-uri')).toBe("base-uri 'self'");
-    expect(directive(csp(), 'frame-ancestors')).toBe("frame-ancestors 'none'");
+  it("ningún token de default-src, script-src ni worker-src es data:, blob:, https: ni comodín", () => {
+    for (const name of ['default-src', 'script-src', 'worker-src']) {
+      const tokens = directive(csp(), name).split(/\s+/).slice(1);
+      for (const token of tokens) {
+        expect(token, `${name} ${token}`).not.toMatch(/^(data:|blob:|https?:|\*)$/);
+      }
+    }
   });
 
-  it("script-src no admite 'unsafe-inline' ni 'unsafe-eval'", () => {
-    const scriptSrc = directive(csp(), 'script-src');
-    expect(scriptSrc).toBeTruthy();
-    expect(scriptSrc).not.toContain("'unsafe-inline'");
-    expect(scriptSrc).not.toContain("'unsafe-eval'");
+  it("style-src no admite 'unsafe-inline' y default-src es solo 'self'", () => {
+    expect(directive(csp(), 'style-src')).not.toContain("'unsafe-inline'");
+    expect(directive(csp(), 'default-src')).toBe("default-src 'self'");
   });
 
   it('index.html no tiene scripts inline (la CSP exige script-src self)', () => {
