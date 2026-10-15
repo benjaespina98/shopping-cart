@@ -68,6 +68,8 @@ export default function Contact() {
     setFieldErrors(errs);
     if (Object.keys(errs).length > 0) {
       toast.error('Revisá los campos marcados.');
+      const first = ['name', 'phone', 'email', 'message'].find((key) => errs[key]);
+      if (first) document.getElementById(`contact-${first}`)?.focus();
       return false;
     }
     return true;
@@ -92,15 +94,21 @@ export default function Contact() {
     }
   };
 
-  const handleWhatsApp = async () => {
-    if (!validateForm()) return;
-    await saveInquiry();
-    const text = getTextMessage();
-    const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
-    const popup = window.open('', '_blank', 'noopener,noreferrer');
-    if (popup && !popup.closed) popup.location.href = whatsappUrl;
-    else window.location.href = whatsappUrl;
-    resetFormWithFeedback('whatsapp');
+  // WhatsApp es un enlace real (<a target="_blank" rel="noopener noreferrer">): el navegador abre la
+  // pestaña con la URL final dentro del gesto del usuario. Antes se hacía window.open('', '_blank',
+  // 'noopener'), que devuelve null y dejaba una pestaña en blanco mientras esta navegaba a WhatsApp.
+  const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(getTextMessage())}`;
+
+  const handleWhatsApp = (event) => {
+    if (!validateForm()) {
+      event.preventDefault();
+      return;
+    }
+    // Sin await: la navegación nativa ocurre al terminar este handler. La consulta se guarda en
+    // segundo plano (saveInquiry atrapa sus errores) y el formulario se limpia en la tarea siguiente,
+    // cuando el href ya fue usado.
+    saveInquiry();
+    setTimeout(() => resetFormWithFeedback('whatsapp'), 0);
   };
 
   const handleEmail = async () => {
@@ -237,14 +245,14 @@ export default function Contact() {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', marginBottom: 'var(--space-5)' }}>
             <div className="ps-form-row">
-              <Input label="Nombre" placeholder="Tu nombre completo" required
+              <Input id="contact-name" label="Nombre" placeholder="Tu nombre completo" required
                 leading={<FiUser size={16} />}
                 value={form.name} onChange={setField('name')} error={fieldErrors.name} />
-              <Input label="Teléfono" placeholder="600 123 456" required
+              <Input id="contact-phone" label="Teléfono" placeholder="600 123 456" required
                 leading={<FiPhone size={16} />}
                 value={form.phone} onChange={setField('phone')} error={fieldErrors.phone} />
             </div>
-            <Input label="Email" type="email" placeholder="tu@email.com" required
+            <Input id="contact-email" label="Email" type="email" placeholder="tu@email.com" required
               leading={<FiMail size={16} />}
               value={form.email} onChange={setField('email')} error={fieldErrors.email} />
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -253,6 +261,8 @@ export default function Contact() {
               </label>
               <textarea
                 id="contact-message"
+                aria-invalid={fieldErrors.message ? true : undefined}
+                aria-describedby={fieldErrors.message ? 'contact-message-msg' : undefined}
                 rows={4}
                 placeholder="¿En qué te podemos ayudar?"
                 value={form.message}
@@ -265,13 +275,14 @@ export default function Contact() {
                 }}
               />
               {fieldErrors.message && (
-                <span style={{ fontSize: '0.875rem', color: 'var(--red-500)', fontFamily: 'var(--font-body)' }}>{fieldErrors.message}</span>
+                <span id="contact-message-msg" role="alert" style={{ fontSize: '0.875rem', color: 'var(--red-500)', fontFamily: 'var(--font-body)' }}>{fieldErrors.message}</span>
               )}
             </div>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-            <Button variant="primary" size="lg" fullWidth onClick={handleWhatsApp} iconLeft={<FaWhatsapp size={17} />}>
+            <Button variant="primary" size="lg" fullWidth href={whatsappUrl} target="_blank" rel="noopener noreferrer"
+              onClick={handleWhatsApp} iconLeft={<FaWhatsapp size={17} />}>
               {sendingChannel === 'whatsapp' ? '¡Listo! Abriendo WhatsApp...' : 'Enviar por WhatsApp'}
             </Button>
             <Button variant="outline" size="lg" fullWidth onClick={handleEmail} iconLeft={<FiSend size={16} />}>
@@ -324,9 +335,9 @@ export default function Contact() {
                 </span>
               </span>
             </div>
-            <a href={LOCATION.mapsUrl} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>
-              <Button variant="primary" iconLeft={<FiNavigation size={16} />}>Cómo llegar</Button>
-            </a>
+            <Button variant="primary" href={LOCATION.mapsUrl} target="_blank" rel="noopener noreferrer" iconLeft={<FiNavigation size={16} />}>
+              Cómo llegar
+            </Button>
           </div>
         </Card>
       </div>

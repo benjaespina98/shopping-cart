@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { fireEvent } from '@testing-library/react';
 import Contact from './Contact';
 import { SettingsProvider } from '../context/SettingsContext';
 import { quotesAPI, settingsAPI } from '../services/api';
@@ -41,7 +42,7 @@ describe('Contact — validación del formulario', () => {
     renderContact();
 
     await llenarCampos(user, { name: 'Juan', phone: '3534224605', email: 'no-es-un-email', message: 'Consulta de prueba' });
-    await user.click(screen.getByRole('button', { name: /enviar por whatsapp/i }));
+    await user.click(screen.getByRole('link', { name: /enviar por whatsapp/i }));
 
     expect(await screen.findByText('Ingresá un email válido.')).toBeInTheDocument();
     expect(quotesAPI.create).not.toHaveBeenCalled();
@@ -53,7 +54,7 @@ describe('Contact — validación del formulario', () => {
     renderContact();
 
     await llenarCampos(user, { name: 'Juan', phone: '12', email: 'juan@test.com', message: 'Consulta de prueba' });
-    await user.click(screen.getByRole('button', { name: /enviar por whatsapp/i }));
+    await user.click(screen.getByRole('link', { name: /enviar por whatsapp/i }));
 
     expect(await screen.findByText('Ingresá un teléfono válido.')).toBeInTheDocument();
     expect(quotesAPI.create).not.toHaveBeenCalled();
@@ -67,7 +68,7 @@ describe('Contact — validación del formulario', () => {
     renderContact();
 
     await llenarCampos(user, { name: 'Juan', phone: '3534224605', email: 'juan@test.com', message: 'Consulta de prueba' });
-    await user.click(screen.getByRole('button', { name: /enviar por whatsapp/i }));
+    await user.click(screen.getByRole('link', { name: /enviar por whatsapp/i }));
 
     expect(quotesAPI.create).toHaveBeenCalledWith(expect.objectContaining({
       name: 'Juan', phone: '3534224605', email: 'juan@test.com', message: 'Consulta de prueba', source: 'contact',
@@ -93,8 +94,58 @@ describe('Contact — validación del formulario', () => {
 
     await llenarCampos(user, { name: 'Bot', phone: '3534224605', email: 'bot@test.com', message: 'spam' });
     await user.type(trap, 'http://spam.example');
-    await user.click(screen.getByRole('button', { name: /enviar por whatsapp/i }));
+    await user.click(screen.getByRole('link', { name: /enviar por whatsapp/i }));
 
     expect(quotesAPI.create).toHaveBeenCalledWith(expect.objectContaining({ website: 'http://spam.example' }));
+  });
+
+  // El envío por WhatsApp es un <a target="_blank" rel="noopener noreferrer">: sin window.open y sin
+  // pestaña en blanco. El mensaje prearmado va en la URL.
+  it('WhatsApp es un enlace real con target _blank, rel noopener noreferrer y el mensaje prearmado', async () => {
+    const user = userEvent.setup();
+    const open = vi.spyOn(window, 'open');
+    renderContact();
+
+    await llenarCampos(user, { name: 'Juana', phone: '3534224605', email: 'juana@test.com', message: 'Quiero una piscina' });
+    const link = screen.getByRole('link', { name: /enviar por whatsapp/i });
+
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+    const url = new URL(link.getAttribute('href'));
+    expect(url.origin).toBe('https://wa.me');
+    const text = url.searchParams.get('text');
+    expect(text).toContain('Hola! Soy Juana');
+    expect(text).toContain('3534224605');
+    expect(text).toContain('Quiero una piscina');
+    expect(open).not.toHaveBeenCalled();
+  });
+
+  it('con datos inválidos el enlace no navega (se previene el clic) y marca el primer error con foco', async () => {
+    const user = userEvent.setup();
+    renderContact();
+
+    await llenarCampos(user, { name: 'Juana', phone: '12', email: 'juana@test.com', message: 'Hola' });
+    const link = screen.getByRole('link', { name: /enviar por whatsapp/i });
+    const notPrevented = fireEvent.click(link);
+
+    expect(notPrevented).toBe(false);
+    expect(quotesAPI.create).not.toHaveBeenCalled();
+    const phone = screen.getByLabelText('Teléfono');
+    expect(phone).toHaveFocus();
+    expect(phone).toHaveAttribute('aria-invalid', 'true');
+    expect(phone).toHaveAccessibleDescription('Ingresá un teléfono válido.');
+  });
+
+  it('con datos válidos el clic no se previene y la consulta se guarda sin esperar', async () => {
+    quotesAPI.create.mockResolvedValue({});
+    const user = userEvent.setup();
+    renderContact();
+
+    await llenarCampos(user, { name: 'Juana', phone: '3534224605', email: 'juana@test.com', message: 'Hola' });
+    const link = screen.getByRole('link', { name: /enviar por whatsapp/i });
+    const notPrevented = fireEvent.click(link);
+
+    expect(notPrevented).toBe(true);
+    expect(quotesAPI.create).toHaveBeenCalledTimes(1);
   });
 });
