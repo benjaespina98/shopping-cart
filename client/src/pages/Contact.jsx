@@ -282,7 +282,9 @@ export default function Contact() {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
             <Button variant="primary" size="lg" fullWidth href={whatsappUrl} target="_blank" rel="noopener noreferrer"
-              onClick={handleWhatsApp} iconLeft={<FaWhatsapp size={17} />}>
+              onClick={handleWhatsApp}
+              onAuxClick={(event) => { if (event.button === 1) handleWhatsApp(event); }}
+              iconLeft={<FaWhatsapp size={17} />}>
               {sendingChannel === 'whatsapp' ? '¡Listo! Abriendo WhatsApp...' : 'Enviar por WhatsApp'}
             </Button>
             <Button variant="outline" size="lg" fullWidth onClick={handleEmail} iconLeft={<FiSend size={16} />}>

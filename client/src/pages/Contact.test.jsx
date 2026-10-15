@@ -148,4 +148,16 @@ describe('Contact — validación del formulario', () => {
     expect(notPrevented).toBe(true);
     expect(quotesAPI.create).toHaveBeenCalledTimes(1);
   });
+
+  it('el clic medio también valida: con datos inválidos no abre WhatsApp', async () => {
+    const user = userEvent.setup();
+    renderContact();
+
+    await llenarCampos(user, { name: 'Juana', phone: '12', email: 'juana@test.com', message: 'Hola' });
+    const link = screen.getByRole('link', { name: /enviar por whatsapp/i });
+    const notPrevented = fireEvent(link, new MouseEvent('auxclick', { bubbles: true, cancelable: true, button: 1 }));
+
+    expect(notPrevented).toBe(false);
+    expect(quotesAPI.create).not.toHaveBeenCalled();
+  });
 });

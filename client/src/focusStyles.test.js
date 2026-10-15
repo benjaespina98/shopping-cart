@@ -45,4 +45,9 @@ describe('foco visible', () => {
     expect(tokens).toMatch(/\.ps-card\s*\{\s*box-shadow:/);
     expect(tokens).toMatch(/\.ps-btn--primary\s*\{\s*box-shadow:/);
   });
+
+  it('los destinos de foco programático (tabindex="-1") no reciben el aro', () => {
+    expect(tokens).not.toMatch(/:where\([^)]*\[tabindex\],/);
+    expect(tokens).toContain('[tabindex]:not([tabindex="-1"])');
+  });
 });
