@@ -4,6 +4,7 @@ export function Input({ label, helper, error, id, leading, trailing, size = 'md'
   const [focused, setFocused] = useState(false);
   const generatedId = useId();
   const inputId = id || generatedId;
+  const messageId = `${inputId}-msg`;
 
   const sizes = {
     md: { padding: '11px 14px', fontSize: '1rem',      minHeight: '44px' },
@@ -39,6 +40,8 @@ export function Input({ label, helper, error, id, leading, trailing, size = 'md'
         <input
           id={inputId}
           disabled={disabled}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error || helper ? messageId : undefined}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           style={{
@@ -51,9 +54,9 @@ export function Input({ label, helper, error, id, leading, trailing, size = 'md'
         {trailing && <span style={{ display: 'inline-flex', color: 'var(--text-muted)' }}>{trailing}</span>}
       </div>
       {error
-        ? <span style={{ fontSize: '0.875rem', color: 'var(--red-500)', fontFamily: 'var(--font-body)' }}>{error}</span>
+        ? <span id={messageId} role="alert" style={{ fontSize: '0.875rem', color: 'var(--red-500)', fontFamily: 'var(--font-body)' }}>{error}</span>
         : helper
-        ? <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)', fontFamily: 'var(--font-body)' }}>{helper}</span>
+        ? <span id={messageId} style={{ fontSize: '0.875rem', color: 'var(--text-muted)', fontFamily: 'var(--font-body)' }}>{helper}</span>
         : null}
     </div>
   );

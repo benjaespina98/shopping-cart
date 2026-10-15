@@ -61,4 +61,64 @@ describe('Quote — campo trampa anti-spam', () => {
       expect.objectContaining({ website: 'http://spam.example' })
     );
   });
+
+  describe('errores y foco', () => {
+    it('enviar vacío: anuncia el error (role alert), marca el campo y le da el foco', async () => {
+      const user = userEvent.setup();
+      renderQuote();
+      await waitFor(() => expect(servicesAPI.getAll).toHaveBeenCalled());
+
+      await user.click(screen.getByRole('button', { name: /solicitar presupuesto/i }));
+
+      const name = screen.getByLabelText(/nombre y apellido/i);
+      expect(name).toHaveFocus();
+      expect(name).toHaveAttribute('aria-invalid', 'true');
+      expect(name).toHaveAccessibleDescription('Ingresá tu nombre.');
+      const alerts = screen.getAllByRole('alert').map((el) => el.textContent);
+      expect(alerts).toEqual(expect.arrayContaining(['Revisá los campos marcados.', 'Ingresá tu nombre.']));
+      expect(quotesAPI.create).not.toHaveBeenCalled();
+    });
+
+    it('con datos válidos pero sin aceptar el consentimiento: alerta y foco en el checkbox', async () => {
+      const user = userEvent.setup();
+      renderQuote();
+      await waitFor(() => expect(servicesAPI.getAll).toHaveBeenCalled());
+
+      await user.type(screen.getByLabelText(/nombre y apellido/i), 'Juana Pérez');
+      await user.type(screen.getByLabelText(/teléfono/i), '3534224605');
+      await user.type(screen.getByLabelText('Email'), 'juana@test.com');
+      await user.click(screen.getByRole('button', { name: /solicitar presupuesto/i }));
+
+      expect(screen.getByRole('alert')).toHaveTextContent(/aceptar el uso de tus datos/i);
+      expect(screen.getByRole('checkbox')).toHaveFocus();
+      expect(quotesAPI.create).not.toHaveBeenCalled();
+    });
+
+    it('al corregir el campo se limpia el error y deja de estar inválido', async () => {
+      const user = userEvent.setup();
+      renderQuote();
+      await waitFor(() => expect(servicesAPI.getAll).toHaveBeenCalled());
+
+      await user.click(screen.getByRole('button', { name: /solicitar presupuesto/i }));
+      const name = screen.getByLabelText(/nombre y apellido/i);
+      await user.type(name, 'Juana');
+
+      expect(name).not.toHaveAttribute('aria-invalid');
+    });
+
+    it('al enviar bien, el foco pasa al "¡Gracias!" para que se anuncie', async () => {
+      const user = userEvent.setup();
+      renderQuote();
+      await waitFor(() => expect(servicesAPI.getAll).toHaveBeenCalled());
+
+      await user.type(screen.getByLabelText(/nombre y apellido/i), 'Juana Pérez');
+      await user.type(screen.getByLabelText(/teléfono/i), '3534224605');
+      await user.type(screen.getByLabelText('Email'), 'juana@test.com');
+      await user.click(screen.getByRole('checkbox'));
+      await user.click(screen.getByRole('button', { name: /solicitar presupuesto/i }));
+
+      const thanks = await screen.findByRole('heading', { name: '¡Gracias!' });
+      await waitFor(() => expect(thanks).toHaveFocus());
+    });
+  });
 });
