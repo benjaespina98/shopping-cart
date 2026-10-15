@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FiX, FiTrash2, FiPlus, FiMinus, FiMessageCircle, FiShoppingCart } from 'react-icons/fi';
 import { useCart } from '../../context/CartContext';
 import CldImage from './CldImage';
@@ -12,6 +12,23 @@ export default function CartDrawer() {
   const [sending, setSending] = useState(false);
   // Campo trampa anti-spam: una persona nunca lo completa (ver components/ui/Honeypot.jsx).
   const [hp, setHp] = useState('');
+  const drawerRef = useRef(null);
+  const closeRef = useRef(null);
+  const openerRef = useRef(null);
+
+  // Foco: al abrir va al botón de cerrar (dentro del diálogo); al cerrar vuelve al elemento que
+  // lo abrió (el botón del carrito en la barra), si sigue en el documento.
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    openerRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    closeRef.current?.focus();
+
+    return () => {
+      const opener = openerRef.current;
+      openerRef.current = null;
+      if (opener && opener.isConnected) opener.focus();
+    };
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -19,15 +36,46 @@ export default function CartDrawer() {
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
 
-    const handleEscape = (event) => {
-      if (event.key === 'Escape') toggleCart();
+    const FOCUSABLE =
+      'a[href], button:not([disabled]), input:not([disabled]):not([tabindex="-1"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+    // Escape cierra y Tab / Shift+Tab ciclan dentro del diálogo (trampa de foco).
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        toggleCart();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+
+      const drawer = drawerRef.current;
+      if (!drawer) return;
+      // Se descartan los ocultos para lectores de pantalla (p. ej. el campo trampa del honeypot).
+      const focusables = [...drawer.querySelectorAll(FOCUSABLE)].filter((el) => !el.closest('[aria-hidden="true"], [hidden], [inert]'));
+      if (focusables.length === 0) {
+        event.preventDefault();
+        return;
+      }
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      const active = document.activeElement;
+
+      if (!drawer.contains(active)) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
+      } else if (event.shiftKey && active === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && active === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
 
-    window.addEventListener('keydown', handleEscape);
+    window.addEventListener('keydown', handleKeyDown);
 
     return () => {
       document.body.style.overflow = previousOverflow;
-      window.removeEventListener('keydown', handleEscape);
+      window.removeEventListener('keydown', handleKeyDown);
     };
   }, [isOpen, toggleCart]);
 
@@ -78,9 +126,10 @@ export default function CartDrawer() {
           tienda el foco se iba a botones invisibles fuera de pantalla, y los lectores
           de pantalla anunciaban un carrito que no está a la vista. */}
       <div
+        ref={drawerRef}
         role="dialog"
         aria-modal={isOpen}
-        aria-label="Carrito de compras"
+        aria-labelledby="cart-drawer-title"
         aria-hidden={!isOpen}
         inert={isOpen ? undefined : ''}
         className={`fixed top-0 right-0 h-full w-full max-w-md bg-white z-50 flex flex-col shadow-xl
@@ -91,7 +140,7 @@ export default function CartDrawer() {
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
           <div className="flex items-center gap-2">
             <FiShoppingCart size={20} className="text-primary-700" />
-            <h2 className="font-semibold text-slate-800 text-lg">
+            <h2 id="cart-drawer-title" className="font-semibold text-slate-800 text-lg">
               Carrito
               {totalItems > 0 && (
                 <span className="ml-2 text-sm font-normal text-slate-500">({totalItems} items)</span>
@@ -108,6 +157,7 @@ export default function CartDrawer() {
               </button>
             )}
             <button
+              ref={closeRef}
               onClick={toggleCart}
               aria-label="Cerrar carrito"
               className="p-2 rounded-xl hover:bg-slate-100 transition-colors text-slate-600"
