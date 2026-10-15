@@ -58,6 +58,8 @@ export default function Projects() {
                     height={i % 3 === 0 ? 280 : 220}
                     src={p.imageUrl || undefined}
                     zoom
+                    sizes="(max-width: 767px) calc(100vw - 40px), (max-width: 1023px) 50vw, 360px"
+                    srcSetWidths={[360, 540, 720, 1080]}
                   />
                 </div>
               );

@@ -47,7 +47,8 @@ export default function Services() {
             {rows.map((r, i) => (
               <div key={r._id || r.title} className="ps-service-row" style={{ direction: i % 2 ? 'rtl' : 'ltr' }}>
                 <div className="ps-service-photo" style={{ direction: 'ltr' }}>
-                  <Photo label={r.title} height={280} src={r.imageUrl || undefined} />
+                  <Photo label={r.title} height={280} src={r.imageUrl || undefined}
+                    sizes="(max-width: 767px) calc(100vw - 40px), 540px" srcSetWidths={[400, 560, 800, 1080]} />
                 </div>
                 <div style={{ direction: 'ltr' }}>
                   <Badge tone={r.tone} variant={r.variant} style={{ marginBottom: 14 }}>{r.tag}</Badge>

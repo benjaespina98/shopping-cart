@@ -152,7 +152,8 @@ export default function Contact() {
         {/* Left — contact info */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
           {contactSettings.contactPhotoUrl && (
-            <Photo src={contactSettings.contactPhotoUrl} label="Nuestro local" height={180} />
+            <Photo src={contactSettings.contactPhotoUrl} label="Nuestro local" height={180}
+              sizes="(max-width: 767px) calc(100vw - 40px), 340px" srcSetWidths={[340, 520, 700]} />
           )}
 
           <Card padding="lg">
