@@ -49,11 +49,48 @@ describe('vercel.json — headers de seguridad', () => {
 });
 
 describe('vercel.json — Content-Security-Policy', () => {
-  const csp = () => allPathsHeaders()['content-security-policy-report-only'];
+  const csp = () => allPathsHeaders()['content-security-policy'];
 
-  it('está en modo report-only (sin enforcement todavía)', () => {
+  it('se aplica (enforcement) y ya no queda ningún Report-Only', () => {
     expect(csp()).toBeTruthy();
-    expect(allPathsHeaders()['content-security-policy']).toBeUndefined();
+    expect(allPathsHeaders()['content-security-policy-report-only']).toBeUndefined();
+  });
+
+  it("incluye manifest-src 'self' y worker-src 'self' explícitos", () => {
+    expect(directive(csp(), 'manifest-src')).toBe("manifest-src 'self'");
+    expect(directive(csp(), 'worker-src')).toBe("worker-src 'self'");
+  });
+
+  it("mantiene object-src 'none', base-uri 'self', form-action 'self' y frame-ancestors 'none'", () => {
+    expect(directive(csp(), 'object-src')).toBe("object-src 'none'");
+    expect(directive(csp(), 'base-uri')).toBe("base-uri 'self'");
+    expect(directive(csp(), 'form-action')).toBe("form-action 'self'");
+    expect(directive(csp(), 'frame-ancestors')).toBe("frame-ancestors 'none'");
+  });
+
+  it('no abre orígenes inseguros: sin comodín global, sin http: ni unsafe-inline/eval en script-src', () => {
+    for (const d of csp().split(';').map((x) => x.trim())) {
+      expect(d, d).not.toMatch(/(^|\s)\*(\s|$)/);
+      expect(d, d).not.toMatch(/\shttp:(\s|$)/);
+    }
+    const script = directive(csp(), 'script-src');
+    expect(script).not.toContain("'unsafe-inline'");
+    expect(script).not.toContain("'unsafe-eval'");
+  });
+
+  it('solo hay los orígenes externos que el código usa (GA, Cloudinary, Google Fonts, Google Maps)', () => {
+    const origins = new Set(csp().match(/https:\/\/[^\s;]+/g));
+    expect([...origins].sort()).toEqual(
+      [
+        'https://*.analytics.google.com',
+        'https://*.google-analytics.com',
+        'https://fonts.googleapis.com',
+        'https://fonts.gstatic.com',
+        'https://res.cloudinary.com',
+        'https://www.google.com',
+        'https://www.googletagmanager.com',
+      ].sort()
+    );
   });
 
   it("contiene object-src 'none', base-uri 'self' y frame-ancestors 'none'", () => {
