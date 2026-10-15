@@ -20,7 +20,7 @@
 9. Post-deploy (solo GET/HEAD): estado del deployment en Vercel (Ready) y
    `curl.exe -sI https://playaysol.vercel.app/` y `.../robots.txt`. No usar `commits/main/status`.
 10. Esperado: `x-content-type-options`, `x-frame-options`, `referrer-policy`, `permissions-policy`,
-    `content-security-policy-report-only` y `strict-transport-security`; `robots.txt` como `text/plain`.
+    `content-security-policy` (enforcement; ya no Report-Only) y `strict-transport-security`; `robots.txt` como `text/plain`.
 11. A mano (dueño): login de admin, imágenes del catálogo, un presupuesto de prueba, consola (CSP).
 12. Rollback: Vercel › Deployments › deployment anterior › **Promote to Production**. Si hay que revertir
     código: `git revert -m 1 <merge-commit>` en una rama aparte, por PR. Para volver a aplicar el release,

@@ -8,7 +8,7 @@
 El login del panel devolvía el JWT en el cuerpo de la respuesta y el cliente lo guardaba en
 `localStorage` (`admin_token`), enviándolo en el header `Authorization: Bearer`. Cualquier script que
 corra en la página (un XSS, una dependencia comprometida) puede leer `localStorage` y robar una sesión
-de administrador válida por 7 días. Además, la CSP del sitio hoy está en modo *report-only*, así que no
+de administrador válida por 7 días. Además, al decidir esto no había una CSP aplicada (estaba en *report-only*; hoy se aplica, ver `docs/CSP.md`, como defensa en profundidad), así que no
 hay una segunda barrera.
 
 ## Decisión
