@@ -164,7 +164,7 @@ export default function AdminServices() {
             <label className="flex-shrink-0 cursor-pointer">
               <div className="w-36 h-28 rounded-xl border-2 border-dashed border-slate-300 hover:border-primary-700 flex flex-col items-center justify-center text-slate-400 hover:text-primary-700 transition-colors overflow-hidden">
                 {preview
-                  ? <img src={preview} alt="preview" className="w-full h-full object-cover" />
+                  ? <img src={preview} alt="Vista previa de la imagen seleccionada" className="w-full h-full object-cover" />
                   : <><FiImage size={24} /><span className="text-xs mt-1">Elegir foto</span></>}
               </div>
               <input type="file" accept="image/*" className="hidden" ref={fileRef} onChange={handleFileChange} />

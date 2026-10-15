@@ -8,28 +8,65 @@
          React los consume en cuanto arranca (ver src/utils/prefetch.js); si ya no están
          disponibles (SPA, ruta distinta, o esto falló) cada componente vuelve a pedirlos
          como antes. En un cold start del backend, esto adelanta el pedido varios cientos
-         de ms — justo el tiempo que la foto del hero se veía como placeholder vacío. -->
-    <script>
-      window.__prefetch = {
-        projects: fetch('/api/projects').then((r) => r.json()).catch(() => null),
-        settings: fetch('/api/settings/public').then((r) => r.json()).catch(() => null),
-      };
-    </script>
+         de ms — justo el tiempo que la foto del hero se veía como placeholder vacío.
+         Vive en /prefetch.js (y no inline) para que la CSP pueda exigir script-src 'self'
+         sin 'unsafe-inline'. -->
+    <script src="/prefetch.js"></script>
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Playa &amp; Sol — Construcción, reforma y mantenimiento de piscinas en Villa María, Córdoba." />
     <title>Playa &amp; Sol Piscinas</title>
+    <link rel="canonical" href="https://playaysol.vercel.app/" />
+    <meta name="theme-color" content="#244B5A" />
+    <link rel="manifest" href="/site.webmanifest" />
 
     <!-- Open Graph / Social preview -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Playa &amp; Sol Piscinas" />
     <meta property="og:description" content="Construcción, reforma y mantenimiento de piscinas en Villa María, Córdoba. +30 años de experiencia." />
-    <meta property="og:image" content="/brand/logo-stacked.png" />
+    <meta property="og:url" content="https://playaysol.vercel.app/" />
+    <meta property="og:site_name" content="Playa &amp; Sol Piscinas" />
+    <meta property="og:locale" content="es_AR" />
+    <meta property="og:image" content="https://playaysol.vercel.app/brand/logo-stacked.png" />
     <meta property="og:image:width" content="1032" />
     <meta property="og:image:height" content="840" />
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:title" content="Playa &amp; Sol Piscinas" />
-    <meta property="twitter:image" content="/brand/logo-stacked.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Playa &amp; Sol Piscinas" />
+    <meta name="twitter:image" content="https://playaysol.vercel.app/brand/logo-stacked.png" />
+    <!-- Datos estructurados: bloque de datos (no se ejecuta), así que la CSP con
+         script-src 'self' no lo afecta. Solo lleva datos que ya existen en el código del
+         sitio (Contact.jsx, SettingsContext.jsx): ver docs/SEO.md. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "@id": "https://playaysol.vercel.app/#negocio",
+        "name": "Playa & Sol Piscinas",
+        "url": "https://playaysol.vercel.app/",
+        "description": "Construcción, reforma y mantenimiento de piscinas en Villa María, Córdoba.",
+        "logo": "https://playaysol.vercel.app/brand/logo-stacked.png",
+        "image": "https://playaysol.vercel.app/brand/logo-stacked.png",
+        "telephone": "+543534224605",
+        "email": "piscinas@playaysol.com.ar",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Corrientes 1210",
+          "addressLocality": "Villa María",
+          "addressRegion": "Córdoba",
+          "addressCountry": "AR"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": -32.41136540202374,
+          "longitude": -63.24136445912394
+        },
+        "sameAs": [
+          "https://www.instagram.com/playaysol.piscinas/",
+          "https://www.facebook.com/playaysol.piscinas",
+          "https://www.tiktok.com/@playaysolpiscinas"
+        ]
+      }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <!-- La imagen del Hero se sirve desde Cloudinary; abrimos la conexión cuanto antes

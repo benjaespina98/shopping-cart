@@ -1,4 +1,4 @@
-export function Card({ children, padding = 'md', accent = 'none', interactive = false, style, onClick, ...rest }) {
+export function Card({ children, padding = 'md', accent = 'none', interactive = false, className, style, onClick, ...rest }) {
   const pads = { none: '0', sm: 'var(--space-4)', md: 'var(--space-5)', lg: 'var(--space-7)' };
   const accents = {
     none: '1px solid var(--border-subtle)',
@@ -11,7 +11,6 @@ export function Card({ children, padding = 'md', accent = 'none', interactive = 
     borderRadius: 'var(--radius-lg)',
     border: '1px solid var(--border-subtle)',
     borderTop: accents[accent],
-    boxShadow: 'var(--shadow-md)',
     padding: pads[padding],
     minWidth: 0,
     boxSizing: 'border-box',
@@ -21,19 +20,25 @@ export function Card({ children, padding = 'md', accent = 'none', interactive = 
     ...style,
   };
 
-  const hoverHandlers = interactive ? {
-    onMouseEnter: (e) => {
-      e.currentTarget.style.transform = 'translateY(-2px)';
-      e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
-    },
-    onMouseLeave: (e) => {
-      e.currentTarget.style.transform = 'none';
-      e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+  const classes = ['ps-card', interactive && 'ps-card--interactive', className].filter(Boolean).join(' ');
+
+  // Con onClick la tarjeta es un control: se anuncia como botón, entra en el orden de tab y
+  // se activa con Enter o Espacio (solo si el foco está en la tarjeta misma, para no robarle
+  // las teclas a un input o enlace que esté adentro). El foco visible lo da tokens.css.
+  const keyboardProps = typeof onClick === 'function' ? {
+    role: 'button',
+    tabIndex: 0,
+    onKeyDown: (e) => {
+      if (e.target !== e.currentTarget) return;
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        onClick(e);
+      }
     },
   } : {};
 
   return (
-    <div style={base} onClick={onClick} {...hoverHandlers} {...rest}>
+    <div className={classes} style={base} onClick={onClick} {...keyboardProps} {...rest}>
       {children}
     </div>
   );

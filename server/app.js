@@ -6,6 +6,7 @@ import mongoSanitize from 'express-mongo-sanitize';
 import rateLimit from 'express-rate-limit';
 import { connectDB } from './config/db.js';
 import { loadServerEnv, assertRequiredEnv } from './config/env.js';
+import { isAllowedOrigin, isSameHostOrigin } from './config/origins.js';
 import authRoutes from './routes/authRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
@@ -22,44 +23,10 @@ assertRequiredEnv();
 
 const app = express();
 
-const normalizeOrigin = (origin) => origin.trim().replace(/\/+$/, '');
-
-const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173,http://127.0.0.1:5173')
-  .split(',')
-  .map((origin) => normalizeOrigin(origin))
-  .filter(Boolean);
-
-const originPatternRegexList = allowedOrigins
-  .filter((origin) => origin.includes('*'))
-  .map((pattern) => {
-    const escaped = pattern.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*');
-    return new RegExp(`^${escaped}$`, 'i');
-  });
-
-const exactOrigins = allowedOrigins.filter((origin) => !origin.includes('*'));
-
-const localDevOriginPattern = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i;
-
-const isAllowedOrigin = (origin) => {
-  if (!origin) return true;
-
-  const normalizedOrigin = normalizeOrigin(origin);
-  if (exactOrigins.includes(normalizedOrigin)) return true;
-  if (originPatternRegexList.some((regex) => regex.test(normalizedOrigin))) return true;
-
-  // Allow any localhost/127.0.0.1 port in development to avoid Vite port drift issues.
-  if (process.env.NODE_ENV !== 'production' && localDevOriginPattern.test(normalizedOrigin)) {
-    return true;
-  }
-
-  return false;
-};
-
 // Trust proxy if we are behind Vercel/proxies
 app.set('trust proxy', 1);
 
 app.use(helmet());
-app.use(mongoSanitize());
 
 // Limitador general.
 //
@@ -97,19 +64,27 @@ const loginLimiter = rateLimit({
   message: 'Demasiados intentos de inicio de sesión, intenta de nuevo en 15 minutos.',
 });
 
+// CORS con credenciales (cookie de sesión): el origen se REFLEJA solo si está en la allowlist
+// (CLIENT_URL) o es el mismo host que sirve la API; nunca "*". Un origen ajeno recibe 403 (antes
+// caía en un 500 genérico).
 app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (isAllowedOrigin(origin)) {
-        callback(null, true);
-        return;
-      }
-      callback(new Error('Not allowed by CORS'));
-    },
-    credentials: true,
+  cors((req, callback) => {
+    const origin = req.header('Origin');
+    if (isAllowedOrigin(origin) || isSameHostOrigin(origin, req)) {
+      callback(null, { origin: true, credentials: true });
+      return;
+    }
+    const error = new Error('Origen no permitido');
+    error.statusCode = 403;
+    callback(error);
   })
 );
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+// Debe ir DESPUÉS de los parsers de body: express-mongo-sanitize solo limpia lo que ya existe en
+// req.body/req.query/req.params. Antes estaba arriba de express.json() y el cuerpo llegaba sin
+// sanear (claves que empiezan con "$" o contienen ".").
+app.use(mongoSanitize());
 // Logging: usa 'combined' en producción
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 app.use('/api/', apiLimiter);
@@ -148,6 +123,8 @@ app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
+const GENERIC_SERVER_ERROR = 'Error interno del servidor. Intentá de nuevo en unos minutos.';
+
 app.use((err, req, res, next) => {
   // Mostrar el error en consola para debugging
   console.error('Express error:', err);
@@ -183,10 +160,15 @@ app.use((err, req, res, next) => {
     message = field ? `Ya existe un registro con ese ${field}.` : 'El recurso ya existe.';
   }
 
-  res.status(statusCode).json({
-    message,
-    stack: process.env.NODE_ENV === 'production' ? null : err.stack,
-  });
+  // Los 5xx son fallas del servidor (Mongo caído, un bug, config faltante). El detalle ya
+  // quedó en el console.error de arriba; al visitante no le sirve y a un atacante sí
+  // (nombres de colecciones, rutas, versiones). Para 5xx va un mensaje genérico y el
+  // stack no viaja nunca en la respuesta, en ningún entorno.
+  if (statusCode >= 500) {
+    message = GENERIC_SERVER_ERROR;
+  }
+
+  res.status(statusCode).json({ message });
 });
 
 export default app;

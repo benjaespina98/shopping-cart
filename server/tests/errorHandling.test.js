@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll, afterEach, beforeEach } from 'vitest';
 import request from 'supertest';
-import { startTestApp, stopTestApp, clearDb, createAdminToken } from './helpers.js';
+import { startTestApp, stopTestApp, clearDb, createAdminToken, adminAuth } from './helpers.js';
 
 describe('Manejo de errores y endpoints admin paginados', () => {
   let app;
@@ -33,7 +33,7 @@ describe('Manejo de errores y endpoints admin paginados', () => {
   it('devuelve 400 (no 500) al cambiar el estado de un pedido con un id malformado', async () => {
     const res = await request(app)
       .patch('/api/orders/no-es-un-object-id/status')
-      .set('Authorization', `Bearer ${token}`)
+      .set(adminAuth(token))
       .send({ status: 'confirmed' });
 
     expect(res.status).toBe(400);
@@ -44,7 +44,7 @@ describe('Manejo de errores y endpoints admin paginados', () => {
   it('no rompe con page=0 en el listado de pedidos', async () => {
     const res = await request(app)
       .get('/api/orders?page=0')
-      .set('Authorization', `Bearer ${token}`);
+      .set(adminAuth(token));
 
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body.orders)).toBe(true);
@@ -53,7 +53,7 @@ describe('Manejo de errores y endpoints admin paginados', () => {
   it('clampea un limit fuera de rango en vez de romper', async () => {
     const res = await request(app)
       .get('/api/orders?limit=99999')
-      .set('Authorization', `Bearer ${token}`);
+      .set(adminAuth(token));
 
     expect(res.status).toBe(200);
   });
@@ -71,7 +71,7 @@ describe('Manejo de errores y endpoints admin paginados', () => {
 
     const res = await request(app)
       .get('/api/logs?search=' + encodeURIComponent('(a+)+$'))
-      .set('Authorization', `Bearer ${token}`)
+      .set(adminAuth(token))
       .timeout(5000);
 
     expect(res.status).toBe(200);
@@ -87,7 +87,7 @@ describe('Manejo de errores y endpoints admin paginados', () => {
 
     const res = await request(app)
       .get('/api/logs?search=sesion')
-      .set('Authorization', `Bearer ${token}`);
+      .set(adminAuth(token));
 
     expect(res.status).toBe(200);
     expect(res.body.logs.length).toBe(1);

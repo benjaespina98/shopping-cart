@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { MIN_PASSWORD_LENGTH, isValidEmail } from '../utils/validation.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -77,4 +78,40 @@ export const resolveMongoConnection = () => {
   }
 
   return { uri, label: 'development' };
+};
+
+// Credenciales del admin que crea el seed. No hay valores por defecto: una contraseña
+// literal en el código queda en el repo y en el historial, y se terminaría usando en
+// una base real si alguien corre el seed sin definir la variable. Se recibe `env` para
+// poder probarla sin tocar process.env ni conectar a ninguna base.
+export const MIN_ADMIN_PASSWORD_LENGTH = MIN_PASSWORD_LENGTH;
+
+export const resolveAdminCredentials = (env = process.env) => {
+  const password = env.ADMIN_PASSWORD;
+
+  if (!password) {
+    throw new Error(
+      'Falta ADMIN_PASSWORD. Definila en server/.env (o en el entorno) antes de correr el seed; no hay valor por defecto.'
+    );
+  }
+
+  if (password.length < MIN_ADMIN_PASSWORD_LENGTH) {
+    throw new Error(
+      `ADMIN_PASSWORD es demasiado corta: se exigen al menos ${MIN_ADMIN_PASSWORD_LENGTH} caracteres.`
+    );
+  }
+
+  // Sin valor por defecto: un email inventado crearía un admin que nadie reconoce, y
+  // con la contraseña de este entorno.
+  const email = String(env.ADMIN_EMAIL || '').trim().toLowerCase();
+  if (!email) {
+    throw new Error(
+      'Falta ADMIN_EMAIL. Definila en server/.env (o en el entorno) antes de correr el seed; no hay valor por defecto.'
+    );
+  }
+  if (!isValidEmail(email)) {
+    throw new Error('ADMIN_EMAIL no tiene un formato de email válido.');
+  }
+
+  return { email, password };
 };

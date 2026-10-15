@@ -2,7 +2,7 @@ name: CI
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, develop]
   push:
     branches: [main]
 
@@ -22,6 +22,14 @@ jobs:
 
       - name: Install server dependencies
         run: npm ci
+        working-directory: server
+
+      - name: Lint server
+        run: npm run lint
+        working-directory: server
+
+      - name: Audit server production dependencies
+        run: npm audit --omit=dev --audit-level=critical
         working-directory: server
 
       - name: Run server tests
@@ -45,11 +53,21 @@ jobs:
         run: npm ci
         working-directory: client
 
+      - name: Lint client
+        run: npm run lint
+        working-directory: client
+
+      - name: Audit client production dependencies
+        run: npm audit --omit=dev --audit-level=critical
+        working-directory: client
+
       - name: Run client tests
         run: npm test
         working-directory: client
 
   vercel-build:
+    # El build corre solo si pasaron el lint y los tests de client y server.
+    needs: [test-server, test-client]
     runs-on: ubuntu-latest
 
     steps:

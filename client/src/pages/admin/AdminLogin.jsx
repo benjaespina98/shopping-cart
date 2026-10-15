@@ -41,7 +41,7 @@ export default function AdminLogin() {
         {/* Brand header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center mb-4">
-            <img src="/brand/logo-stacked.png" alt="Playa & Sol" className="ps-logo-inverse"
+            <img src="/brand/logo-stacked.png" alt="Playa & Sol" width={93} height={76} className="ps-logo-inverse"
                  style={{ height: 76, width: 'auto', display: 'block' }} />
           </div>
           <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, fontFamily: 'var(--font-body)' }}>
@@ -59,10 +59,10 @@ export default function AdminLogin() {
             <FiLock size={20} style={{ color: 'var(--sun-500)' }} />
           </div>
 
-          <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: 17,
+          <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: 17,
                        color: '#fff', textAlign: 'center', marginBottom: 20 }}>
             Ingresá a tu cuenta
-          </h2>
+          </h1>
 
           <form onSubmit={handleSubmit} autoComplete="off" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {/* Email */}
@@ -123,6 +123,8 @@ export default function AdminLogin() {
                 <button
                   type="button"
                   onClick={() => setShowPw(s => !s)}
+                  aria-label={showPw ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                  aria-pressed={showPw}
                   style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
                            background: 'none', border: 'none', cursor: 'pointer',
                            color: 'rgba(255,255,255,0.4)', padding: 2 }}

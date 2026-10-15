@@ -6,7 +6,7 @@ import { AuthProvider } from './context/AuthContext';
 import { authAPI } from './services/api';
 
 vi.mock('./services/api', () => ({
-  authAPI: { login: vi.fn(), me: vi.fn() },
+  authAPI: { login: vi.fn(), logout: vi.fn(), me: vi.fn() },
 }));
 vi.mock('react-toastify', () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 
@@ -22,22 +22,21 @@ const renderApp = (initialPath) =>
 describe('App — ProtectedRoute', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    localStorage.clear();
   });
 
   // Regresión: no había ningún test que confirmara que /admin/* está realmente protegido
   // del lado del cliente (más allá de que el backend también lo exija).
-  it('sin sesión, redirige de una ruta admin al login en vez de mostrar el panel', async () => {
+  it('sin sesión (el server responde 401), redirige de una ruta admin al login', async () => {
+    authAPI.me.mockRejectedValue({ response: { status: 401 } });
+
     renderApp('/admin/dashboard');
 
     expect(await screen.findByText('Ingresá a tu cuenta')).toBeInTheDocument();
+    expect(authAPI.me).toHaveBeenCalled();
   });
 
-  it('con sesión guardada, deja pasar a una ruta admin sin redirigir al login', async () => {
-    localStorage.setItem('admin_token', 'token-valido');
-    localStorage.setItem(
-      'admin_user',
-      JSON.stringify({ _id: '1', name: 'Admin', email: 'admin@playaysol.com.ar', role: 'admin' })
-    );
+  it('con sesión válida en el server, deja pasar a una ruta admin sin redirigir al login', async () => {
     authAPI.me.mockResolvedValue({
       data: { _id: '1', name: 'Admin', email: 'admin@playaysol.com.ar', role: 'admin' },
     });
@@ -49,5 +48,15 @@ describe('App — ProtectedRoute', () => {
     // al login.
     expect(await screen.findByText('Proyectos')).toBeInTheDocument();
     expect(screen.queryByText('Ingresá a tu cuenta')).not.toBeInTheDocument();
+  });
+
+  it('un token viejo en localStorage no alcanza: la sesión la decide el server', async () => {
+    localStorage.setItem('admin_token', 'token-viejo');
+    localStorage.setItem('admin_user', JSON.stringify({ _id: '1', email: 'admin@playaysol.com.ar' }));
+    authAPI.me.mockRejectedValue({ response: { status: 401 } });
+
+    renderApp('/admin/dashboard');
+
+    expect(await screen.findByText('Ingresá a tu cuenta')).toBeInTheDocument();
   });
 });

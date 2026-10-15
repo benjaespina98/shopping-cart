@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiUser, FiPhone, FiMail, FiMapPin, FiSend, FiCheck, FiClock, FiShield, FiMessageSquare, FiTag, FiChevronDown } from 'react-icons/fi';
 import { Button } from '../design-system/Button';
@@ -6,6 +6,7 @@ import { Card } from '../design-system/Card';
 import { Badge } from '../design-system/Badge';
 import { Input } from '../design-system/Input';
 import { Checkbox } from '../design-system/Checkbox';
+import Honeypot from '../components/ui/Honeypot';
 import { useReveal } from '../hooks/useReveal';
 import { servicesAPI, quotesAPI } from '../services/api';
 import { trackEvent } from '../utils/analytics';
@@ -23,9 +24,12 @@ const STEPS = [
 export default function Quote() {
   const navigate = useNavigate();
   const reveal = useReveal();
+  const thanksRef = useRef(null);
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
   const [formError, setFormError] = useState('');
+  // Campo trampa anti-spam: una persona nunca lo completa (ver components/ui/Honeypot.jsx).
+  const [hp, setHp] = useState('');
   const [fieldErrors, setFieldErrors] = useState({});
   const [types, setTypes] = useState(FALLBACK_TYPES);
   const [tipo, setTipo] = useState('');
@@ -48,6 +52,11 @@ export default function Quote() {
       .catch(() => setTipo(FALLBACK_TYPES[0]));
   }, []);
 
+  // Al enviar bien se desmonta el formulario: el foco pasaría al body y el "¡Gracias!" no se anunciaría.
+  useEffect(() => {
+    if (sent) thanksRef.current?.focus();
+  }, [sent]);
+
   const allTypes = [...types, OTHER_TYPE];
 
   const setField = (field) => (e) => {
@@ -61,6 +70,9 @@ export default function Quote() {
     if (!isValidPhone(form.phone)) errs.phone = 'Ingresá un teléfono válido.';
     if (!isValidEmail(form.email)) errs.email = 'Ingresá un email válido.';
     setFieldErrors(errs);
+    // Foco al primer campo con error: el teclado y el lector de pantalla caen donde hay que corregir.
+    const first = ['name', 'phone', 'email'].find((key) => errs[key]);
+    if (first) document.getElementById(`quote-${first}`)?.focus();
     return Object.keys(errs).length === 0;
   };
 
@@ -72,6 +84,7 @@ export default function Quote() {
     }
     if (!acceptedPrivacy) {
       setFormError('Tenés que aceptar el uso de tus datos para poder enviar la consulta.');
+      document.getElementById('quote-privacy')?.focus();
       return;
     }
     setFormError('');
@@ -84,6 +97,7 @@ export default function Quote() {
         email: form.email,
         location: form.location,
         message: form.message,
+        website: hp,
       });
       trackEvent('generate_lead', { project_type: tipo });
       setSent(true);
@@ -138,9 +152,10 @@ export default function Quote() {
         <Card padding="lg">
           {sent ? (
             <div style={{ textAlign: 'center', padding: '32px 10px' }}>
-              <img src="/brand/logo-icon.png" alt="" style={{ height: 88, width: 'auto', display: 'block', margin: '0 auto 20px' }} />
-              <h2 style={{ fontSize: 26, marginBottom: 10, fontFamily: 'var(--font-display)',
-                           color: 'var(--text-strong)' }}>¡Gracias!</h2>
+              <img src="/brand/logo-icon.png" alt="" width={99} height={88} loading="lazy" decoding="async" style={{ height: 88, width: 'auto', display: 'block', margin: '0 auto 20px' }} />
+              {/* Destino de foco programático (no es un control): sin aro, a propósito. */}
+              <h2 ref={thanksRef} tabIndex={-1} style={{ fontSize: 26, marginBottom: 10, fontFamily: 'var(--font-display)',
+                           color: 'var(--text-strong)', outline: 'none' }}>¡Gracias!</h2>
               <p style={{ color: 'var(--text-muted)', marginBottom: 28, fontSize: 15, lineHeight: 1.6 }}>
                 Hemos recibido tu solicitud. Nos contactaremos con vos brevemente.
               </p>
@@ -150,6 +165,7 @@ export default function Quote() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+              <Honeypot value={hp} onChange={(e) => setHp(e.target.value)} />
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 'var(--space-1)' }}>
                   <FiShield size={14} style={{ color: 'var(--brand-accent-press)' }} />
@@ -187,12 +203,12 @@ export default function Quote() {
               </div>
 
               <div className="ps-form-row">
-                <Input label="Nombre y apellido" placeholder="Tu nombre completo" required value={form.name} onChange={setField('name')}
+                <Input id="quote-name" label="Nombre y apellido" placeholder="Tu nombre completo" required value={form.name} onChange={setField('name')}
                   leading={<FiUser size={16} />} error={fieldErrors.name} />
-                <Input label="Teléfono / WhatsApp" placeholder="600 123 456" required value={form.phone} onChange={setField('phone')}
+                <Input id="quote-phone" label="Teléfono / WhatsApp" placeholder="600 123 456" required value={form.phone} onChange={setField('phone')}
                   leading={<FiPhone size={16} />} error={fieldErrors.phone} />
               </div>
-              <Input label="Email" placeholder="hola@ejemplo.com" type="email" required value={form.email} onChange={setField('email')}
+              <Input id="quote-email" label="Email" placeholder="hola@ejemplo.com" type="email" required value={form.email} onChange={setField('email')}
                 leading={<FiMail size={16} />} error={fieldErrors.email} />
               <Input label="Localidad de la obra" placeholder="Corrientes 1210, Villa María…" value={form.location} onChange={setField('location')}
                 leading={<FiMapPin size={16} />} helper="Dónde sería el trabajo (opcional)." />
@@ -211,7 +227,7 @@ export default function Quote() {
                     value={form.message}
                     onChange={setField('message')}
                     style={{
-                      flex: 1, border: 'none', outline: 'none', resize: 'vertical', minHeight: 64,
+                      flex: 1, border: 'none', resize: 'vertical', minHeight: 64,
                       fontFamily: 'var(--font-body)', fontSize: '1rem', color: 'var(--text-strong)', background: 'transparent',
                     }}
                   />
@@ -221,10 +237,10 @@ export default function Quote() {
               {/* Decía "Acepto la política de privacidad" sin que existiera esa página en
                   ningún lado del sitio — un enlace a nada. Mismo criterio que ya se aplicó
                   en el Footer (ver su comentario): un dato real en vez de una promesa vacía. */}
-              <Checkbox label="Acepto que usen mis datos para responder esta consulta" checked={acceptedPrivacy}
+              <Checkbox id="quote-privacy" label="Acepto que usen mis datos para responder esta consulta" checked={acceptedPrivacy}
                 onChange={(e) => setAcceptedPrivacy(e.target.checked)} />
               {formError && (
-                <p style={{ color: 'var(--red-500)', fontSize: 14, fontFamily: 'var(--font-body)' }}>{formError}</p>
+                <p role="alert" style={{ color: 'var(--red-500)', fontSize: 14, fontFamily: 'var(--font-body)' }}>{formError}</p>
               )}
               <Button type="submit" variant="primary" size="lg" fullWidth disabled={sending}
                 iconLeft={!sending && <FiSend size={16} />}>

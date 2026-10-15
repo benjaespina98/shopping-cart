@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll, afterEach, beforeEach } from 'vitest';
 import request from 'supertest';
-import { startTestApp, stopTestApp, clearDb, createAdminToken } from './helpers.js';
+import { startTestApp, stopTestApp, clearDb, createAdminToken, adminAuth } from './helpers.js';
 
 describe('Categories', () => {
   let app;
@@ -35,7 +35,7 @@ describe('Categories', () => {
   it('crea una categoría', async () => {
     const res = await request(app)
       .post('/api/categories')
-      .set('Authorization', `Bearer ${token}`)
+      .set(adminAuth(token))
       .send({ name: 'Bombas y filtros' });
 
     expect(res.status).toBe(201);
@@ -45,12 +45,12 @@ describe('Categories', () => {
   it('rechaza crear una categoría duplicada (case-insensitive)', async () => {
     await request(app)
       .post('/api/categories')
-      .set('Authorization', `Bearer ${token}`)
+      .set(adminAuth(token))
       .send({ name: 'Limpieza' });
 
     const res = await request(app)
       .post('/api/categories')
-      .set('Authorization', `Bearer ${token}`)
+      .set(adminAuth(token))
       .send({ name: 'limpieza' });
 
     expect(res.status).toBe(409);
@@ -63,8 +63,8 @@ describe('Categories', () => {
   // fallaría (ambas quedarían creadas) aunque el controller esté "bien".
   it('el índice único evita que una carrera cree dos categorías que solo difieren en mayúsculas', async () => {
     const [first, second] = await Promise.all([
-      request(app).post('/api/categories').set('Authorization', `Bearer ${token}`).send({ name: 'Repuestos' }),
-      request(app).post('/api/categories').set('Authorization', `Bearer ${token}`).send({ name: 'REPUESTOS' }),
+      request(app).post('/api/categories').set(adminAuth(token)).send({ name: 'Repuestos' }),
+      request(app).post('/api/categories').set(adminAuth(token)).send({ name: 'REPUESTOS' }),
     ]);
 
     const statuses = [first.status, second.status].sort();
@@ -77,7 +77,7 @@ describe('Categories', () => {
   it('renombrar una categoría propaga el cambio a los productos que la usan', async () => {
     const created = await request(app)
       .post('/api/categories')
-      .set('Authorization', `Bearer ${token}`)
+      .set(adminAuth(token))
       .send({ name: 'Seguridad' });
 
     await Product.create({
@@ -86,7 +86,7 @@ describe('Categories', () => {
 
     const res = await request(app)
       .put(`/api/categories/${created.body._id}`)
-      .set('Authorization', `Bearer ${token}`)
+      .set(adminAuth(token))
       .send({ name: 'Seguridad y cercos' });
 
     expect(res.status).toBe(200);
@@ -98,7 +98,7 @@ describe('Categories', () => {
   it('bloquea el borrado de una categoría en uso', async () => {
     const created = await request(app)
       .post('/api/categories')
-      .set('Authorization', `Bearer ${token}`)
+      .set(adminAuth(token))
       .send({ name: 'Climatización' });
 
     await Product.create({
@@ -107,7 +107,7 @@ describe('Categories', () => {
 
     const res = await request(app)
       .delete(`/api/categories/${created.body._id}`)
-      .set('Authorization', `Bearer ${token}`);
+      .set(adminAuth(token));
 
     expect(res.status).toBe(409);
   });
@@ -115,12 +115,12 @@ describe('Categories', () => {
   it('permite borrar una categoría sin productos', async () => {
     const created = await request(app)
       .post('/api/categories')
-      .set('Authorization', `Bearer ${token}`)
+      .set(adminAuth(token))
       .send({ name: 'Sin uso' });
 
     const res = await request(app)
       .delete(`/api/categories/${created.body._id}`)
-      .set('Authorization', `Bearer ${token}`);
+      .set(adminAuth(token));
 
     expect(res.status).toBe(200);
   });

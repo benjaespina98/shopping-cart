@@ -190,8 +190,22 @@ function ProductCard({ product, inCartQuantity = 0, onOpenDetail, priority = fal
               {product.description}
             </p>
           )}
+          {isLowStock && (
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 6, marginTop: 8,
+              padding: '6px 10px', borderRadius: 'var(--radius-sm)',
+              background: 'var(--amber-100)', color: 'var(--amber-500)',
+              fontSize: 12, fontWeight: 600,
+            }}>
+              <FiAlertTriangle size={12} style={{ flexShrink: 0 }} />
+              Últimas {product.stock} unidades
+            </div>
+          )}
         </div>
 
+        {/* Precio, cantidad y botón forman un bloque pegado al pie (margin-top:auto): con o sin
+            descripción o aviso de stock, el precio y "Agregar" quedan alineados entre tarjetas. */}
+        <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
         {/* Precio — el dato que el visitante busca primero, con el mayor peso visual */}
         <div style={{
           display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
@@ -211,18 +225,6 @@ function ProductCard({ product, inCartQuantity = 0, onOpenDetail, priority = fal
             </span>
           )}
         </div>
-
-        {isLowStock && (
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 6,
-            padding: '6px 10px', borderRadius: 'var(--radius-sm)',
-            background: 'var(--amber-100)', color: 'var(--amber-500)',
-            fontSize: 12, fontWeight: 600,
-          }}>
-            <FiAlertTriangle size={12} style={{ flexShrink: 0 }} />
-            Últimas {product.stock} unidades
-          </div>
-        )}
 
         {!isOutOfStock && (
           <>
@@ -297,6 +299,7 @@ function ProductCard({ product, inCartQuantity = 0, onOpenDetail, priority = fal
             </p>
           </>
         )}
+        </div>
       </div>
     </article>
   );

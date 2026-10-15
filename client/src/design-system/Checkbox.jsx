@@ -20,9 +20,9 @@ export function Checkbox({ label, checked, defaultChecked, onChange, disabled = 
       fontFamily: 'var(--font-body)', fontSize: '1rem', color: 'var(--text-body)',
       ...style,
     }}>
-      <input id={inputId} type="checkbox" checked={on} onChange={toggle} disabled={disabled}
+      <input id={inputId} type="checkbox" className="ps-checkbox__input" checked={on} onChange={toggle} disabled={disabled}
         style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }} {...rest} />
-      <span style={{
+      <span className="ps-checkbox__box" style={{
         width: '22px', height: '22px', flexShrink: 0,
         borderRadius: 'var(--radius-xs)',
         border: on ? '2px solid var(--brand-primary)' : '2px solid var(--border-default)',

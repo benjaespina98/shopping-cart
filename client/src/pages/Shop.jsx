@@ -161,16 +161,17 @@ export default function Shop() {
                                          pointerEvents: 'none' }} />
             <input
               type="text"
+              aria-label="Buscar productos"
               placeholder="Buscar productos..."
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1); }}
               style={{ width: '100%', paddingLeft: 34, paddingRight: search ? 32 : 12, height: 38,
                        border: '1.5px solid var(--border-default)', borderRadius: 'var(--radius-sm)',
                        fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--text-body)',
-                       background: 'var(--bg-page)', outline: 'none', boxSizing: 'border-box' }}
+                       background: 'var(--bg-page)', boxSizing: 'border-box' }}
             />
             {search && (
-              <button onClick={() => { setSearch(''); setPage(1); }}
+              <button type="button" aria-label="Borrar búsqueda" onClick={() => { setSearch(''); setPage(1); }}
                 style={{ position: 'absolute', right: 9, top: '50%', transform: 'translateY(-50%)',
                          background: 'none', border: 'none', cursor: 'pointer',
                          color: 'var(--text-muted)', display: 'flex', alignItems: 'center' }}>
@@ -180,11 +181,12 @@ export default function Shop() {
           </div>
 
           <select
+            aria-label="Ordenar por"
             value={sort}
             onChange={(e) => { setSort(e.target.value); setPage(1); }}
             style={{ height: 38, padding: '0 10px', border: '1.5px solid var(--border-default)',
                      borderRadius: 'var(--radius-sm)', fontFamily: 'var(--font-body)', fontSize: 14,
-                     color: 'var(--text-body)', background: 'var(--bg-page)', cursor: 'pointer', outline: 'none' }}
+                     color: 'var(--text-body)', background: 'var(--bg-page)', cursor: 'pointer' }}
           >
             {SORT_OPTIONS.map(({ value, label }) => (
               <option key={value} value={value}>{label}</option>
