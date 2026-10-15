@@ -15,6 +15,11 @@ export const login = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error('Email y contraseña son requeridos');
   }
+  // Tipos estrictos: un objeto (p. ej. { "$gt": "" }) no es un email ni una contraseña.
+  if (typeof email !== 'string' || typeof password !== 'string') {
+    res.status(400);
+    throw new Error('Email y contraseña no son válidos');
+  }
 
   const user = await User.findOne({ email });
   if (!user || !(await user.matchPassword(password))) {

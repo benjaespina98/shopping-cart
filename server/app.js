@@ -27,7 +27,6 @@ const app = express();
 app.set('trust proxy', 1);
 
 app.use(helmet());
-app.use(mongoSanitize());
 
 // Limitador general.
 //
@@ -81,6 +80,11 @@ app.use(
   })
 );
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+// Debe ir DESPUÉS de los parsers de body: express-mongo-sanitize solo limpia lo que ya existe en
+// req.body/req.query/req.params. Antes estaba arriba de express.json() y el cuerpo llegaba sin
+// sanear (claves que empiezan con "$" o contienen ".").
+app.use(mongoSanitize());
 // Logging: usa 'combined' en producción
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 app.use('/api/', apiLimiter);

@@ -252,22 +252,40 @@
    Se usa :focus-visible para que el anillo aparezca al tabular pero no al
    hacer click con el mouse.
    ============================================================ */
-:where(a, button, input, select, textarea, summary, [tabindex], [role="button"], [role="link"]):focus-visible {
+:where(a, button, input, select, textarea, summary, [tabindex]:not([tabindex="-1"]), [role="button"], [role="link"]):focus-visible {
+  /* Dos capas con los tokens existentes: un aro interno de marca (teal, 9,4:1 sobre blanco) y el
+     contorno amarillo de foco por fuera. Sobre claro se ve el teal; sobre teal oscuro, el amarillo.
+     El amarillo solo (1,57:1 sobre blanco) NO alcanza los 3:1 de WCAG 1.4.11.
+     El box-shadow lleva !important a propósito: muchos componentes definen su propia sombra inline
+     y, sin !important, pisaban el aro y dejaban solo el amarillo. El outline no se toca. */
   outline: 3px solid var(--focus-ring);
   outline-offset: 2px;
-  /* Anillo interno de marca: el amarillo solo tiene ~1.5:1 contra blanco y fondo claro (WCAG
-     pide 3:1 para indicadores de foco). El teal pegado al elemento sí lo cumple y no se quita
-     ningún color: son los mismos tokens, en dos capas. */
-  box-shadow: 0 0 0 2px var(--brand-primary);
-  border-radius: var(--radius-xs);
+  box-shadow: 0 0 0 2px var(--brand-primary) !important;
 }
 
-/* Sobre fondos teal oscuros el amarillo de foco pierde contraste contra el
-   propio acento de marca; ahí el anillo va blanco. */
-.ps-on-dark :where(a, button, input, select, textarea, summary, [tabindex], [role="button"], [role="link"]):focus-visible {
+/* Sobre fondos teal oscuros el aro va blanco. */
+.ps-on-dark :where(a, button, input, select, textarea, summary, [tabindex]:not([tabindex="-1"]), [role="button"], [role="link"]):focus-visible {
   outline-color: var(--text-inverse);
-  box-shadow: 0 0 0 2px var(--brand-primary-press);
+  box-shadow: 0 0 0 2px var(--brand-primary-press) !important;
 }
+
+/* Checkbox del design system: el input real es invisible (0x0), el foco se dibuja en la caja. */
+.ps-checkbox__input:focus-visible {
+  outline: none;
+  box-shadow: none !important;
+}
+.ps-checkbox__input:focus-visible + .ps-checkbox__box {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--brand-primary);
+}
+
+/* Sombras de Button y Card: viven en clases (no inline) para que el estado de foco y de hover
+   puedan resolverse desde CSS. */
+.ps-card { box-shadow: var(--shadow-md); }
+.ps-card--interactive:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+.ps-btn--primary { box-shadow: var(--shadow-accent); }
+.ps-btn--secondary { box-shadow: var(--shadow-sm); }
 
 /* Enlace "Saltar al contenido": primer elemento enfocable de la página, visible solo con foco. */
 .ps-skip-link {

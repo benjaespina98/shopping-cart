@@ -10,6 +10,8 @@ export function Button({
   disabled = false,
   type = 'button',
   onClick,
+  href,
+  className,
   style,
   ...rest
 }) {
@@ -24,25 +26,21 @@ export function Button({
       background: 'var(--brand-accent)',
       color: 'var(--text-on-accent)',
       border: '2px solid transparent',
-      boxShadow: 'var(--shadow-accent)',
     },
     secondary: {
       background: 'var(--brand-primary)',
       color: 'var(--text-inverse)',
       border: '2px solid transparent',
-      boxShadow: 'var(--shadow-sm)',
     },
     outline: {
       background: 'transparent',
       color: 'var(--brand-primary)',
       border: '2px solid var(--border-strong)',
-      boxShadow: 'none',
     },
     ghost: {
       background: 'transparent',
       color: 'var(--brand-primary)',
       border: '2px solid transparent',
-      boxShadow: 'none',
     },
   };
 
@@ -96,11 +94,27 @@ export function Button({
     onMouseUp: (e) => { e.currentTarget.style.transform = 'none'; },
   };
 
-  return (
-    <button type={type} disabled={disabled} onClick={onClick} style={base} {...hoverHandlers} {...rest}>
+  // Con href se renderiza un <a> (navegación real: abre en pestaña nueva con target, sin window.open).
+  const classes = ['ps-btn', `ps-btn--${variant}`, className].filter(Boolean).join(' ');
+  const content = (
+    <>
       {iconLeft ? <span style={{ display: 'inline-flex' }}>{iconLeft}</span> : null}
       {children}
       {iconRight ? <span style={{ display: 'inline-flex' }}>{iconRight}</span> : null}
+    </>
+  );
+
+  if (href) {
+    return (
+      <a href={href} className={classes} onClick={onClick} style={{ ...base, textDecoration: 'none' }} {...hoverHandlers} {...rest}>
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <button type={type} disabled={disabled} className={classes} onClick={onClick} style={base} {...hoverHandlers} {...rest}>
+      {content}
     </button>
   );
 }
