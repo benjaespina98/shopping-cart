@@ -1,28 +1,11 @@
+import { afterLoadAndIdle } from './idle';
+
 const MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
 
 let initialized = false;
 
-// Espera a que termine la carga (evento load) y después a un momento de inactividad del hilo
-// principal. gtag.js pesa ~100 KB y ejecuta bastante JavaScript: no puede competir con el render
-// inicial ni entrar en el camino crítico (LCP, TBT).
-const GTAG_IDLE_TIMEOUT_MS = 5000;
-const GTAG_FALLBACK_DELAY_MS = 3000;
-
-function afterWindowLoad(callback) {
-  if (document.readyState === 'complete') {
-    callback();
-    return;
-  }
-  window.addEventListener('load', callback, { once: true });
-}
-
-function whenIdle(callback) {
-  if (typeof window.requestIdleCallback === 'function') {
-    window.requestIdleCallback(callback, { timeout: GTAG_IDLE_TIMEOUT_MS });
-  } else {
-    setTimeout(callback, GTAG_FALLBACK_DELAY_MS);
-  }
-}
+// gtag.js pesa ~100 KB y ejecuta bastante JavaScript: no puede competir con el render inicial ni
+// entrar en el camino crítico (LCP, TBT). Se carga después de load y en idle (utils/idle.js).
 
 function loadGtagScript() {
   const script = document.createElement('script');
@@ -47,7 +30,7 @@ export function initAnalytics() {
   // necesario porque es una SPA y gtag por defecto solo registra la carga inicial.
   gtag('config', MEASUREMENT_ID, { send_page_view: false });
 
-  afterWindowLoad(() => whenIdle(loadGtagScript));
+  afterLoadAndIdle(loadGtagScript);
 }
 
 export function trackPageview(path) {

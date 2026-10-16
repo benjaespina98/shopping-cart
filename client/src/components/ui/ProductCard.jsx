@@ -2,7 +2,7 @@ import { memo, useEffect, useRef, useState } from 'react';
 import { FiShoppingCart, FiPlus, FiMinus, FiCheck, FiAlertTriangle, FiImage } from 'react-icons/fi';
 import { useCart } from '../../context/CartContext';
 import CldImage from './CldImage';
-import { toast } from 'react-toastify';
+import { notify } from '../../utils/notify';
 
 // Anchos reales de la tarjeta en la grilla (1 / 2 / 3 columnas) — pedir más que esto
 // era lo que hacía que la foto tardara en aparecer.
@@ -33,7 +33,7 @@ function ProductCard({ product, inCartQuantity = 0, onOpenDetail, priority = fal
     if (isOutOfStock || hasReachedCartStockLimit) return;
     addItem(product, qty);
     setAdded(true);
-    toast.success(`"${product.name}" agregado al carrito`);
+    notify.success(`"${product.name}" agregado al carrito`);
     if (addedTimeoutRef.current) clearTimeout(addedTimeoutRef.current);
     addedTimeoutRef.current = setTimeout(() => setAdded(false), 2000);
     setQty(1);
