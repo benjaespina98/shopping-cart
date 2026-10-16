@@ -12,7 +12,7 @@ function fontPreload() {
       handler(html, ctx) {
         if (!ctx.bundle) return undefined;
         return Object.keys(ctx.bundle)
-          .filter((name) => /(quicksand|mulish)-latin-wght-normal-.*.woff2$/.test(name))
+          .filter((name) => /(quicksand|mulish)-latin-wght-normal-.*\.woff2$/.test(name))
           .map((name) => ({
             tag: 'link',
             attrs: { rel: 'preload', as: 'font', type: 'font/woff2', href: `/${name}`, crossorigin: '' },
