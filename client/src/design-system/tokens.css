@@ -105,8 +105,8 @@
      ancha, pensada para títulos, y en párrafos de 14–16 px pierde legibilidad. El
      propio manual aplica ese criterio cuando aclara que para su cuerpo de texto eligió
      otra familia "por su legibilidad y clarificación óptica". */
-  --font-display: 'Quicksand', 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-body:    'Mulish', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Quicksand Variable', 'Quicksand', 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-body:    'Mulish Variable', 'Mulish', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
   /* Spacing */
   --space-1:  0.25rem;
