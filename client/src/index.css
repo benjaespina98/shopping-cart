@@ -1,3 +1,5 @@
+@import '@fontsource-variable/quicksand/wght.css';
+@import '@fontsource-variable/mulish/wght.css';
 @import './design-system/tokens.css';
 @import './design-system/responsive.css';
 
@@ -5,8 +7,10 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Las tipografías se piden desde index.html, no con @import acá: dentro del CSS el
-   navegador tiene que bajar y parsear esta hoja antes de descubrir que existen. */
+/* Las tipografías son propias (paquetes @fontsource-variable, licencia OFL, font-display: swap)
+   y se sirven desde el mismo origen: sin pedidos a Google. El subset latin se precarga desde
+   index.html (plugin fontPreload de vite.config.js), así el navegador no espera a parsear esta hoja
+   para descubrirlas. Las familias se llaman 'Quicksand Variable' y 'Mulish Variable'. */
 
 @layer base {
   html {

@@ -105,10 +105,13 @@ export default function Footer() {
         {/* Link columns */}
         {cols.map(c => (
           <div key={c.title}>
-            <h4 style={{ color: 'var(--text-inverse)', fontFamily: 'var(--font-display)', fontSize: 13,
+            {/* h2 y no h4: antes de este título la página suele terminar en un h2 (o solo tiene h1), y
+                saltar a h4 rompía el orden de encabezados. El aspecto no cambia: los h1–h6 comparten
+                estilo en index.css y el tamaño va en línea. */}
+            <h2 style={{ color: 'var(--text-inverse)', fontFamily: 'var(--font-display)', fontSize: 13,
                          letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 14 }}>
               {c.title}
-            </h4>
+            </h2>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 9 }}>
               {c.items.map(([to, label]) => (
                 <li key={label}><FooterLink to={to} label={label} /></li>

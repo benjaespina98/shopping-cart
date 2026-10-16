@@ -38,19 +38,16 @@ export function useReveal() {
       return;
     }
 
-    // Si la sección monta tarde y para entonces ya quedó por encima del viewport,
-    // nunca va a "entrar" scrolleando hacia abajo. Se muestra directo, sin animar.
-    // Se exige alto real: un elemento sin medir todavía devuelve un rectángulo en
-    // cero, y `bottom <= 0` a secas lo daba por "ya pasado" revelándolo de entrada.
-    const rect = node.getBoundingClientRect();
-    if (rect.height > 0 && rect.bottom <= 0) {
-      setVisible(true);
-      return;
-    }
-
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
+        // Si la sección monta tarde y para entonces ya quedó por encima del viewport, nunca va a
+        // "entrar" scrolleando hacia abajo: se muestra directo, sin animar. La posición sale de la
+        // entrada del observer y no de node.getBoundingClientRect(): leerla acá, al montar, forzaba un
+        // reflow síncrono por cada sección (Lighthouse: "Avoid forced reflow"). Se exige alto real: un
+        // elemento sin medir devuelve un rectángulo en cero y `bottom <= 0` a secas lo daba por pasado.
+        const rect = entry.boundingClientRect;
+        const yaPasada = !entry.isIntersecting && rect && rect.height > 0 && rect.bottom <= 0;
+        if (entry.isIntersecting || yaPasada) {
           setVisible(true);
           observer.disconnect();
           observerRef.current = null;

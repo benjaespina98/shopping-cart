@@ -118,8 +118,8 @@ export default {
       // Quicksand es la tipografía de marca (manual de identidad); Mulish para el
       // texto corrido, donde manda la legibilidad.
       fontFamily: {
-        display: ['"Quicksand"', '"Poppins"', 'system-ui', 'sans-serif'],
-        sans:    ['"Mulish"', 'system-ui', 'sans-serif'],
+        display: ['"Quicksand Variable"', '"Quicksand"', '"Poppins"', 'system-ui', 'sans-serif'],
+        sans:    ['"Mulish Variable"', '"Mulish"', 'system-ui', 'sans-serif'],
       },
       fontSize: {
         'xs':   ['12px', { lineHeight: '16px' }],
