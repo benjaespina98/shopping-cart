@@ -35,12 +35,12 @@ export default defineConfig({
         // y no entra en el bundle inicial.
         manualChunks(id) {
           if (!id.includes('node_modules')) return undefined;
-          if (/node_modules[\/](react-dom|scheduler)[\/]/.test(id)) return 'vendor-react-dom';
-          if (/node_modules[\/]react[\/]/.test(id)) return 'vendor-react';
-          if (/node_modules[\/](react-router|react-router-dom|@remix-run)[\/]/.test(id)) return 'vendor-router';
-          if (/node_modules[\/]axios[\/]/.test(id)) return 'vendor-http';
-          if (/node_modules[\/]react-toastify[\/]/.test(id)) return 'vendor-toast';
-          if (/node_modules[\/]react-icons[\/]/.test(id)) return 'vendor-icons';
+          if (/node_modules[/](react-dom|scheduler)[/]/.test(id)) return 'vendor-react-dom';
+          if (/node_modules[/]react[/]/.test(id)) return 'vendor-react';
+          if (/node_modules[/](react-router|react-router-dom|@remix-run)[/]/.test(id)) return 'vendor-router';
+          if (/node_modules[/]axios[/]/.test(id)) return 'vendor-http';
+          if (/node_modules[/]react-toastify[/]/.test(id)) return 'vendor-toast';
+          if (/node_modules[/]react-icons[/]/.test(id)) return 'vendor-icons';
           return undefined;
         },
       },
