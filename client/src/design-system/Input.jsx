@@ -54,7 +54,7 @@ export function Input({ label, helper, error, id, leading, trailing, size = 'md'
         {trailing && <span style={{ display: 'inline-flex', color: 'var(--text-muted)' }}>{trailing}</span>}
       </div>
       {error
-        ? <span id={messageId} role="alert" style={{ fontSize: '0.875rem', color: 'var(--red-500)', fontFamily: 'var(--font-body)' }}>{error}</span>
+        ? <span id={messageId} role="alert" style={{ fontSize: '0.875rem', color: 'var(--text-error)', fontFamily: 'var(--font-body)' }}>{error}</span>
         : helper
         ? <span id={messageId} style={{ fontSize: '0.875rem', color: 'var(--text-muted)', fontFamily: 'var(--font-body)' }}>{helper}</span>
         : null}

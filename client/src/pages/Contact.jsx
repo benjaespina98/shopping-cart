@@ -276,7 +276,7 @@ export default function Contact() {
                 }}
               />
               {fieldErrors.message && (
-                <span id="contact-message-msg" role="alert" style={{ fontSize: '0.875rem', color: 'var(--red-500)', fontFamily: 'var(--font-body)' }}>{fieldErrors.message}</span>
+                <span id="contact-message-msg" role="alert" style={{ fontSize: '0.875rem', color: 'var(--text-error)', fontFamily: 'var(--font-body)' }}>{fieldErrors.message}</span>
               )}
             </div>
           </div>
