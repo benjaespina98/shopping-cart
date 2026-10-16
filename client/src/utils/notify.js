@@ -4,7 +4,9 @@
 const call = (method, message) =>
   import('react-toastify')
     .then(({ toast }) => toast[method](message))
-    .catch(() => {});
+    // Sin la librería (sin red, o un chunk con hash viejo tras un deploy) el aviso no se puede mostrar;
+    // queda al menos en la consola en lugar de perderse sin rastro.
+    .catch((err) => console.error('No se pudo mostrar el aviso:', message, err));
 
 export const notify = {
   success: (message) => call('success', message),

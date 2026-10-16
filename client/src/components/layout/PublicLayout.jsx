@@ -18,6 +18,9 @@ export default function PublicLayout() {
   const [cartReady, setCartReady] = useState(false);
 
   useEffect(() => { afterLoadAndIdle(() => setCartReady(true), { timeout: 3000, fallbackDelay: 2000 }); }, []);
+  // Una vez abierto, queda montado: si no, al cerrarlo (con cartReady todavía en false) se desmontaba
+  // y se perdía la animación de salida y la de las aperturas siguientes.
+  useEffect(() => { if (cartOpen) setCartReady(true); }, [cartOpen]);
 
   useEffect(() => { initAnalytics(); }, []);
   useEffect(() => { trackPageview(location.pathname); }, [location.pathname]);

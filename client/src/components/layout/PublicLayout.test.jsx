@@ -72,6 +72,24 @@ describe('PublicLayout — carrito fuera del camino crítico', () => {
     expect(await screen.findByLabelText('Carrito')).toBeInTheDocument();
   });
 
+  it('una vez abierto el carrito queda montado aunque se cierre antes de load + idle', async () => {
+    cartState.isOpen = true;
+    const { rerender } = renderLayout();
+    expect(await screen.findByLabelText('Carrito')).toBeInTheDocument();
+
+    cartState.isOpen = false;
+    rerender(
+      <MemoryRouter initialEntries={['/']}>
+        <Routes>
+          <Route element={<PublicLayout />}>
+            <Route path="/" element={<h1>Inicio</h1>} />
+          </Route>
+        </Routes>
+      </MemoryRouter>
+    );
+    expect(screen.getByLabelText('Carrito')).toBeInTheDocument();
+  });
+
   it('si el visitante abre el carrito antes de que cargue, se monta de inmediato', async () => {
     cartState.isOpen = true;
     renderLayout();
