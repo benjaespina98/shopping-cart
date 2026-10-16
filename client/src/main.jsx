@@ -1,14 +1,15 @@
-import React, { Suspense, lazy, useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
 import { afterLoadAndIdle } from './utils/idle';
+import { lazyOptional } from './utils/lazyOptional';
 import './index.css';
 
 // react-toastify y su CSS salen del arranque: el contenedor se descarga después de load, en idle.
-const ToastHost = lazy(() => import('./components/ToastHost'));
+const ToastHost = lazyOptional(() => import('./components/ToastHost'));
 
 function DeferredToasts() {
   const [ready, setReady] = useState(false);
