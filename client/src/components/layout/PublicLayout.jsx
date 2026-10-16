@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Navbar from './Navbar';
 import Footer from './Footer';
@@ -7,10 +7,11 @@ import { initAnalytics, trackPageview } from '../../utils/analytics';
 import { SettingsProvider } from '../../context/SettingsContext';
 import { useCart } from '../../context/CartContext';
 import { afterLoadAndIdle } from '../../utils/idle';
+import { lazyOptional } from '../../utils/lazyOptional';
 
 // El carrito empieza cerrado y es de los componentes más pesados del layout: su chunk se descarga
 // después de load, en idle, o al instante si el visitante abre el carrito antes.
-const CartDrawer = lazy(() => import('../ui/CartDrawer'));
+const CartDrawer = lazyOptional(() => import('../ui/CartDrawer'));
 
 export default function PublicLayout() {
   const location = useLocation();
