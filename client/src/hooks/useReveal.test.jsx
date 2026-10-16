@@ -19,6 +19,8 @@ class IOFake {
   disconnect() { this.conectado = false; }
   takeRecords() { return []; }
   entrarEnPantalla() { this.cb([{ isIntersecting: true }]); }
+  // Primera notificación del observer cuando la sección está fuera del viewport.
+  notificar(entrada) { this.cb([{ isIntersecting: false, ...entrada }]); }
 }
 
 const activos = () => instancias.filter((i) => i.conectado && i.observados.length > 0);
@@ -82,14 +84,32 @@ describe('useReveal', () => {
   it('muestra la sección si ya quedó por encima del viewport al montar', () => {
     // Sección que monta tarde cuando el visitante ya scrolleó más abajo: nunca va a
     // volver a "entrar" en pantalla, así que no puede quedarse invisible.
-    const original = Element.prototype.getBoundingClientRect;
-    Element.prototype.getBoundingClientRect = () => ({ bottom: -500, top: -900, height: 400 });
-
     render(<Seccion />);
+    const observer = activos()[0];
+    expect(screen.getByTestId('seccion').className).toBe('ps-reveal');
+
+    act(() => observer.notificar({ boundingClientRect: { bottom: -500, top: -900, height: 400 } }));
 
     expect(screen.getByTestId('seccion').className).toContain('ps-reveal-visible');
-    expect(activos()).toHaveLength(0);
-    Element.prototype.getBoundingClientRect = original;
+    expect(observer.conectado).toBe(false);
+  });
+
+  it('no la da por pasada si todavía no tiene alto (sin medir) ni si está debajo del viewport', () => {
+    render(<Seccion />);
+    const observer = activos()[0];
+
+    act(() => observer.notificar({ boundingClientRect: { bottom: 0, top: 0, height: 0 } }));
+    act(() => observer.notificar({ boundingClientRect: { bottom: 1800, top: 1400, height: 400 } }));
+
+    expect(screen.getByTestId('seccion').className).toBe('ps-reveal');
+    expect(observer.conectado).toBe(true);
+  });
+
+  it('no lee la geometría del nodo al montar (evita el reflow forzado)', () => {
+    const espia = vi.spyOn(Element.prototype, 'getBoundingClientRect');
+    render(<Seccion />);
+    expect(espia).not.toHaveBeenCalled();
+    espia.mockRestore();
   });
 
   it('muestra el contenido si el navegador no soporta IntersectionObserver', () => {
