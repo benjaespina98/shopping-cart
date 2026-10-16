@@ -73,11 +73,18 @@
   /* Text */
   --text-strong:        var(--teal-900);
   --text-body:          var(--grey-700);
-  --text-muted:         var(--grey-500);
-  --text-faint:         var(--grey-400);
+  /* Texto neutro con contraste AA (>= 4.5:1) sobre todos los fondos del sitio, incluidos los de los
+     temas "elegante" y "moderno". Son valores propios y no --grey-500/--grey-400, que siguen siendo
+     para bordes e íconos. Tabla antes/después en docs/A11Y.md. */
+  --text-muted:         #626C71;
+  --text-faint:         #686F73;
+  /* Texto de estado: los --red-500/--amber-500/--green-500 son de relleno y no llegan a 4.5:1 como texto. */
+  --text-error:         #BA3C28;
+  --text-warning:       #966012;
+  --text-success:       #237952;
   --text-inverse:       var(--grey-0);
   --text-inverse-muted: rgba(255, 255, 255, 0.78);
-  --text-inverse-faint: rgba(255, 255, 255, 0.55);
+  --text-inverse-faint: rgba(255, 255, 255, 0.6);
   --text-on-accent:     var(--teal-900);
   --text-link:          var(--teal-600);
 
@@ -105,8 +112,8 @@
      ancha, pensada para títulos, y en párrafos de 14–16 px pierde legibilidad. El
      propio manual aplica ese criterio cuando aclara que para su cuerpo de texto eligió
      otra familia "por su legibilidad y clarificación óptica". */
-  --font-display: 'Quicksand', 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-body:    'Mulish', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Quicksand Variable', 'Quicksand', 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-body:    'Mulish Variable', 'Mulish', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
   /* Spacing */
   --space-1:  0.25rem;

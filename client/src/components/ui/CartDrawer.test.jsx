@@ -9,9 +9,9 @@ import { ordersAPI } from '../../services/api';
 vi.mock('../../services/api', () => ({
   ordersAPI: { create: vi.fn() },
 }));
-vi.mock('react-toastify', () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
+vi.mock('../../utils/notify', () => ({ notify: { success: vi.fn(), error: vi.fn() } }));
 
-import { toast } from 'react-toastify';
+import { notify } from '../../utils/notify';
 
 // El drawer arranca cerrado (CartContext.isOpen = false) y no hay forma de abrirlo desde
 // afuera salvo por toggleCart(); este componente lo abre apenas monta, para poder probar
@@ -68,7 +68,7 @@ describe('CartDrawer — checkout por WhatsApp', () => {
     expect(window.open).toHaveBeenCalledWith('', '_blank');
     await waitFor(() => expect(popup.location.href).toBe('https://wa.me/5493534224605?text=hola'));
 
-    await waitFor(() => expect(toast.success).toHaveBeenCalled());
+    await waitFor(() => expect(notify.success).toHaveBeenCalled());
     expect(JSON.parse(localStorage.getItem('cart_items'))).toEqual([]);
   });
 
@@ -81,7 +81,7 @@ describe('CartDrawer — checkout por WhatsApp', () => {
     await screen.findByText('Cloro granulado 5kg');
     await user.click(screen.getByRole('button', { name: /finalizar compra/i }));
 
-    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Sin stock'));
+    await waitFor(() => expect(notify.error).toHaveBeenCalledWith('Sin stock'));
     expect(popup.close).toHaveBeenCalled();
     expect(JSON.parse(localStorage.getItem('cart_items'))).toHaveLength(1);
   });

@@ -70,6 +70,7 @@ export default function About() {
                 radius="var(--radius-lg)"
                 priority
                 sizes="(max-width: 767px) calc(100vw - 40px), 540px"
+                srcSetWidths={[400, 560, 800, 1080]}
               />
             </div>
           </div>

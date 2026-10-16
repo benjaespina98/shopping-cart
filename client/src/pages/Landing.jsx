@@ -112,6 +112,7 @@ export default function Landing() {
                 placeholderDataUrl={!heroProject ? HERO_BLUR_PLACEHOLDER : undefined}
                 priority
                 sizes="(max-width: 767px) calc(100vw - 40px), 540px"
+                srcSetWidths={[400, 560, 800, 1080]}
               />
             </div>
           </div>
@@ -199,7 +200,8 @@ export default function Landing() {
                   position: 'relative', borderRadius: 'var(--radius-lg)', overflow: 'hidden',
                   cursor: 'pointer', ...(i === 0 ? { gridRow: '1 / span 2' } : {}),
                 }} onClick={() => navigate('/proyectos')}>
-                  <Photo label={`${p.title} · ${p.location}`} height="100%" src={p.imageUrl || undefined} zoom />
+                  <Photo label={`${p.title} · ${p.location}`} height="100%" src={p.imageUrl || undefined} zoom
+                    sizes="(max-width: 767px) calc(100vw - 40px), (max-width: 1023px) 50vw, 560px" srcSetWidths={[400, 560, 800, 1120]} />
                 </div>
               ))}
             </div>

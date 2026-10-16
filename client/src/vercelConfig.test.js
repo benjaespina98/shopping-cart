@@ -78,14 +78,12 @@ describe('vercel.json — Content-Security-Policy', () => {
     expect(script).not.toContain("'unsafe-eval'");
   });
 
-  it('solo hay los orígenes externos que el código usa (GA, Cloudinary, Google Fonts, Google Maps)', () => {
+  it('solo hay los orígenes externos que el código usa (GA, Cloudinary, Google Maps)', () => {
     const origins = new Set(csp().match(/https:\/\/[^\s;]+/g));
     expect([...origins].sort()).toEqual(
       [
         'https://*.analytics.google.com',
         'https://*.google-analytics.com',
-        'https://fonts.googleapis.com',
-        'https://fonts.gstatic.com',
         'https://res.cloudinary.com',
         'https://www.google.com',
         'https://www.googletagmanager.com',
@@ -105,6 +103,12 @@ describe('vercel.json — Content-Security-Policy', () => {
   it("style-src no admite 'unsafe-inline' y default-src es solo 'self'", () => {
     expect(directive(csp(), 'style-src')).not.toContain("'unsafe-inline'");
     expect(directive(csp(), 'default-src')).toBe("default-src 'self'");
+  });
+
+  it("las tipografías son propias: style-src y font-src son solo 'self' y index.html no pide nada a Google Fonts", () => {
+    expect(directive(csp(), 'style-src')).toBe("style-src 'self'");
+    expect(directive(csp(), 'font-src')).toBe("font-src 'self'");
+    expect(indexHtml).not.toMatch(/fonts.(googleapis|gstatic).com/);
   });
 
   it('index.html no tiene scripts inline (la CSP exige script-src self)', () => {

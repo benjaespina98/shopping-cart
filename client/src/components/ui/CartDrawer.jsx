@@ -4,7 +4,7 @@ import { useCart } from '../../context/CartContext';
 import CldImage from './CldImage';
 import Honeypot from './Honeypot';
 import { ordersAPI } from '../../services/api';
-import { toast } from 'react-toastify';
+import { notify } from '../../utils/notify';
 
 export default function CartDrawer() {
   const { items, removeItem, updateQty, clearCart, totalItems, totalPrice, isOpen, toggleCart } =
@@ -98,10 +98,10 @@ export default function CartDrawer() {
 
       clearCart();
       toggleCart();
-      toast.success('¡Pedido enviado a WhatsApp!');
+      notify.success('¡Pedido enviado a WhatsApp!');
     } catch (err) {
       if (popup && !popup.closed) popup.close();
-      toast.error(err.response?.data?.message || 'Error al procesar el pedido');
+      notify.error(err.response?.data?.message || 'Error al procesar el pedido');
     } finally {
       setSending(false);
     }
