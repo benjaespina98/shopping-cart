@@ -106,10 +106,10 @@ export default function Landing() {
                 height={460}
                 radius="var(--radius-lg)"
                 src={heroProject?.imageUrl || undefined}
-                // Mientras todavía no llegó la respuesta de /api/projects, muestra una
-                // miniatura borrosa de la foto del hero en vez de la caja lisa color
-                // marca — así nunca se ve "vacío" antes de que aparezca la foto nítida.
-                placeholderDataUrl={!heroProject ? HERO_BLUR_PLACEHOLDER : undefined}
+                // Miniatura borrosa de la foto del hero: se ve desde el primer pintado (antes de que
+                // responda /api/projects) y sigue debajo de la foto nítida hasta que esta termina de
+                // cargar, para que la aparición sea un fundido y no un salto.
+                placeholderDataUrl={HERO_BLUR_PLACEHOLDER}
                 priority
                 sizes="(max-width: 767px) calc(100vw - 40px), 540px"
                 srcSetWidths={[400, 560, 800, 1080]}
