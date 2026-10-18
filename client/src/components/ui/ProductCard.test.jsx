@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import ProductCard from './ProductCard';
 import { CartProvider } from '../../context/CartContext';
 
-vi.mock('react-toastify', () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
+vi.mock('../../utils/notify', () => ({ notify: { success: vi.fn(), error: vi.fn() } }));
 
 const producto = (over = {}) => ({
   _id: 'p1',

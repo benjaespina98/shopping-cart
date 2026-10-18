@@ -26,8 +26,8 @@ const THEME = {
 
 const STATUS_LABELS = {
   whatsapp_sent: { label: 'Enviado WA', bg: 'var(--info-100)', color: 'var(--info-500)' },
-  confirmed:     { label: 'Confirmado', bg: 'var(--green-100)', color: 'var(--green-500)' },
-  cancelled:     { label: 'Cancelado',  bg: 'var(--red-100)', color: 'var(--red-500)' },
+  confirmed:     { label: 'Confirmado', bg: 'var(--green-100)', color: 'var(--text-success)' },
+  cancelled:     { label: 'Cancelado',  bg: 'var(--red-100)', color: 'var(--text-error)' },
 };
 
 const cardStyle = { background: '#fff', borderRadius: 14, border: '1px solid var(--grey-200)' };

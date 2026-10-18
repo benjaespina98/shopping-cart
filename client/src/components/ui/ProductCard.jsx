@@ -2,7 +2,7 @@ import { memo, useEffect, useRef, useState } from 'react';
 import { FiShoppingCart, FiPlus, FiMinus, FiCheck, FiAlertTriangle, FiImage } from 'react-icons/fi';
 import { useCart } from '../../context/CartContext';
 import CldImage from './CldImage';
-import { toast } from 'react-toastify';
+import { notify } from '../../utils/notify';
 
 // Anchos reales de la tarjeta en la grilla (1 / 2 / 3 columnas) — pedir más que esto
 // era lo que hacía que la foto tardara en aparecer.
@@ -33,7 +33,7 @@ function ProductCard({ product, inCartQuantity = 0, onOpenDetail, priority = fal
     if (isOutOfStock || hasReachedCartStockLimit) return;
     addItem(product, qty);
     setAdded(true);
-    toast.success(`"${product.name}" agregado al carrito`);
+    notify.success(`"${product.name}" agregado al carrito`);
     if (addedTimeoutRef.current) clearTimeout(addedTimeoutRef.current);
     addedTimeoutRef.current = setTimeout(() => setAdded(false), 2000);
     setQty(1);
@@ -133,7 +133,7 @@ function ProductCard({ product, inCartQuantity = 0, onOpenDetail, priority = fal
             <span style={{
               display: 'inline-flex', alignItems: 'center', gap: 4,
               padding: '4px 10px', borderRadius: 'var(--radius-pill)',
-              background: 'var(--surface-card)', color: 'var(--green-500)',
+              background: 'var(--surface-card)', color: 'var(--text-success)',
               fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700,
               boxShadow: 'var(--shadow-sm)', whiteSpace: 'nowrap',
             }}>
@@ -194,7 +194,7 @@ function ProductCard({ product, inCartQuantity = 0, onOpenDetail, priority = fal
             <div style={{
               display: 'flex', alignItems: 'center', gap: 6, marginTop: 8,
               padding: '6px 10px', borderRadius: 'var(--radius-sm)',
-              background: 'var(--amber-100)', color: 'var(--amber-500)',
+              background: 'var(--amber-100)', color: 'var(--text-warning)',
               fontSize: 12, fontWeight: 600,
             }}>
               <FiAlertTriangle size={12} style={{ flexShrink: 0 }} />

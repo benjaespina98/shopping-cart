@@ -15,6 +15,9 @@ export function Photo({
   zoom = false,
   priority = false,
   sizes = '100vw',
+  // Anchos del srcset (ver utils/cloudinary.js). Pasar los reales de render: pedir 1400 px para una
+  // caja de 540 px es peso de más.
+  srcSetWidths,
   className,
   style,
   // Data URI diminuto (ver src/data/heroFallback.js) que se muestra en vez de la caja
@@ -46,6 +49,7 @@ export function Photo({
           alt={alt || label}
           width={1200}
           sizes={sizes}
+          srcSetWidths={srcSetWidths}
           priority={priority}
           imgStyle={{
             width: '100%', height: '100%', objectFit: 'cover', display: 'block',

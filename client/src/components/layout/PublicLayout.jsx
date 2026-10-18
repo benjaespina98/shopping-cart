@@ -1,14 +1,27 @@
-import { useEffect } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Navbar from './Navbar';
 import Footer from './Footer';
-import CartDrawer from '../ui/CartDrawer';
 import WhatsAppFloat from '../ui/WhatsAppFloat';
 import { initAnalytics, trackPageview } from '../../utils/analytics';
 import { SettingsProvider } from '../../context/SettingsContext';
+import { useCart } from '../../context/CartContext';
+import { afterLoadAndIdle } from '../../utils/idle';
+import { lazyOptional } from '../../utils/lazyOptional';
+
+// El carrito empieza cerrado y es de los componentes más pesados del layout: su chunk se descarga
+// después de load, en idle, o al instante si el visitante abre el carrito antes.
+const CartDrawer = lazyOptional(() => import('../ui/CartDrawer'));
 
 export default function PublicLayout() {
   const location = useLocation();
+  const { isOpen: cartOpen } = useCart();
+  const [cartReady, setCartReady] = useState(false);
+
+  useEffect(() => { afterLoadAndIdle(() => setCartReady(true), { timeout: 3000, fallbackDelay: 2000 }); }, []);
+  // Una vez abierto, queda montado: si no, al cerrarlo (con cartReady todavía en false) se desmontaba
+  // y se perdía la animación de salida y la de las aperturas siguientes.
+  useEffect(() => { if (cartOpen) setCartReady(true); }, [cartOpen]);
 
   useEffect(() => { initAnalytics(); }, []);
   useEffect(() => { trackPageview(location.pathname); }, [location.pathname]);
@@ -37,7 +50,11 @@ export default function PublicLayout() {
           <Outlet />
         </main>
         <Footer />
-        <CartDrawer />
+        {(cartReady || cartOpen) && (
+          <Suspense fallback={null}>
+            <CartDrawer />
+          </Suspense>
+        )}
         <WhatsAppFloat />
       </div>
     </SettingsProvider>

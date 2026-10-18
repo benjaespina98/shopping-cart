@@ -67,18 +67,13 @@
         ]
       }
     </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <!-- La imagen del Hero se sirve desde Cloudinary; abrimos la conexión cuanto antes
          para que la foto principal descargue lo más rápido posible en el primer render -->
     <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
-    <!-- Quicksand es la tipografía de marca según el manual de identidad; Mulish se usa
-         para el texto corrido, donde prima la legibilidad. Acá se pedían Inter y
-         JetBrains Mono, que no usa ningún componente: dos descargas por visita para
-         nada. Y Mulish se cargaba recién desde un @import dentro del CSS — el navegador
-         tenía que bajar y parsear la hoja antes de enterarse de que existía, así que el
-         texto aparecía un instante con la fuente del sistema y después saltaba. -->
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Mulish:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <!-- Tipografías propias (Quicksand de marca, Mulish para texto corrido): se empaquetan desde
+         @fontsource-variable en src/index.css y vite.config.js (plugin fontPreload) agrega acá el
+         <link rel="preload"> del subset latin con el nombre con hash. Antes venían de Google Fonts: dos
+         orígenes más, una hoja que bloqueaba el render y un salto de fuente al llegar. -->
   </head>
   <body>
     <div id="root"></div>

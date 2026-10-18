@@ -152,7 +152,8 @@ export default function Contact() {
         {/* Left — contact info */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
           {contactSettings.contactPhotoUrl && (
-            <Photo src={contactSettings.contactPhotoUrl} label="Nuestro local" height={180} />
+            <Photo src={contactSettings.contactPhotoUrl} label="Nuestro local" height={180}
+              sizes="(max-width: 767px) calc(100vw - 40px), 340px" srcSetWidths={[340, 520, 700]} />
           )}
 
           <Card padding="lg">
@@ -275,7 +276,7 @@ export default function Contact() {
                 }}
               />
               {fieldErrors.message && (
-                <span id="contact-message-msg" role="alert" style={{ fontSize: '0.875rem', color: 'var(--red-500)', fontFamily: 'var(--font-body)' }}>{fieldErrors.message}</span>
+                <span id="contact-message-msg" role="alert" style={{ fontSize: '0.875rem', color: 'var(--text-error)', fontFamily: 'var(--font-body)' }}>{fieldErrors.message}</span>
               )}
             </div>
           </div>

@@ -240,7 +240,7 @@ export default function Quote() {
               <Checkbox id="quote-privacy" label="Acepto que usen mis datos para responder esta consulta" checked={acceptedPrivacy}
                 onChange={(e) => setAcceptedPrivacy(e.target.checked)} />
               {formError && (
-                <p role="alert" style={{ color: 'var(--red-500)', fontSize: 14, fontFamily: 'var(--font-body)' }}>{formError}</p>
+                <p role="alert" style={{ color: 'var(--text-error)', fontSize: 14, fontFamily: 'var(--font-body)' }}>{formError}</p>
               )}
               <Button type="submit" variant="primary" size="lg" fullWidth disabled={sending}
                 iconLeft={!sending && <FiSend size={16} />}>
