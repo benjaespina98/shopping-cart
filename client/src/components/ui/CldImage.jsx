@@ -19,6 +19,8 @@ export default function CldImage({
   sizes,
   srcSetWidths,
   priority = false,
+  // Aviso al padre cuando la foto terminó de cargar (o falló): lo usa Photo para retirar su blur.
+  onLoadComplete,
   className = '',
   imgStyle,
   fallback = null,
@@ -54,8 +56,8 @@ export default function CldImage({
         // navegador. En minúscula la pasa tal cual al DOM.
         fetchpriority={priority ? 'high' : undefined}
         decoding="async"
-        onLoad={() => setLoaded(true)}
-        onError={() => setLoaded(true)}
+        onLoad={() => { setLoaded(true); onLoadComplete?.(); }}
+        onError={() => { setLoaded(true); onLoadComplete?.(); }}
         className={className}
         style={{
           position: 'relative',

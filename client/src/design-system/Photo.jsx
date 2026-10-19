@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import CldImage from '../components/ui/CldImage';
 
+// Un poco más que el fundido de la foto (--duration-slow en CldImage/Photo): el blur no se retira a mitad de la transición.
+const BLUR_RETIRE_MS = 700;
 const overlayGradient = 'linear-gradient(180deg, rgba(18,43,51,0) 55%, rgba(18,43,51,0.78) 100%)';
 // Mismo degradado de marca que el placeholder sin imagen: se ve al instante (0 red)
 // mientras carga la foto, así el hueco nunca queda vacío.
@@ -27,6 +29,16 @@ export function Photo({
   placeholderDataUrl,
 }) {
   const [hovered, setHovered] = useState(false);
+  // El blur embebido (placeholderDataUrl) queda bajo la foto mientras carga y durante su fundido de
+  // entrada; después se retira: si el admin cambió la foto del hero, ese blur es de la anterior y no
+  // tiene que quedar a la vista si la imagen falla o tiene transparencias.
+  const [photoLoaded, setPhotoLoaded] = useState(false);
+  const [blurRetired, setBlurRetired] = useState(false);
+  useEffect(() => {
+    if (!photoLoaded) return undefined;
+    const timer = setTimeout(() => setBlurRetired(true), BLUR_RETIRE_MS);
+    return () => clearTimeout(timer);
+  }, [photoLoaded]);
 
   const hoverHandlers = zoom ? {
     onMouseEnter: () => setHovered(true),
@@ -45,7 +57,7 @@ export function Photo({
         {/* Con placeholderDataUrl la miniatura borrosa queda DEBAJO de la foto, también después de que se
             sepa la URL: antes se la reemplazaba por el blur de Cloudinary (otro pedido de red) y entre
             un blur y el otro la caja quedaba lisa. Así la transición es blur -> foto, sin parpadeo. */}
-        {placeholderDataUrl && (
+        {placeholderDataUrl && !blurRetired && (
           <img
             src={placeholderDataUrl}
             alt=""
@@ -65,6 +77,7 @@ export function Photo({
           sizes={sizes}
           srcSetWidths={srcSetWidths}
           priority={priority}
+          onLoadComplete={() => setPhotoLoaded(true)}
           imgStyle={{
             width: '100%', height: '100%', objectFit: 'cover', display: 'block',
             transform: zoom && hovered ? 'scale(1.05)' : 'scale(1)',
