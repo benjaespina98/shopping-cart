@@ -42,6 +42,20 @@ export function Photo({
         style={{ position: 'relative', height, borderRadius: radius, overflow: 'hidden', background: brandGradient, ...style }}
         {...hoverHandlers}
       >
+        {/* Con placeholderDataUrl la miniatura borrosa queda DEBAJO de la foto, también después de que se
+            sepa la URL: antes se la reemplazaba por el blur de Cloudinary (otro pedido de red) y entre
+            un blur y el otro la caja quedaba lisa. Así la transición es blur -> foto, sin parpadeo. */}
+        {placeholderDataUrl && (
+          <img
+            src={placeholderDataUrl}
+            alt=""
+            aria-hidden="true"
+            style={{
+              position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover',
+              filter: 'blur(6px)', transform: 'scale(1.1)',
+            }}
+          />
+        )}
         {/* Blur-up, f_auto/q_auto y srcset los resuelve CldImage — misma lógica de
             carga que usan las tarjetas de producto, para no mantenerla dos veces. */}
         <CldImage

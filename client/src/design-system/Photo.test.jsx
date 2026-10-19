@@ -43,4 +43,16 @@ describe('Photo — imágenes de Cloudinary', () => {
     expect(img.getAttribute('src')).toBe(OTHER);
     expect(img.getAttribute('srcset')).toBeNull();
   });
+
+  it('con src y placeholderDataUrl, la miniatura borrosa queda debajo de la foto (sin parpadeo entre ambas)', () => {
+    const blur = 'data:image/webp;base64,AAAA';
+    const { container } = render(<Photo src={CLD} alt="Piscina" priority sizes="540px" height={460} placeholderDataUrl={blur} />);
+    const imgs = [...container.querySelectorAll('img')];
+
+    expect(imgs).toHaveLength(2);
+    expect(imgs[0].getAttribute('src')).toBe(blur);
+    expect(imgs[0].getAttribute('aria-hidden')).toBe('true');
+    expect(imgs[1].getAttribute('alt')).toBe('Piscina');
+    expect(imgs[1].getAttribute('fetchpriority')).toBe('high');
+  });
 });
