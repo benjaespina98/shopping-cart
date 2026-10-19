@@ -3,11 +3,10 @@ import { FiShoppingCart, FiPlus, FiMinus, FiCheck, FiAlertTriangle, FiImage } fr
 import { useCart } from '../../context/CartContext';
 import CldImage from './CldImage';
 import { notify } from '../../utils/notify';
+import { PRODUCT_CARD_PHOTO } from '../../utils/imageSpecs';
 
 // Anchos reales de la tarjeta en la grilla (1 / 2 / 3 columnas) — pedir más que esto
 // era lo que hacía que la foto tardara en aparecer.
-const CARD_SRCSET_WIDTHS = [320, 480, 640];
-const CARD_SIZES = '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 340px';
 
 function ProductCard({ product, inCartQuantity = 0, onOpenDetail, priority = false }) {
   const { addItem } = useCart();
@@ -82,9 +81,9 @@ function ProductCard({ product, inCartQuantity = 0, onOpenDetail, priority = fal
         <CldImage
           src={currentImg}
           alt={product.name}
-          width={640}
-          sizes={CARD_SIZES}
-          srcSetWidths={CARD_SRCSET_WIDTHS}
+          width={PRODUCT_CARD_PHOTO.width}
+          sizes={PRODUCT_CARD_PHOTO.sizes}
+          srcSetWidths={PRODUCT_CARD_PHOTO.widths}
           priority={priority}
           className="ps-product-card__img"
           imgStyle={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}

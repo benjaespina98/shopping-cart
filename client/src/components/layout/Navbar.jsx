@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { prefetchRoute } from '../../utils/routePrefetch';
 import { FiShoppingCart, FiMenu, FiX } from 'react-icons/fi';
 import { useCart } from '../../context/CartContext';
 import { Button } from '../../design-system/Button';
@@ -21,8 +22,12 @@ function NavItem({ to, label, end, onClick, mobile = false }) {
       to={to}
       end={end}
       onClick={onClick}
-      onMouseEnter={() => setHovered(true)}
+      // Con señal de intención (mouse, foco o toque) se adelanta el chunk, los datos y las primeras
+      // fotos de la página: ver utils/routePrefetch.js.
+      onMouseEnter={() => { setHovered(true); prefetchRoute(to); }}
       onMouseLeave={() => setHovered(false)}
+      onFocus={() => prefetchRoute(to)}
+      onTouchStart={() => prefetchRoute(to)}
       style={({ isActive }) => ({
         border: 'none', cursor: 'pointer',
         fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: 15,
