@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import CldImage from '../components/ui/CldImage';
 
+// Un poco más que el fundido de la foto (--duration-slow en CldImage/Photo): el blur no se retira a mitad de la transición.
+const BLUR_RETIRE_MS = 700;
 const overlayGradient = 'linear-gradient(180deg, rgba(18,43,51,0) 55%, rgba(18,43,51,0.78) 100%)';
 // Mismo degradado de marca que el placeholder sin imagen: se ve al instante (0 red)
 // mientras carga la foto, así el hueco nunca queda vacío.
@@ -27,6 +29,16 @@ export function Photo({
   placeholderDataUrl,
 }) {
   const [hovered, setHovered] = useState(false);
+  // El blur embebido (placeholderDataUrl) queda bajo la foto mientras carga y durante su fundido de
+  // entrada; después se retira: si el admin cambió la foto del hero, ese blur es de la anterior y no
+  // tiene que quedar a la vista si la imagen falla o tiene transparencias.
+  const [photoLoaded, setPhotoLoaded] = useState(false);
+  const [blurRetired, setBlurRetired] = useState(false);
+  useEffect(() => {
+    if (!photoLoaded) return undefined;
+    const timer = setTimeout(() => setBlurRetired(true), BLUR_RETIRE_MS);
+    return () => clearTimeout(timer);
+  }, [photoLoaded]);
 
   const hoverHandlers = zoom ? {
     onMouseEnter: () => setHovered(true),
@@ -42,6 +54,21 @@ export function Photo({
         style={{ position: 'relative', height, borderRadius: radius, overflow: 'hidden', background: brandGradient, ...style }}
         {...hoverHandlers}
       >
+        {/* Con placeholderDataUrl la miniatura borrosa queda DEBAJO de la foto, también después de que se
+            sepa la URL: antes se la reemplazaba (por el blur de CldImage, que llega por red) y entre uno y
+            otro la caja quedaba lisa. Usa el mismo desenfoque que CldImage (12px): cuando CldImage retira el
+            suyo al cargar la foto, este sigue idéntico durante el fundido -> blur -> foto, sin parpadeo. */}
+        {placeholderDataUrl && !blurRetired && (
+          <img
+            src={placeholderDataUrl}
+            alt=""
+            aria-hidden="true"
+            style={{
+              position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover',
+              filter: 'blur(12px)', transform: 'scale(1.1)',
+            }}
+          />
+        )}
         {/* Blur-up, f_auto/q_auto y srcset los resuelve CldImage — misma lógica de
             carga que usan las tarjetas de producto, para no mantenerla dos veces. */}
         <CldImage
@@ -51,6 +78,7 @@ export function Photo({
           sizes={sizes}
           srcSetWidths={srcSetWidths}
           priority={priority}
+          onLoadComplete={() => setPhotoLoaded(true)}
           imgStyle={{
             width: '100%', height: '100%', objectFit: 'cover', display: 'block',
             transform: zoom && hovered ? 'scale(1.05)' : 'scale(1)',
@@ -88,7 +116,7 @@ export function Photo({
             position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover',
             // Ya viene borrosa desde Cloudinary, pero a 32px estirada al tamaño real
             // se ve "en bloques" — este blur extra de CSS la suaviza.
-            filter: 'blur(6px)', transform: 'scale(1.1)',
+            filter: 'blur(12px)', transform: 'scale(1.1)',
           }}
         />
         {label && (
