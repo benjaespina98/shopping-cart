@@ -55,8 +55,9 @@ export function Photo({
         {...hoverHandlers}
       >
         {/* Con placeholderDataUrl la miniatura borrosa queda DEBAJO de la foto, también después de que se
-            sepa la URL: antes se la reemplazaba por el blur de Cloudinary (otro pedido de red) y entre
-            un blur y el otro la caja quedaba lisa. Así la transición es blur -> foto, sin parpadeo. */}
+            sepa la URL: antes se la reemplazaba (por el blur de CldImage, que llega por red) y entre uno y
+            otro la caja quedaba lisa. Usa el mismo desenfoque que CldImage (12px): cuando CldImage retira el
+            suyo al cargar la foto, este sigue idéntico durante el fundido -> blur -> foto, sin parpadeo. */}
         {placeholderDataUrl && !blurRetired && (
           <img
             src={placeholderDataUrl}
@@ -64,7 +65,7 @@ export function Photo({
             aria-hidden="true"
             style={{
               position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover',
-              filter: 'blur(6px)', transform: 'scale(1.1)',
+              filter: 'blur(12px)', transform: 'scale(1.1)',
             }}
           />
         )}
@@ -115,7 +116,7 @@ export function Photo({
             position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover',
             // Ya viene borrosa desde Cloudinary, pero a 32px estirada al tamaño real
             // se ve "en bloques" — este blur extra de CSS la suaviza.
-            filter: 'blur(6px)', transform: 'scale(1.1)',
+            filter: 'blur(12px)', transform: 'scale(1.1)',
           }}
         />
         {label && (

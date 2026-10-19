@@ -109,7 +109,7 @@ export default function Landing() {
                 // Miniatura borrosa de la foto del hero: se ve desde el primer pintado (antes de que
                 // responda /api/projects) y sigue debajo de la foto nítida hasta que esta termina de
                 // cargar, para que la aparición sea un fundido y no un salto.
-                placeholderDataUrl={HERO_BLUR_PLACEHOLDER}
+                placeholderDataUrl={!heroProject || heroProject.imageUrl ? HERO_BLUR_PLACEHOLDER : undefined}
                 priority
                 sizes="(max-width: 767px) calc(100vw - 40px), 540px"
                 srcSetWidths={[400, 560, 800, 1080]}
