@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { render } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { render, act, fireEvent } from '@testing-library/react';
 import { Photo } from './Photo';
 
 const CLD = 'https://res.cloudinary.com/demo/image/upload/v1/shopping-cart/projects/hero.jpg';
@@ -54,5 +54,29 @@ describe('Photo — imágenes de Cloudinary', () => {
     expect(imgs[0].getAttribute('aria-hidden')).toBe('true');
     expect(imgs[1].getAttribute('alt')).toBe('Piscina');
     expect(imgs[1].getAttribute('fetchpriority')).toBe('high');
+  });
+
+  it('el blur se retira solo después de que la foto cargó y terminó su fundido', () => {
+    vi.useFakeTimers();
+    try {
+      const blur = 'data:image/webp;base64,AAAA';
+      const { container } = render(<Photo src={CLD} alt="Piscina" priority sizes="540px" height={460} placeholderDataUrl={blur} />);
+      expect(container.querySelectorAll('img')).toHaveLength(2);
+
+      // sigue ahí mientras la foto no cargó, aunque pase el tiempo
+      act(() => { vi.advanceTimersByTime(5000); });
+      expect(container.querySelectorAll('img')).toHaveLength(2);
+
+      fireEvent.load(container.querySelectorAll('img')[1]);
+      act(() => { vi.advanceTimersByTime(300); });
+      expect(container.querySelectorAll('img')).toHaveLength(2); // a mitad del fundido
+
+      act(() => { vi.advanceTimersByTime(500); });
+      const imgs = container.querySelectorAll('img');
+      expect(imgs).toHaveLength(1);
+      expect(imgs[0].getAttribute('alt')).toBe('Piscina');
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

@@ -25,11 +25,17 @@ window.__prefetch = {
     return url.slice(0, i) + 'f_auto,q_auto,c_limit,w_' + width + '/' + url.slice(i);
   }
 
+  // Solo la home muestra el hero: en /tienda, /proyectos, /admin... la foto se bajaría con prioridad alta
+  // sin usarse y le quitaría ancho de banda a la página real. (El fetch de arriba sí queda para todas.)
+  if (location.pathname !== '/') return;
+
   window.__prefetch.projects.then(function (data) {
     if (!Array.isArray(data)) return;
     var hero = data.find(function (p) { return p.isHero; }) || data.find(function (p) { return p.featured; });
     var url = hero && hero.imageUrl;
     if (typeof url !== 'string' || url.indexOf('https://res.cloudinary.com/') !== 0 || url.indexOf(UPLOAD) === -1) return;
+    // La URL va dentro de imagesrcset: una coma o un espacio agregaría candidatos de srcset.
+    if (/[\s,"'<>]/.test(url)) return;
 
     var link = document.createElement('link');
     link.rel = 'preload';
