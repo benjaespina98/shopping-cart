@@ -43,6 +43,8 @@ describe('caché de datos precalentados', () => {
     expect(loader).toHaveBeenCalledTimes(1);
     expect(a).toBe(b);
     expect(takePrefetched('x')).toBe(a);
+    // uso único: la siguiente visita pide datos frescos
+    expect(takePrefetched('x')).toBeNull();
 
     const falla = prefetchData('y', () => Promise.reject(new Error('red')));
     await falla.catch(() => {});
@@ -50,12 +52,11 @@ describe('caché de datos precalentados', () => {
     expect(takePrefetched('y')).toBeNull();
   });
 
-  it('vence pasado un minuto', () => {
+  it('vence a los 30 segundos', () => {
     vi.useFakeTimers();
     try {
       prefetchData('z', () => Promise.resolve(1));
-      expect(takePrefetched('z')).not.toBeNull();
-      vi.advanceTimersByTime(61_000);
+      vi.advanceTimersByTime(31_000);
       expect(takePrefetched('z')).toBeNull();
     } finally {
       vi.useRealTimers();
@@ -81,8 +82,18 @@ describe('warmImage pide lo mismo que pinta la página (si no, se descarga dos v
     expect(warmed[0].fetchPriority).toBe('low');
   });
 
+  it('no repite el pedido de la misma foto (mouse + foco + toque sobre el mismo link)', () => {
+    warmImage(CLD('dup'), SERVICE_PHOTO);
+    warmImage(CLD('dup'), SERVICE_PHOTO);
+    expect(warmed).toHaveLength(1);
+    clearPrefetchCache();
+    warmImage(CLD('dup'), SERVICE_PHOTO);
+    expect(warmed).toHaveLength(2);
+  });
+
   it('no hace nada con URLs que no son de Cloudinary', () => {
     warmImage('https://placehold.co/400x400.png', PRODUCT_CARD_PHOTO);
+    warmImage('https://otro-host.test/image/upload/x.jpg', PRODUCT_CARD_PHOTO);
     expect(warmed).toHaveLength(0);
   });
 });

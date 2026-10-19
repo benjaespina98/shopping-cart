@@ -9,7 +9,9 @@ import { SERVICE_PHOTO, PROJECT_PHOTO, ABOUT_PHOTO, CONTACT_PHOTO, PRODUCT_CARD_
 // a abrirse (pasar el mouse, foco, toque) o, en baja prioridad, cuando la home ya terminó de cargar.
 // Todo es opcional: si algo falla, la página pide lo suyo como siempre.
 
-const DATA_TTL_MS = 60_000; // igual que el s-maxage de la API: no se muestra nada más viejo que el borde
+// Corto a propósito: los datos precalentados no deben mostrar stock, precios o textos viejos. Además se
+// consumen una sola vez (takePrefetched) y se invalidan al crear un pedido (clearPrefetchCache).
+const DATA_TTL_MS = 30_000;
 
 const cache = new Map();
 
@@ -24,13 +26,17 @@ export function prefetchData(key, loader) {
   return promise;
 }
 
-// Para las páginas: la promesa vigente o null (y entonces piden los datos ellas, como siempre).
+// Para las páginas: la promesa vigente o null (y entonces piden los datos ellas, como siempre). Es de uso
+// único: una visita posterior a la misma sección vuelve a pedir datos frescos.
 export function takePrefetched(key) {
   const entry = cache.get(key);
-  return entry && Date.now() - entry.at < DATA_TTL_MS ? entry.promise : null;
+  if (!entry) return null;
+  cache.delete(key);
+  return Date.now() - entry.at < DATA_TTL_MS ? entry.promise : null;
 }
 
-export function clearPrefetchCache() { cache.clear(); }
+// Descarta datos y fotos ya adelantados (p. ej. tras crear un pedido, que cambia el stock).
+export function clearPrefetchCache() { cache.clear(); warmedImages.clear(); }
 
 // Sin ahorro de datos ni conexiones 2G: no se gasta ancho de banda por adelantado.
 function shouldSkip() {
@@ -40,8 +46,15 @@ function shouldSkip() {
 
 // Pide la misma variante que va a pintar <CldImage>/<Photo> (mismo srcset y sizes), en baja prioridad,
 // sin tocar el DOM: queda en la caché HTTP del navegador.
+const warmedImages = new Set();
+
 export function warmImage(url, spec) {
-  if (typeof Image === 'undefined' || !isCloudinary(url)) return;
+  // Solo el host de Cloudinary del sitio (isCloudinary solo mira el segmento /image/upload/ de la URL).
+  if (typeof Image === 'undefined' || !isCloudinary(url) || !url.startsWith('https://res.cloudinary.com/')) return;
+  // Una vez por foto y variante: mouse + foco + toque sobre el mismo link no repiten el pedido.
+  const key = `${url}|${spec.sizes}`;
+  if (warmedImages.has(key)) return;
+  warmedImages.add(key);
   const img = new Image();
   img.decoding = 'async';
   img.fetchPriority = 'low';
