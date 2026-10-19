@@ -55,4 +55,18 @@ describe('Landing — sección de proyectos destacados', () => {
     expect(await screen.findByText('Reforma de borde · Villa Nueva')).toBeInTheDocument();
     expect(screen.queryByText(/Cargá proyectos desde el admin/i)).not.toBeInTheDocument();
   });
+
+  it('un hero sin imageUrl no muestra el blur de otra foto (queda la caja de marca)', async () => {
+    projectsAPI.getAll.mockResolvedValue({ data: [{ _id: 'p1', title: 'Sin foto', location: 'Villa María', isHero: true, imageUrl: '' }] });
+    const { container } = renderLanding();
+
+    await waitFor(() => expect(screen.getByText(/Sin foto · Villa María/i)).toBeInTheDocument());
+    expect(container.querySelector('img[src^="data:image"]')).toBeNull();
+  });
+
+  it('mientras no responde /api/projects muestra el blur embebido del hero', () => {
+    projectsAPI.getAll.mockReturnValue(new Promise(() => {}));
+    const { container } = renderLanding();
+    expect(container.querySelector('img[src^="data:image"]')).not.toBeNull();
+  });
 });

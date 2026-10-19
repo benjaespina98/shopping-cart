@@ -9,9 +9,9 @@
 // se pinta en su lugar, instantáneo (viaja en el bundle, cero red), y una vez que
 // llega el dato real CldImage hace su propio blur-up hacia la foto nítida encima.
 //
-// Se pone desactualizado si el admin cambia la foto del hero — no importa: durante
-// la fracción de segundo que se ve, sólo cumple la función de "ya hay algo tomando
-// forma", no la de mostrar la foto exacta. Si en algún momento se nota muy distinta,
+// Se pone desactualizado si el admin cambia la foto del hero: la foto vieja se vería
+// borrosa hasta que cargue la nueva (y un instante más durante el fundido). Si eso se nota,
+// regenerarlo. Si la API no responde o no hay proyectos, queda a la vista (igual que antes). Si en algún momento se nota muy distinta,
 // se regenera pegando la URL de Cloudinary de la foto nueva en:
 //   https://res.cloudinary.com/<cloud>/image/upload/w_32,e_blur:800,q_1,f_auto/<resto-de-la-url>
 // y volcando el resultado en base64 acá.
