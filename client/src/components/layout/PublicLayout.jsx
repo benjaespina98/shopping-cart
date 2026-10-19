@@ -2,6 +2,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import RouteWarmup from './RouteWarmup';
 import WhatsAppFloat from '../ui/WhatsAppFloat';
 import { initAnalytics, trackPageview } from '../../utils/analytics';
 import { SettingsProvider } from '../../context/SettingsContext';
@@ -46,6 +47,7 @@ export default function PublicLayout() {
           Saltar al contenido
         </a>
         <Navbar />
+        <RouteWarmup />
         <main id="contenido" tabIndex={-1} className="flex-1">
           <Outlet />
         </main>

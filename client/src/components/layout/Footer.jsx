@@ -5,6 +5,7 @@ import { FaWhatsapp, FaTiktok } from 'react-icons/fa';
 import { servicesAPI } from '../../services/api';
 import { useSettings } from '../../context/SettingsContext';
 import { FALLBACK_SERVICE_NAMES } from '../../data/fallbackServices';
+import { prefetchRoute } from '../../utils/routePrefetch';
 
 const empresaLinks = [
   ['/nosotros', 'Nosotros'],
@@ -28,8 +29,9 @@ const socialHover = (e, on) => {
 // entera: se perdía el carrito en memoria y volvían a descargarse todos los bundles.
 function FooterLink({ to, label }) {
   const handlers = {
-    onMouseEnter: (e) => linkHover(e, true),
+    onMouseEnter: (e) => { linkHover(e, true); prefetchRoute(to); },
     onMouseLeave: (e) => linkHover(e, false),
+    onFocus: () => prefetchRoute(to),
   };
 
   return to.startsWith('/')

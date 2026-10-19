@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { FiSearch, FiX, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { productsAPI, categoriesAPI } from '../services/api';
+import { takePrefetched } from '../utils/routePrefetch';
 import ProductCard from '../components/ui/ProductCard';
 import ProductDetailModal from '../components/ui/ProductDetailModal';
 import { useCart } from '../context/CartContext';
@@ -90,7 +91,9 @@ export default function Shop() {
       if (selectedCategory) params.category = selectedCategory;
       if (debouncedSearch)  params.search   = debouncedSearch;
       if (sort)             params.sort      = sort;
-      const { data } = await productsAPI.getAll(params);
+      // La primera carga sin filtros puede venir precalentada (utils/routePrefetch.js, mismos parámetros).
+      const firstLoad = page === 1 && !selectedCategory && !debouncedSearch && !sort;
+      const { data } = await (firstLoad ? takePrefetched('products', () => productsAPI.getAll(params)) : productsAPI.getAll(params));
       setProducts(data.products);
       setTotalPages(data.pages);
       setTotalProducts(data.total ?? data.products.length);

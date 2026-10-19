@@ -4,6 +4,8 @@ import { Button } from '../design-system/Button';
 import { Badge } from '../design-system/Badge';
 import { Photo } from '../design-system/Photo';
 import { servicesAPI } from '../services/api';
+import { takePrefetched } from '../utils/routePrefetch';
+import { SERVICE_PHOTO } from '../utils/imageSpecs';
 import CtaBlock from '../components/sections/CtaBlock';
 import { FALLBACK_SERVICES } from '../data/fallbackServices';
 
@@ -13,7 +15,8 @@ export default function Services() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    servicesAPI.getAll()
+    // Si la sección se precalentó (ver utils/routePrefetch.js) los datos ya están; si no, se piden como siempre.
+    takePrefetched('services', () => servicesAPI.getAll())
       .then(({ data }) => { if (data?.length > 0) setRows(data); })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -47,8 +50,9 @@ export default function Services() {
             {rows.map((r, i) => (
               <div key={r._id || r.title} className="ps-service-row" style={{ direction: i % 2 ? 'rtl' : 'ltr' }}>
                 <div className="ps-service-photo" style={{ direction: 'ltr' }}>
-                  <Photo label={r.title} height={280} src={r.imageUrl || undefined}
-                    sizes="(max-width: 767px) calc(100vw - 40px), 540px" srcSetWidths={[400, 560, 800, 1080]} />
+                  {/* Las dos primeras filas entran en pantalla sin scrollear: sin diferir su carga. */}
+                  <Photo label={r.title} height={280} src={r.imageUrl || undefined} priority={i < 2}
+                    sizes={SERVICE_PHOTO.sizes} srcSetWidths={SERVICE_PHOTO.widths} />
                 </div>
                 <div style={{ direction: 'ltr' }}>
                   <Badge tone={r.tone} variant={r.variant} style={{ marginBottom: 14 }}>{r.tag}</Badge>

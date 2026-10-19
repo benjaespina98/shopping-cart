@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Photo } from '../design-system/Photo';
 import { Lightbox } from '../components/ui/Lightbox';
 import { projectsAPI } from '../services/api';
+import { takePrefetched } from '../utils/routePrefetch';
+import { PROJECT_PHOTO } from '../utils/imageSpecs';
 
 export default function Projects() {
   const [projects, setProjects] = useState([]);
@@ -9,7 +11,7 @@ export default function Projects() {
   const [lightboxIndex, setLightboxIndex] = useState(null);
 
   useEffect(() => {
-    projectsAPI.getAll()
+    takePrefetched('projects', () => projectsAPI.getAll())
       .then(({ data }) => setProjects(data))
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -58,8 +60,9 @@ export default function Projects() {
                     height={i % 3 === 0 ? 280 : 220}
                     src={p.imageUrl || undefined}
                     zoom
-                    sizes="(max-width: 767px) calc(100vw - 40px), (max-width: 1023px) 50vw, 360px"
-                    srcSetWidths={[360, 540, 720, 1080]}
+                    priority={i < 3}
+                    sizes={PROJECT_PHOTO.sizes}
+                    srcSetWidths={PROJECT_PHOTO.widths}
                   />
                 </div>
               );

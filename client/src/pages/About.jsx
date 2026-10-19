@@ -1,6 +1,7 @@
 import { FiCheckCircle, FiPenTool, FiShield, FiHeart } from 'react-icons/fi';
 import { Card } from '../design-system/Card';
 import { Photo } from '../design-system/Photo';
+import { ABOUT_PHOTO } from '../utils/imageSpecs';
 import StatsStrip from '../components/sections/StatsStrip';
 import CtaBlock from '../components/sections/CtaBlock';
 import { useReveal } from '../hooks/useReveal';
@@ -69,8 +70,8 @@ export default function About() {
                 height={480}
                 radius="var(--radius-lg)"
                 priority
-                sizes="(max-width: 767px) calc(100vw - 40px), 540px"
-                srcSetWidths={[400, 560, 800, 1080]}
+                sizes={ABOUT_PHOTO.sizes}
+                srcSetWidths={ABOUT_PHOTO.widths}
               />
             </div>
           </div>
