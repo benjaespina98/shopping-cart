@@ -26,13 +26,16 @@ export function prefetchData(key, loader) {
   return promise;
 }
 
-// Para las páginas: la promesa vigente o null (y entonces piden los datos ellas, como siempre). Es de uso
-// único: una visita posterior a la misma sección vuelve a pedir datos frescos.
-export function takePrefetched(key) {
+// Para las páginas: la promesa vigente, o el resultado de `loader()` (la llamada normal de la página) si no hay
+// datos vigentes, o null si no se pasa `loader`. Es de uso único: una visita posterior a la misma sección vuelve
+// a pedir datos frescos. Si el precalentado falla, la página pide lo suyo en lugar de mostrar el error.
+export function takePrefetched(key, loader) {
   const entry = cache.get(key);
-  if (!entry) return null;
   cache.delete(key);
-  return Date.now() - entry.at < DATA_TTL_MS ? entry.promise : null;
+  if (entry && Date.now() - entry.at < DATA_TTL_MS) {
+    return loader ? entry.promise.catch(() => loader()) : entry.promise;
+  }
+  return loader ? loader() : null;
 }
 
 // Descarta datos y fotos ya adelantados (p. ej. tras crear un pedido, que cambia el stock).
@@ -57,7 +60,7 @@ export function warmImage(url, spec) {
   warmedImages.add(key);
   const img = new Image();
   img.decoding = 'async';
-  img.fetchPriority = 'low';
+  img.fetchPriority = 'low'; // donde no existe (Safari < 17.4, Firefox) se ignora
   img.sizes = spec.sizes;
   img.srcset = cldSrcSet(url, spec.widths);
   img.src = cldOptimized(url, spec.width);
@@ -97,7 +100,18 @@ const done = new Set();
 
 // Último `settings` conocido (lo informa RouteWarmup): trae las fotos de Nosotros y Contacto.
 let latestSettings = null;
-export function rememberSettings(settings) { latestSettings = settings; }
+let idleWarmed = false;
+// Vuelve al estado inicial (lo usan los tests).
+export function resetWarmup() { done.clear(); idleWarmed = false; latestSettings = null; }
+
+export function rememberSettings(settings) {
+  latestSettings = settings;
+  // Si los ajustes llegan después del idle, las fotos de Nosotros y Contacto se calientan igual.
+  if (idleWarmed && !shouldSkip() && !isSmallScreen()) {
+    warmSettingsPhoto('/nosotros', settings);
+    warmSettingsPhoto('/contacto', settings);
+  }
+}
 
 // Con intención del visitante (hover, foco, toque): chunk + datos + primeras fotos de esa página.
 export function prefetchRoute(path, settings = latestSettings) {
@@ -113,16 +127,23 @@ function warmSettingsPhoto(path, settings) {
   if (path === '/contacto' && settings?.contactPhotoUrl) warmImage(settings.contactPhotoUrl, CONTACT_PHOTO);
 }
 
-// En idle, tras la carga de la home: chunks y datos de todas las secciones principales y solo la primera foto
-// de cada una (un par de KB de JS y unas decenas de KB de imagen, en baja prioridad). Se ejecuta una vez.
+// En pantallas chicas (datos móviles) el idle no baja fotos: solo chunks y datos. Con intención sí.
+function isSmallScreen() {
+  return typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(max-width: 767px)').matches;
+}
+
+// En idle, tras la carga de la home: chunks y datos de todas las secciones principales y, en pantallas grandes,
+// la primera foto de cada una (en baja prioridad). Se ejecuta una vez.
 export function warmPublicRoutes(settings = latestSettings) {
   if (shouldSkip()) return;
+  idleWarmed = true;
+  const photos = isSmallScreen() ? 0 : 1;
   Object.keys(ROUTES).forEach((path) => {
     if (done.has(path)) return;
     done.add(path);
     const route = ROUTES[path];
     route.chunk?.().catch(() => {});
-    route.run?.(1).catch(() => {});
-    warmSettingsPhoto(path, settings);
+    route.run?.(photos).catch(() => {});
+    if (photos) warmSettingsPhoto(path, settings);
   });
 }

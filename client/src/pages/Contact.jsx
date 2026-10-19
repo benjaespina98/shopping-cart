@@ -153,7 +153,7 @@ export default function Contact() {
         {/* Left — contact info */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
           {contactSettings.contactPhotoUrl && (
-            <Photo src={contactSettings.contactPhotoUrl} label="Nuestro local" height={180} priority
+            <Photo src={contactSettings.contactPhotoUrl} label="Nuestro local" height={180}
               sizes={CONTACT_PHOTO.sizes} srcSetWidths={CONTACT_PHOTO.widths} />
           )}
 

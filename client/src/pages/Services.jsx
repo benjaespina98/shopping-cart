@@ -16,7 +16,7 @@ export default function Services() {
 
   useEffect(() => {
     // Si la sección se precalentó (ver utils/routePrefetch.js) los datos ya están; si no, se piden como siempre.
-    (takePrefetched('services') || servicesAPI.getAll())
+    takePrefetched('services', () => servicesAPI.getAll())
       .then(({ data }) => { if (data?.length > 0) setRows(data); })
       .catch(() => {})
       .finally(() => setLoading(false));

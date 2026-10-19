@@ -11,7 +11,7 @@ export default function Projects() {
   const [lightboxIndex, setLightboxIndex] = useState(null);
 
   useEffect(() => {
-    (takePrefetched('projects') || projectsAPI.getAll())
+    takePrefetched('projects', () => projectsAPI.getAll())
       .then(({ data }) => setProjects(data))
       .catch(() => {})
       .finally(() => setLoading(false));

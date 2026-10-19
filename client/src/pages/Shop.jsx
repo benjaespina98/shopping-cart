@@ -93,7 +93,7 @@ export default function Shop() {
       if (sort)             params.sort      = sort;
       // La primera carga sin filtros puede venir precalentada (utils/routePrefetch.js, mismos parámetros).
       const firstLoad = page === 1 && !selectedCategory && !debouncedSearch && !sort;
-      const { data } = await ((firstLoad && takePrefetched('products')) || productsAPI.getAll(params));
+      const { data } = await (firstLoad ? takePrefetched('products', () => productsAPI.getAll(params)) : productsAPI.getAll(params));
       setProducts(data.products);
       setTotalPages(data.pages);
       setTotalProducts(data.total ?? data.products.length);

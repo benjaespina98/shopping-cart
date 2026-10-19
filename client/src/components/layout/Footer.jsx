@@ -32,7 +32,6 @@ function FooterLink({ to, label }) {
     onMouseEnter: (e) => { linkHover(e, true); prefetchRoute(to); },
     onMouseLeave: (e) => linkHover(e, false),
     onFocus: () => prefetchRoute(to),
-    onTouchStart: () => prefetchRoute(to),
   };
 
   return to.startsWith('/')

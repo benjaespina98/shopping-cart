@@ -27,7 +27,6 @@ function NavItem({ to, label, end, onClick, mobile = false }) {
       onMouseEnter={() => { setHovered(true); prefetchRoute(to); }}
       onMouseLeave={() => setHovered(false)}
       onFocus={() => prefetchRoute(to)}
-      onTouchStart={() => prefetchRoute(to)}
       style={({ isActive }) => ({
         border: 'none', cursor: 'pointer',
         fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: 15,

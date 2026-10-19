@@ -3,7 +3,7 @@ import { render } from '@testing-library/react';
 import { Photo } from '../design-system/Photo';
 import { SERVICE_PHOTO, PROJECT_PHOTO, PRODUCT_CARD_PHOTO } from './imageSpecs';
 import {
-  prefetchData, takePrefetched, clearPrefetchCache, warmImage, prefetchRoute, warmPublicRoutes, rememberSettings,
+  prefetchData, takePrefetched, clearPrefetchCache, warmImage, prefetchRoute, warmPublicRoutes, rememberSettings, resetWarmup,
 } from './routePrefetch';
 import { servicesAPI, projectsAPI, productsAPI } from '../services/api';
 
@@ -26,6 +26,7 @@ let warmed;
 const RealImage = globalThis.Image;
 beforeEach(() => {
   clearPrefetchCache();
+  resetWarmup();
   vi.clearAllMocks();
   warmed = [];
   globalThis.Image = class {
@@ -50,6 +51,16 @@ describe('caché de datos precalentados', () => {
     await falla.catch(() => {});
     await Promise.resolve();
     expect(takePrefetched('y')).toBeNull();
+  });
+
+  it('con loader: si el precalentado falla la página pide lo suyo; sin datos vigentes también', async () => {
+    prefetchData('k', () => Promise.reject(new Error('red')));
+    const loader = vi.fn(() => Promise.resolve('fresco'));
+    await expect(takePrefetched('k', loader)).resolves.toBe('fresco');
+    expect(loader).toHaveBeenCalledTimes(1);
+
+    await expect(takePrefetched('nada', loader)).resolves.toBe('fresco');
+    expect(loader).toHaveBeenCalledTimes(2);
   });
 
   it('vence a los 30 segundos', () => {
@@ -133,6 +144,30 @@ describe('prefetchRoute / warmPublicRoutes', () => {
     Object.defineProperty(navigator, 'connection', { configurable: true, value: { effectiveType: '2g' } });
     prefetchRoute('/servicios');
     expect(servicesAPI.getAll).not.toHaveBeenCalled();
+  });
+
+  it('en pantallas chicas el idle no baja fotos (solo chunks y datos); con intención sí', async () => {
+    window.matchMedia = vi.fn(() => ({ matches: true }));
+    try {
+      rememberSettings({ aboutPhotoUrl: CLD('about') });
+      warmPublicRoutes();
+      await vi.waitFor(() => expect(servicesAPI.getAll).toHaveBeenCalledTimes(1));
+      await Promise.resolve();
+      expect(warmed).toHaveLength(0);
+
+      prefetchRoute('/servicios');
+      await vi.waitFor(() => expect(warmed.length).toBeGreaterThan(0));
+    } finally {
+      delete window.matchMedia;
+    }
+  });
+
+  it('si los ajustes llegan después del idle, igual se calientan las fotos de Nosotros y Contacto', async () => {
+    warmPublicRoutes();
+    await vi.waitFor(() => expect(servicesAPI.getAll).toHaveBeenCalled());
+    const antes = warmed.length;
+    rememberSettings({ aboutPhotoUrl: CLD('about2'), contactPhotoUrl: CLD('contact2') });
+    expect(warmed.length).toBe(antes + 2);
   });
 
   it('en idle calienta una sola foto por sección y las de Nosotros/Contacto, una única vez', async () => {

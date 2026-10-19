@@ -5,9 +5,6 @@ import CldImage from './CldImage';
 import { notify } from '../../utils/notify';
 import { PRODUCT_CARD_PHOTO } from '../../utils/imageSpecs';
 
-// Anchos reales de la tarjeta en la grilla (1 / 2 / 3 columnas) — pedir más que esto
-// era lo que hacía que la foto tardara en aparecer.
-
 function ProductCard({ product, inCartQuantity = 0, onOpenDetail, priority = false }) {
   const { addItem } = useCart();
   const [qty, setQty] = useState(1);
