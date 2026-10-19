@@ -5,6 +5,7 @@ import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import PublicLayout from './PublicLayout';
 
 vi.mock('./Navbar', () => ({ default: () => <nav aria-label="Principal"><a href="/tienda">Tienda</a></nav> }));
+vi.mock('./RouteWarmup', () => ({ default: () => null }));
 vi.mock('./Footer', () => ({ default: () => <footer>pie</footer> }));
 vi.mock('../ui/CartDrawer', () => ({ default: () => <aside aria-label="Carrito" /> }));
 const cartState = vi.hoisted(() => ({ isOpen: false }));

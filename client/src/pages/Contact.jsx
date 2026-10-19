@@ -7,6 +7,7 @@ import { Button } from '../design-system/Button';
 import { Card } from '../design-system/Card';
 import { Input } from '../design-system/Input';
 import { Photo } from '../design-system/Photo';
+import { CONTACT_PHOTO } from '../utils/imageSpecs';
 import Honeypot from '../components/ui/Honeypot';
 import { useReveal } from '../hooks/useReveal';
 import { useSettings } from '../context/SettingsContext';
@@ -153,7 +154,7 @@ export default function Contact() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
           {contactSettings.contactPhotoUrl && (
             <Photo src={contactSettings.contactPhotoUrl} label="Nuestro local" height={180}
-              sizes="(max-width: 767px) calc(100vw - 40px), 340px" srcSetWidths={[340, 520, 700]} />
+              sizes={CONTACT_PHOTO.sizes} srcSetWidths={CONTACT_PHOTO.widths} />
           )}
 
           <Card padding="lg">

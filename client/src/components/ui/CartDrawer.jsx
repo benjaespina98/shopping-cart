@@ -5,6 +5,7 @@ import CldImage from './CldImage';
 import Honeypot from './Honeypot';
 import { ordersAPI } from '../../services/api';
 import { notify } from '../../utils/notify';
+import { clearPrefetchCache } from '../../utils/routePrefetch';
 
 export default function CartDrawer() {
   const { items, removeItem, updateQty, clearCart, totalItems, totalPrice, isOpen, toggleCart } =
@@ -98,6 +99,8 @@ export default function CartDrawer() {
 
       clearCart();
       toggleCart();
+      // El pedido descuenta stock: lo que la Tienda tenía precalentado quedó viejo.
+      clearPrefetchCache();
       notify.success('¡Pedido enviado a WhatsApp!');
     } catch (err) {
       if (popup && !popup.closed) popup.close();
