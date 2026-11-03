@@ -6,8 +6,8 @@ import { useReveal } from '../../hooks/useReveal';
 // copia del mismo markup con distinto texto; ahora el texto es prop y el diseño uno solo.
 // Sin `secondaryLabel`, la segunda acción es WhatsApp: es el canal más directo para consultar.
 export default function CtaBlock({
-  title = '¿Pensando en tu piscina?',
-  text = 'Contanos tu idea y te respondemos en 48 horas con un presupuesto sin compromiso.',
+  title = 'Hablemos de tu proyecto',
+  text = 'Contanos qué necesitás y armamos un presupuesto a tu medida.',
   primaryLabel = 'Pedir presupuesto',
   primaryTo = '/presupuesto',
   secondaryLabel,
@@ -29,7 +29,7 @@ export default function CtaBlock({
             {secondaryLabel ? (
               <Button variant="outline" inverse size="lg" to={secondaryTo}>{secondaryLabel}</Button>
             ) : (
-              <WhatsAppButton inverse size="lg" location="cta">Escribinos por WhatsApp</WhatsAppButton>
+              <WhatsAppButton inverse size="lg" location="cta">Consultar por WhatsApp</WhatsAppButton>
             )}
             <Button variant="primary" size="lg" to={primaryTo}>{primaryLabel}</Button>
           </div>

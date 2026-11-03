@@ -36,7 +36,7 @@
 /* ── Trust strip (stats) ───────────────────────────────── */
 .ps-stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(var(--ps-stat-cols, 4), 1fr);
   gap: 32px;
 }
 .ps-stat-item { border-left: 1px solid var(--divider); }
@@ -45,6 +45,8 @@
   .ps-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 28px 14px; }
   .ps-stat-item  { border-left: none; border-top: 1px solid var(--divider); padding-top: 20px !important; }
   .ps-stat-item:nth-child(1), .ps-stat-item:nth-child(2) { border-top: none; padding-top: 0 !important; }
+  /* Con una cantidad impar de cifras, la última ocupa todo el ancho en vez de quedar suelta a la izquierda. */
+  .ps-stat-item:last-child:nth-child(odd) { grid-column: 1 / -1; }
 }
 
 /* ── Services cards (home) ─────────────────────────────── */

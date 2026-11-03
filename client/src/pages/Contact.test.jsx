@@ -114,7 +114,7 @@ describe('Contact — validación del formulario', () => {
     const url = new URL(link.getAttribute('href'));
     expect(url.origin).toBe('https://wa.me');
     const text = url.searchParams.get('text');
-    expect(text).toContain('Hola! Soy Juana');
+    expect(text).toContain('Hola, soy Juana');
     expect(text).toContain('3534224605');
     expect(text).toContain('Quiero una piscina');
     expect(open).not.toHaveBeenCalled();

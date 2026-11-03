@@ -2,15 +2,15 @@
 // sin mensaje: quien tocaba el botón llegaba a un chat vacío, sin contexto, y el número del admin
 // (texto libre) entraba sin sanear a la URL.
 
-export const WHATSAPP_GREETING = 'Hola! Quiero consultar por una piscina.';
+export const WHATSAPP_GREETING = 'Hola, quiero consultar por una piscina.';
 
 // Mensaje inicial según la sección desde la que se escribe: quien atiende sabe de qué se trata.
 const CONTEXT_MESSAGES = {
-  '/servicios': 'Hola! Estuve viendo sus servicios y quiero hacer una consulta.',
-  '/proyectos': 'Hola! Vi los proyectos que realizaron y quiero consultar por una piscina.',
-  '/tienda': 'Hola! Quiero consultar por productos de la tienda.',
+  '/servicios': 'Hola, estuve viendo sus servicios y quiero hacer una consulta.',
+  '/proyectos': 'Hola, vi los proyectos que realizaron y quiero consultar por una piscina.',
+  '/tienda': 'Hola, quiero consultar por productos de la tienda.',
   '/nosotros': WHATSAPP_GREETING,
-  '/presupuesto': 'Hola! Quiero pedir un presupuesto.',
+  '/presupuesto': 'Hola, quiero pedir un presupuesto.',
   '/contacto': WHATSAPP_GREETING,
 };
 

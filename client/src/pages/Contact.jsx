@@ -60,7 +60,7 @@ export default function Contact() {
   };
 
   const getTextMessage = () =>
-    `Hola! Soy ${form.name} (${form.phone}${form.email ? `, ${form.email}` : ''}).\n\n${form.message}`;
+    `Hola, soy ${form.name} (${form.phone}${form.email ? `, ${form.email}` : ''}).\n\n${form.message}`;
 
   const setField = (field) => (e) => {
     setForm((f) => ({ ...f, [field]: e.target.value }));
@@ -150,8 +150,8 @@ export default function Contact() {
       <div ref={reveal.ref} className={reveal.className}>
       <PageHeader
         eyebrow="Contacto"
-        title="¿Tenés una consulta?"
-        lead="Escribinos por WhatsApp o email. Te respondemos directamente, sin intermediarios."
+        title="Hablemos de tu proyecto"
+        lead="Escribinos por WhatsApp o por email, o visitanos en nuestro local."
       />
 
       <div className="ps-quote-grid" style={{ maxWidth: 1000, margin: '0 auto' }}>
@@ -214,9 +214,7 @@ export default function Contact() {
             <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 700, color: 'var(--text-strong)', marginBottom: 'var(--space-1)' }}>
               Seguinos en redes
             </h2>
-            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 'var(--space-4)' }}>
-              Mirá nuestras últimas obras terminadas y en construcción.
-            </p>
+            <div style={{ marginBottom: 'var(--space-4)' }} />
             <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
               {SOCIAL_LINKS.map(({ href, label, Icon }) => (
                 <Button key={label} variant="outline" size="sm" href={href} target="_blank" rel="noopener noreferrer"
@@ -233,9 +231,7 @@ export default function Contact() {
           <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 700, color: 'var(--text-strong)', marginBottom: 'var(--space-1)' }}>
             Envianos tu consulta
           </h2>
-          <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 'var(--space-5)' }}>
-            Armamos el mensaje automáticamente con tus datos.
-          </p>
+          <div style={{ marginBottom: 'var(--space-5)' }} />
 
           <Honeypot value={hp} onChange={(e) => setHp(e.target.value)} />
 
@@ -298,11 +294,8 @@ export default function Contact() {
           <div className="ps-eyebrow" style={{ marginBottom: 'var(--space-2)' }}>Showroom</div>
           <h2 style={{ fontSize: 'clamp(20px, 4.5vw, 30px)', fontFamily: 'var(--font-display)',
                        color: 'var(--text-strong)', marginBottom: 'var(--space-2)' }}>
-            Visitanos en persona
+            Nuestro local
           </h2>
-          <p style={{ fontSize: 15, color: 'var(--text-body)', lineHeight: 1.6 }}>
-            Te esperamos en nuestro local con atención personalizada.
-          </p>
         </div>
 
         <Card padding="none" style={{ overflow: 'hidden' }}>

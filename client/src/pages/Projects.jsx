@@ -89,7 +89,7 @@ export default function Projects() {
       <div style={{ marginTop: 64 }}>
         <CtaBlock
           title="¿Querés una piscina como estas?"
-          text="Contanos qué tenés en mente y te respondemos en 48 horas con un presupuesto sin compromiso."
+          text="Contanos qué necesitás y armamos un presupuesto a tu medida."
         />
       </div>
     </section>

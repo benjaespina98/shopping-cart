@@ -54,11 +54,11 @@ describe('Landing — sección de proyectos destacados', () => {
     expect(whatsapp).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
-  it('muestra todas las líneas de trabajo de respaldo, incluida la fibra INDUPLAST', () => {
+  it('muestra todas las líneas de trabajo de respaldo, incluida la fibra INDUSPLAST', () => {
     projectsAPI.getAll.mockReturnValue(new Promise(() => {}));
     renderLanding();
 
-    expect(screen.getByRole('heading', { name: 'Piscinas de fibra INDUPLAST' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Piscinas de fibra INDUSPLAST' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Climatización' })).toBeInTheDocument();
   });
 

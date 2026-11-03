@@ -17,8 +17,8 @@ export const FALLBACK_SERVICES = [
     cta: 'Pedir presupuesto',
   },
   {
-    title: 'Piscinas de fibra INDUPLAST', tag: 'Fibra', tone: 'teal', variant: 'soft',
-    description: 'Trabajamos con piscinas de fibra INDUPLAST. Consultanos por los modelos y medidas disponibles y te ayudamos a elegir el que mejor se adapte a tu espacio.',
+    title: 'Piscinas de fibra INDUSPLAST', tag: 'Fibra', tone: 'teal', variant: 'soft',
+    description: 'Trabajamos con piscinas de fibra INDUSPLAST. Consultanos por los modelos y las medidas disponibles.',
     bullets: [],
     cta: 'Consultar modelos',
   },
@@ -26,7 +26,7 @@ export const FALLBACK_SERVICES = [
     title: 'Revestimientos', tag: 'Renovación', tone: 'teal', variant: 'soft',
     description: 'Renová la estética y la protección de tu piscina con revestimientos de calidad. Trabajamos con materiales resistentes y acabados que combinan diseño, durabilidad y fácil mantenimiento.',
     bullets: ['Cerámicos', 'Travertino', 'Acabados resistentes y de larga vida útil'],
-    cta: 'Quiero renovar mi piscina',
+    cta: 'Pedir presupuesto',
   },
   {
     title: 'Cercos perimetrales', tag: 'Seguridad', tone: 'teal', variant: 'soft',
@@ -38,11 +38,11 @@ export const FALLBACK_SERVICES = [
     title: 'Cobertores', tag: 'Protección', tone: 'teal', variant: 'soft',
     description: 'Protegé tu piscina durante todo el año y reducí el mantenimiento diario. Contamos con cobertores pensados para mejorar la seguridad, conservar la temperatura y mantener el agua limpia por más tiempo.',
     bullets: ['Menor evaporación y pérdida de calor', 'Más seguridad y menos mantenimiento'],
-    cta: 'Quiero asesoramiento',
+    cta: 'Consultar opciones',
   },
   {
     title: 'Climatización', tag: 'Confort', tone: 'teal', variant: 'soft',
-    description: 'Soluciones de climatización para tu piscina. Contanos cómo la usás y te orientamos sobre la opción más adecuada.',
+    description: 'Soluciones de climatización para tu piscina. Consultanos por las opciones disponibles.',
     bullets: [],
     cta: 'Consultar opciones',
   },

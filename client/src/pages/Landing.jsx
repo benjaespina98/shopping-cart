@@ -92,16 +92,13 @@ export default function Landing() {
             <p className="ps-hero-subtitle"
               style={{ fontSize: 'clamp(15px, 4vw, 18px)', lineHeight: 1.65,
                        color: 'var(--text-inverse-muted)', maxWidth: 480, marginBottom: 'var(--space-6)' }}>
-              Construimos piscinas de hormigón y de fibra INDUPLAST. También instalamos revestimientos, cercos,
-              cobertores y climatización, y tenemos accesorios en la tienda.
+              Construimos piscinas de hormigón y de fibra INDUSPLAST. También trabajamos con revestimientos,
+              cercos, cobertores y climatización, y ofrecemos accesorios en nuestra tienda.
             </p>
             <div className="ps-hero-btns" style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
               <Button variant="primary" size="lg" to="/presupuesto">Pedir presupuesto</Button>
-              <WhatsAppButton inverse size="lg" text={WHATSAPP_GREETING} location="hero">Escribinos por WhatsApp</WhatsAppButton>
+              <WhatsAppButton inverse size="lg" text={WHATSAPP_GREETING} location="hero">Consultar por WhatsApp</WhatsAppButton>
             </div>
-            <p style={{ marginTop: 'var(--space-4)', fontSize: 14, color: 'var(--text-inverse-faint)' }}>
-              Presupuesto sin compromiso. Te respondemos en 48 horas.
-            </p>
           </div>
           <div className="ps-hero-photo ps-hero-photo--show">
             <div style={{
@@ -137,7 +134,7 @@ export default function Landing() {
       {/* LÍNEAS DE TRABAJO */}
       <section ref={servicesReveal.ref} className={servicesReveal.className} style={{ padding: 'var(--space-9) var(--space-5)' }}>
         <div style={{ maxWidth: 1120, margin: '0 auto' }}>
-          <SectionHeading eyebrow="Qué hacemos" title="Todo para construir y cuidar tu piscina" align="left"
+          <SectionHeading eyebrow="Servicios" title="Construcción, renovación y equipamiento" align="left"
             action={<Button variant="outline" to="/servicios">Ver todos los servicios</Button>} />
           <div className="ps-services-grid" style={{ '--ps-cols': serviceColumns(services.length) }}>
             {services.map((s) => (

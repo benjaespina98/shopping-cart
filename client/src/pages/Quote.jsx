@@ -1,9 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { FiUser, FiPhone, FiMail, FiMapPin, FiSend, FiCheck, FiClock, FiShield, FiMessageSquare, FiTag, FiChevronDown } from 'react-icons/fi';
+import { FiUser, FiPhone, FiMail, FiMapPin, FiSend, FiMessageSquare, FiTag, FiChevronDown } from 'react-icons/fi';
 import { Button } from '../design-system/Button';
 import { Card } from '../design-system/Card';
-import { Badge } from '../design-system/Badge';
 import PageHeader from '../components/sections/PageHeader';
 import WhatsAppButton from '../components/ui/WhatsAppButton';
 import { FALLBACK_SERVICE_NAMES } from '../data/fallbackServices';
@@ -19,12 +18,6 @@ import { isValidEmail, isValidPhone } from '../utils/validation';
 // Mismos nombres que las líneas de trabajo del sitio (ver data/fallbackServices.js).
 const FALLBACK_TYPES = FALLBACK_SERVICE_NAMES;
 const OTHER_TYPE = 'Otra consulta';
-
-const STEPS = [
-  { Icon: FiSend,  text: 'Contanos tu proyecto con el formulario' },
-  { Icon: FiClock, text: 'Nos contactamos con vos dentro de 48 horas' },
-  { Icon: FiCheck, text: 'Recibís tu presupuesto sin compromiso' },
-];
 
 export default function Quote() {
   const [searchParams] = useSearchParams();
@@ -127,33 +120,14 @@ export default function Quote() {
         <div>
           <PageHeader
             align="left"
-            eyebrow="Presupuesto sin compromiso"
+            eyebrow="Presupuesto"
             title="Contanos tu proyecto"
-            lead="Completá el formulario y nos contactamos en 48 horas. Sin costo y sin compromiso."
+            lead="Completá el formulario y nos ponemos en contacto con vos."
             style={{ marginBottom: 'var(--space-6)' }}
           />
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', marginBottom: 'var(--space-6)' }}>
-            {STEPS.map(({ Icon, text }, i) => (
-              <div key={text} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-                <span style={{
-                  width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  background: 'var(--teal-50)', color: 'var(--brand-primary)',
-                }}>
-                  <Icon size={15} />
-                </span>
-                <span style={{ fontSize: 14, color: 'var(--text-body)', fontWeight: 500 }}>
-                  <strong style={{ color: 'var(--text-strong)' }}>{i + 1}.</strong> {text}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          <Badge tone="teal" dot>Respuesta en 48 h</Badge>
-
           {/* Quien prefiere no completar un formulario tiene una salida directa. */}
-          <div style={{ marginTop: 'var(--space-6)', paddingTop: 'var(--space-5)', borderTop: '1px solid var(--border-subtle)' }}>
+          <div style={{ paddingTop: 'var(--space-5)', borderTop: '1px solid var(--border-subtle)' }}>
             <p style={{ fontSize: 15, color: 'var(--text-body)', marginBottom: 'var(--space-3)' }}>
               ¿Preferís escribirnos directamente?
             </p>
@@ -172,7 +146,7 @@ export default function Quote() {
               <h2 ref={thanksRef} tabIndex={-1} style={{ fontSize: 26, marginBottom: 10, fontFamily: 'var(--font-display)',
                            color: 'var(--text-strong)', outline: 'none' }}>¡Gracias!</h2>
               <p style={{ color: 'var(--text-muted)', marginBottom: 28, fontSize: 15, lineHeight: 1.6 }}>
-                Recibimos tu solicitud. Te vamos a contactar dentro de las próximas 48 horas.
+                Recibimos tu solicitud. Nos vamos a comunicar con vos a la brevedad.
               </p>
               <div style={{ display: 'flex', gap: 'var(--space-3)', justifyContent: 'center', flexWrap: 'wrap' }}>
                 <Button variant="secondary" to="/">Volver al inicio</Button>
@@ -182,16 +156,6 @@ export default function Quote() {
           ) : (
             <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
               <Honeypot value={hp} onChange={(e) => setHp(e.target.value)} />
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 'var(--space-1)' }}>
-                  <FiShield size={14} style={{ color: 'var(--brand-accent-press)' }} />
-                  <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 700, color: 'var(--text-strong)' }}>
-                    Tus datos de contacto
-                  </h2>
-                </div>
-                <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>Usamos esta información únicamente para responder tu consulta.</p>
-              </div>
-
               <div>
                 <label htmlFor="quote-type" style={{ fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 14,
                                 color: 'var(--text-strong)', display: 'block', marginBottom: 'var(--space-2)' }}>

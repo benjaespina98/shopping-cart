@@ -6,7 +6,7 @@ export const SITE_NAME = 'Playa & Sol Piscinas';
 export const PAGE_META = {
   '/': {
     title: 'Playa & Sol Piscinas | Piscinas en Villa María, Córdoba',
-    description: 'Piscinas de hormigón y de fibra INDUPLAST, revestimientos, cercos, cobertores, climatización y accesorios. Más de 30 años en Villa María, Córdoba.',
+    description: 'Piscinas de hormigón y de fibra INDUSPLAST, revestimientos, cercos, cobertores, climatización y accesorios. Más de 30 años en Villa María, Córdoba.',
   },
   '/tienda': {
     title: 'Tienda | Playa & Sol Piscinas',
@@ -14,7 +14,7 @@ export const PAGE_META = {
   },
   '/servicios': {
     title: 'Servicios de piscinas | Playa & Sol Piscinas',
-    description: 'Piscinas de hormigón y de fibra INDUPLAST, revestimientos, cercos, cobertores y climatización en Villa María, Córdoba. Pedí tu presupuesto sin compromiso.',
+    description: 'Piscinas de hormigón y de fibra INDUSPLAST, revestimientos, cercos, cobertores y climatización en Villa María, Córdoba. Pedí tu presupuesto.',
   },
   '/proyectos': {
     title: 'Obras y proyectos de piscinas | Playa & Sol Piscinas',
@@ -26,7 +26,7 @@ export const PAGE_META = {
   },
   '/presupuesto': {
     title: 'Pedí tu presupuesto de piscina | Playa & Sol Piscinas',
-    description: 'Contanos tu proyecto y recibí tu presupuesto sin compromiso. Nos contactamos con vos dentro de 48 horas.',
+    description: 'Pedí tu presupuesto de piscina en Villa María, Córdoba. Contanos tu proyecto y nos ponemos en contacto con vos.',
   },
   '/contacto': {
     title: 'Contacto y showroom | Playa & Sol Piscinas',

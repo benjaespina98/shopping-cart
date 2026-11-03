@@ -326,7 +326,7 @@ export default function Shop() {
                 ¿No encontrás lo que buscás?
               </h2>
               <p style={{ fontSize: 15, color: 'var(--text-body)', lineHeight: 1.6 }}>
-                Consultanos por el producto o por la disponibilidad y te respondemos por WhatsApp.
+                Escribinos por WhatsApp para consultar por un producto o su disponibilidad.
               </p>
             </div>
             <WhatsAppButton text={whatsappMessageFor('/tienda')} location="tienda">Consultar por WhatsApp</WhatsAppButton>

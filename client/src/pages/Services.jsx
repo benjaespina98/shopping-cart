@@ -28,7 +28,7 @@ export default function Services() {
         <PageHeader
           eyebrow="Servicios"
           title="De la primera idea al último baño"
-          lead="Construimos piscinas de hormigón y de fibra INDUPLAST, y nos ocupamos de revestimientos, cercos, cobertores y climatización."
+          lead="Construimos piscinas de hormigón y de fibra INDUSPLAST, y nos ocupamos de revestimientos, cercos, cobertores y climatización."
           style={{ marginBottom: 52 }}
         />
 
@@ -86,7 +86,7 @@ export default function Services() {
                       aria-label={`${r.cta || 'Pedir presupuesto'}: ${r.title}`}>
                       {r.cta || 'Pedir presupuesto'}
                     </Button>
-                    <WhatsAppButton text={`Hola! Quiero consultar por: ${r.title}.`} location="servicios"
+                    <WhatsAppButton text={`Hola, quiero consultar por: ${r.title}.`} location="servicios"
                       aria-label={`Consultar por WhatsApp: ${r.title}`}>
                       Consultar por WhatsApp
                     </WhatsAppButton>
@@ -109,7 +109,7 @@ export default function Services() {
                 Accesorios para tu piscina
               </h2>
               <p style={{ fontSize: 15, color: 'var(--text-body)', lineHeight: 1.6 }}>
-                Mirá los productos disponibles y armá tu pedido para finalizarlo por WhatsApp.
+                Consultá los productos disponibles y armá tu pedido: lo finalizás por WhatsApp.
               </p>
             </div>
             <Button variant="outline" to="/tienda">Ver la tienda</Button>
@@ -121,8 +121,8 @@ export default function Services() {
           terminan ofreciendo el mismo próximo paso. */}
       <div style={{ marginTop: 64 }}>
         <CtaBlock
-          title="¿Cuál de estos necesitás?"
-          text="Contanos qué tenés en mente y te armamos un presupuesto sin compromiso."
+          title="¿Qué servicio te interesa?"
+          text="Contanos qué necesitás y armamos un presupuesto a tu medida."
           primaryLabel="Pedir presupuesto"
           secondaryLabel="Ver proyectos"
           secondaryTo="/proyectos"
