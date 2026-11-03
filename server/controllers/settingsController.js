@@ -3,9 +3,22 @@ import Settings from '../models/Settings.js';
 import User from '../models/User.js';
 import { cloudinary } from '../config/cloudinary.js';
 import { writeAuditLog } from '../utils/auditLogger.js';
-import { MIN_PASSWORD_LENGTH } from '../utils/validation.js';
+import { MIN_PASSWORD_LENGTH, hasControlChars, isValidEmail } from '../utils/validation.js';
 
 const VALID_THEMES = ['default', 'elegante', 'moderno'];
+
+// Estos campos llegan al sitio público como `href` (tel:, wa.me, mailto:) o como texto: se validan el
+// formato y el largo acá, no solo en el panel. Un valor como "javascript:..." o "//otro-sitio" no pasa.
+const WHATSAPP_RE = /^\d{8,15}$/;
+const PHONE_LINK_RE = /^tel:\+?[\d-]{6,20}$/;
+
+const badRequest = (res, message) => {
+  res.status(400);
+  throw new Error(message);
+};
+
+// WhatsApp admite que se pegue con +, espacios o guiones: se normaliza a solo dígitos.
+const normalizeWhatsapp = (value) => String(value).replace(/[\s+()-]/g, '');
 
 const defaultSettings = {
   singletonKey: 'main',
@@ -88,12 +101,43 @@ export const updateAdminSettings = asyncHandler(async (req, res) => {
   if (theme && VALID_THEMES.includes(theme)) {
     settings.theme = theme;
   }
+  if (contactEmail && !isValidEmail(contactEmail)) badRequest(res, 'El email de contacto no es válido');
+
+  const whatsappDigits = whatsappNumber ? normalizeWhatsapp(whatsappNumber) : '';
+  if (whatsappDigits && !WHATSAPP_RE.test(whatsappDigits)) {
+    badRequest(res, 'El WhatsApp debe tener entre 8 y 15 dígitos, con código de país (ej: 5493534224605)');
+  }
+
+  const phoneLink = phoneNumberLink.replace(/\s+/g, '');
+  if (phoneLink && !PHONE_LINK_RE.test(phoneLink)) {
+    badRequest(res, 'El enlace del teléfono debe tener el formato tel:+543534224605');
+  }
+  if (phoneNumberDisplay && (phoneNumberDisplay.length > 40 || hasControlChars(phoneNumberDisplay))) {
+    badRequest(res, 'El teléfono a mostrar no es válido (máximo 40 caracteres)');
+  }
+
+  let secondaryLabel;
+  if (secondaryContactLabel !== undefined) {
+    secondaryLabel = String(secondaryContactLabel).trim();
+    if (secondaryLabel.length > 80 || hasControlChars(secondaryLabel)) {
+      badRequest(res, 'La etiqueta del contacto secundario no es válida (máximo 80 caracteres)');
+    }
+  }
+
+  let secondaryWhatsapp;
+  if (secondaryContactWhatsapp !== undefined) {
+    secondaryWhatsapp = normalizeWhatsapp(String(secondaryContactWhatsapp).trim());
+    if (secondaryWhatsapp && !WHATSAPP_RE.test(secondaryWhatsapp)) {
+      badRequest(res, 'El WhatsApp secundario debe tener entre 8 y 15 dígitos, o quedar vacío');
+    }
+  }
+
   settings.contactEmail = contactEmail || settings.contactEmail;
-  settings.whatsappNumber = whatsappNumber || settings.whatsappNumber;
+  settings.whatsappNumber = whatsappDigits || settings.whatsappNumber;
   settings.phoneNumberDisplay = phoneNumberDisplay || settings.phoneNumberDisplay;
-  settings.phoneNumberLink = phoneNumberLink || settings.phoneNumberLink;
-  if (secondaryContactLabel !== undefined) settings.secondaryContactLabel = String(secondaryContactLabel).trim();
-  if (secondaryContactWhatsapp !== undefined) settings.secondaryContactWhatsapp = String(secondaryContactWhatsapp).trim();
+  settings.phoneNumberLink = phoneLink || settings.phoneNumberLink;
+  if (secondaryLabel !== undefined) settings.secondaryContactLabel = secondaryLabel;
+  if (secondaryWhatsapp !== undefined) settings.secondaryContactWhatsapp = secondaryWhatsapp;
   settings.businessHours = sanitizeBusinessHours(req.body?.businessHours);
 
   await settings.save();

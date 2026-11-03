@@ -84,6 +84,9 @@ export default function CartDrawer() {
     if (items.length === 0) return;
 
     const popup = window.open('', '_blank');
+    // La pestaña se abre vacía (dentro del gesto del usuario, para que no la bloquee el navegador) y recién
+    // después navega a WhatsApp: sin `noopener` quedaba con acceso a esta ventana vía window.opener.
+    if (popup) popup.opener = null;
     setSending(true);
     try {
       const { data } = await ordersAPI.create({
