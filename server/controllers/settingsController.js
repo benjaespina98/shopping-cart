@@ -11,6 +11,8 @@ const VALID_THEMES = ['default', 'elegante', 'moderno'];
 // formato y el largo acá, no solo en el panel. Un valor como "javascript:..." o "//otro-sitio" no pasa.
 const WHATSAPP_RE = /^\d{8,15}$/;
 const PHONE_LINK_RE = /^tel:\+?[\d-]{6,20}$/;
+// El email se publica dentro de un mailto:: sin `? & = / % #` en la parte local, que agregarían parámetros (bcc, cc, body).
+const CONTACT_EMAIL_RE = /^[A-Za-z0-9._+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)+$/;
 
 const badRequest = (res, message) => {
   res.status(400);
@@ -53,19 +55,25 @@ const sanitizeBusinessHours = (hours) => {
       hours: String(item?.hours || '').trim(),
     }))
     .filter((item) => item.day && item.hours)
+    .filter((item) => item.day.length <= 60 && item.hours.length <= 60)
+    .filter((item) => !hasControlChars(item.day) && !hasControlChars(item.hours))
     .slice(0, 14);
 
   return normalized.length > 0 ? normalized : defaultSettings.businessHours;
 };
 
+// Lo que ya estuviera guardado antes de que existiera la validación (o escrito directo en la base) no se
+// publica si no tiene el formato esperado: el sitio usa estos valores como `href`.
+const onlyIfValid = (value, pattern, fallback) => (pattern.test(String(value ?? '')) ? value : fallback);
+
 const toPublicResponse = (settings) => ({
   theme: settings.theme || 'default',
-  contactEmail: settings.contactEmail,
-  whatsappNumber: settings.whatsappNumber,
+  contactEmail: onlyIfValid(settings.contactEmail, CONTACT_EMAIL_RE, defaultSettings.contactEmail),
+  whatsappNumber: onlyIfValid(settings.whatsappNumber, WHATSAPP_RE, defaultSettings.whatsappNumber),
   phoneNumberDisplay: settings.phoneNumberDisplay,
-  phoneNumberLink: settings.phoneNumberLink,
+  phoneNumberLink: onlyIfValid(settings.phoneNumberLink, PHONE_LINK_RE, defaultSettings.phoneNumberLink),
   secondaryContactLabel: settings.secondaryContactLabel || '',
-  secondaryContactWhatsapp: settings.secondaryContactWhatsapp || '',
+  secondaryContactWhatsapp: onlyIfValid(settings.secondaryContactWhatsapp || '', /^(\d{8,15})?$/, ''),
   contactPhotoUrl: settings.contactPhotoUrl || '',
   aboutPhotoUrl: settings.aboutPhotoUrl || '',
   businessHours: settings.businessHours,
@@ -101,7 +109,9 @@ export const updateAdminSettings = asyncHandler(async (req, res) => {
   if (theme && VALID_THEMES.includes(theme)) {
     settings.theme = theme;
   }
-  if (contactEmail && !isValidEmail(contactEmail)) badRequest(res, 'El email de contacto no es válido');
+  if (contactEmail && !(isValidEmail(contactEmail) && CONTACT_EMAIL_RE.test(contactEmail))) {
+    badRequest(res, 'El email de contacto no es válido (solo letras, números, punto, guion, guion bajo y +)');
+  }
 
   const whatsappDigits = whatsappNumber ? normalizeWhatsapp(whatsappNumber) : '';
   if (whatsappDigits && !WHATSAPP_RE.test(whatsappDigits)) {
@@ -138,7 +148,8 @@ export const updateAdminSettings = asyncHandler(async (req, res) => {
   settings.phoneNumberLink = phoneLink || settings.phoneNumberLink;
   if (secondaryLabel !== undefined) settings.secondaryContactLabel = secondaryLabel;
   if (secondaryWhatsapp !== undefined) settings.secondaryContactWhatsapp = secondaryWhatsapp;
-  settings.businessHours = sanitizeBusinessHours(req.body?.businessHours);
+  // Un guardado parcial (sin horarios) no pisa los horarios cargados.
+  if (req.body?.businessHours !== undefined) settings.businessHours = sanitizeBusinessHours(req.body.businessHours);
 
   await settings.save();
 

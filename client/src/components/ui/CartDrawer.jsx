@@ -94,6 +94,11 @@ export default function CartDrawer() {
         website: hp,
       });
 
+      // El servidor arma esta URL con WHATSAPP_NUMBER; igual se exige que sea de wa.me antes de navegar a ella.
+      if (typeof data.whatsappUrl !== 'string' || !data.whatsappUrl.startsWith('https://wa.me/')) {
+        throw new Error('No pudimos abrir WhatsApp. Intentá de nuevo.');
+      }
+
       if (popup && !popup.closed) {
         popup.location.href = data.whatsappUrl;
       } else {

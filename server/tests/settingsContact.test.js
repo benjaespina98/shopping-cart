@@ -43,6 +43,8 @@ describe('Settings — validación de los datos de contacto', () => {
     ['WhatsApp demasiado largo', { whatsappNumber: '1234567890123456' }],
     ['WhatsApp secundario inválido', { secondaryContactWhatsapp: 'no-es-un-numero' }],
     ['email inválido', { contactEmail: 'esto no es un mail' }],
+    ['email con parámetros de mailto', { contactEmail: 'x?bcc=otro@dominio.com@playaysol.com.ar' }],
+    ['email con ? en la parte local', { contactEmail: 'x?bcc=a@dominio.com' }],
     ['teléfono a mostrar con salto de línea', { phoneNumberDisplay: '3534\n224605' }],
     ['etiqueta demasiado larga', { secondaryContactLabel: 'x'.repeat(81) }],
   ])('rechaza %s y no guarda nada', async (_label, body) => {
@@ -52,6 +54,37 @@ describe('Settings — validación de los datos de contacto', () => {
     expect(res.status).toBe(400);
     const after = await request(app).get('/api/settings/admin').set(adminAuth(token));
     expect(after.body).toEqual(before.body);
+  });
+
+  it('descarta los horarios con caracteres de control o demasiado largos', async () => {
+    const res = await save({
+      businessHours: [
+        { day: 'Lunes\nviernes', hours: '9 a 18' },
+        { day: 'x'.repeat(61), hours: '9 a 18' },
+        { day: 'Sábados', hours: '9:00 - 13:00' },
+      ],
+    });
+
+    expect(res.status).toBe(200);
+    expect(res.body.settings.businessHours).toEqual([{ day: 'Sábados', hours: '9:00 - 13:00' }]);
+  });
+
+  it('un guardado parcial no pisa los horarios cargados', async () => {
+    await save({ businessHours: [{ day: 'Lunes a Sábado', hours: '8:00 - 20:00' }] });
+    const res = await save({ contactEmail: 'ventas@playaysol.com.ar' });
+
+    expect(res.body.settings.businessHours).toEqual([{ day: 'Lunes a Sábado', hours: '8:00 - 20:00' }]);
+  });
+
+  it('no publica valores viejos con formato inválido que ya estuvieran en la base', async () => {
+    const { default: Settings } = await import('../models/Settings.js');
+    await Settings.create({ singletonKey: 'main', phoneNumberLink: 'javascript:alert(1)', whatsappNumber: 'abc', secondaryContactWhatsapp: '//x' });
+
+    const res = await request(app).get('/api/settings/public');
+
+    expect(res.body.phoneNumberLink).toBe('tel:+543534224605');
+    expect(res.body.whatsappNumber).toBe('5493534224605');
+    expect(res.body.secondaryContactWhatsapp).toBe('');
   });
 
   it('un WhatsApp secundario vacío lo quita', async () => {

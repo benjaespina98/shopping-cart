@@ -44,6 +44,29 @@ describe('cloudinaryStorage', () => {
     await expect(handle(cloudinaryStorage({ cloudinary: client, params: {} }))).rejects.toThrow('Invalid image file');
   });
 
+  it('si Cloudinary rechaza la imagen (400) responde con un error 400 propio', async () => {
+    const { client } = fakeClient({ error: { message: 'Invalid image file', http_code: 400 } });
+    const err = await handle(cloudinaryStorage({ cloudinary: client, params: {} })).catch((e) => e);
+
+    expect(err).toBeInstanceOf(Error);
+    expect(err.statusCode).toBe(400);
+  });
+
+  it('si el stream del archivo falla, cierra la subida a Cloudinary y propaga el error', async () => {
+    const sink = new PassThrough();
+    const client = { uploader: { upload_stream: vi.fn(() => sink), destroy: vi.fn() } };
+    const storage = cloudinaryStorage({ cloudinary: client, params: {} });
+    const stream = new PassThrough();
+    const ended = vi.fn();
+    sink.on('finish', ended);
+
+    const result = new Promise((resolve) => storage._handleFile({}, { stream }, (err) => resolve(err)));
+    stream.destroy(new Error('conexión cortada'));
+
+    expect((await result).message).toBe('conexión cortada');
+    expect(ended).toHaveBeenCalled();
+  });
+
   it('borra el archivo subido por public_id cuando multer lo descarta', async () => {
     const { client } = fakeClient({});
     const storage = cloudinaryStorage({ cloudinary: client, params: {} });
