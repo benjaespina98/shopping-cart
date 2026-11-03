@@ -1,29 +1,37 @@
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
 import { productsAPI, projectsAPI, servicesAPI } from '../services/api';
 import ProductCard from '../components/ui/ProductCard';
+import WhatsAppButton from '../components/ui/WhatsAppButton';
 import StatsStrip from '../components/sections/StatsStrip';
 import CtaBlock from '../components/sections/CtaBlock';
+import { SectionHeading } from '../components/sections/PageHeader';
 import { FALLBACK_SERVICES } from '../data/fallbackServices';
 import { useCart } from '../context/CartContext';
 import { useReveal } from '../hooks/useReveal';
 import { consumePrefetch } from '../utils/prefetch';
+import { WHATSAPP_GREETING } from '../utils/whatsapp';
 import { Button } from '../design-system/Button';
 import { Card } from '../design-system/Card';
 import { Badge } from '../design-system/Badge';
 import { Photo } from '../design-system/Photo';
 import { HERO_BLUR_PLACEHOLDER } from '../data/heroFallback';
 
+// Columnas de la grilla de líneas de trabajo según la cantidad de tarjetas, para no dejar una huérfana
+// suelta en la última fila (4 → 4 en fila; 5 y 6 → 3; 7 y 8 → 4).
+const serviceColumns = (count) => {
+  if (count <= 4) return Math.max(count, 1);
+  return count % 4 === 0 || count % 4 === 3 ? 4 : 3;
+};
+
 export default function Landing() {
-  const navigate = useNavigate();
   const { items } = useCart();
   const [featured, setFeatured] = useState([]);
   const [heroProject, setHeroProject] = useState(null);
   const [featuredProjects, setFeaturedProjects] = useState([]);
   // `featuredProjects.length === 0` por sí solo no distingue "todavía no respondió
-  // /api/projects" de "ya respondió y no hay ninguno destacado" — con eso, cualquier
-  // visitante veía el texto de "Cargá proyectos desde el admin" (pensado para el
-  // segundo caso) en CADA carga de la home, mientras la respuesta estaba en camino.
+  // /api/projects" de "ya respondió y no hay ninguno destacado": mientras la respuesta está en
+  // camino se muestra el esqueleto, y si no hay proyectos destacados la sección no se muestra.
   const [projectsLoading, setProjectsLoading] = useState(true);
   const [services, setServices] = useState(FALLBACK_SERVICES);
 
@@ -58,14 +66,14 @@ export default function Landing() {
       .finally(() => setProjectsLoading(false));
 
     servicesAPI.getAll()
-      .then(({ data }) => { if (data?.length > 0) setServices(data.slice(0, 4)); })
+      .then(({ data }) => { if (data?.length > 0) setServices(data.slice(0, 8)); })
       .catch(() => {});
   }, []);
 
   return (
     <div style={{ fontFamily: 'var(--font-body)' }}>
 
-      {/* HERO */}
+      {/* HERO — qué hacemos, dónde y hace cuánto, y las dos formas de consultar */}
       <section className="ps-hero-section"
         style={{ background: 'var(--teal-700)', color: 'var(--text-inverse)',
                  padding: 'var(--space-9) var(--space-5) var(--space-10)', overflow: 'hidden' }}>
@@ -73,23 +81,27 @@ export default function Landing() {
           <div>
             <div style={{ color: 'var(--sun-400)', fontFamily: 'var(--font-display)', fontWeight: 600,
                           letterSpacing: '0.12em', textTransform: 'uppercase', fontSize: 13, marginBottom: 'var(--space-4)' }}>
-              Piscinas en Villa María, Córdoba
+              Villa María, Córdoba
             </div>
             <h1 className="ps-hero-title"
-              style={{ color: 'var(--text-inverse)', fontSize: 'clamp(32px, 8vw, 52px)', lineHeight: 1.08,
+              style={{ color: 'var(--text-inverse)', fontSize: 'clamp(32px, 7.5vw, 50px)', lineHeight: 1.1,
                        letterSpacing: '-0.02em', marginBottom: 'var(--space-5)',
-                       fontFamily: 'var(--font-display)', fontWeight: 600 }}>
-              Tu piscina,<br />disfrutada<br />todo el año
+                       fontFamily: 'var(--font-display)', fontWeight: 700 }}>
+              Piscinas con más de 30 años de trayectoria
             </h1>
             <p className="ps-hero-subtitle"
-              style={{ fontSize: 'clamp(14px, 4vw, 18px)', lineHeight: 1.65,
-                       color: 'var(--text-inverse-muted)', maxWidth: 440, marginBottom: 'var(--space-6)' }}>
-              Diseñamos, construimos y mantenemos piscinas a medida. Del primer plano al primer baño, sin complicaciones.
+              style={{ fontSize: 'clamp(15px, 4vw, 18px)', lineHeight: 1.65,
+                       color: 'var(--text-inverse-muted)', maxWidth: 480, marginBottom: 'var(--space-6)' }}>
+              Construimos piscinas de hormigón y de fibra INDUPLAST. También instalamos revestimientos, cercos,
+              cobertores y climatización, y tenemos accesorios en la tienda.
             </p>
             <div className="ps-hero-btns" style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
-              <Button variant="primary" size="lg" onClick={() => navigate('/presupuesto')}>Solicitar presupuesto</Button>
-              <Button variant="outline" inverse size="lg" onClick={() => navigate('/proyectos')}>Ver proyectos</Button>
+              <Button variant="primary" size="lg" to="/presupuesto">Pedir presupuesto</Button>
+              <WhatsAppButton inverse size="lg" text={WHATSAPP_GREETING} location="hero">Escribinos por WhatsApp</WhatsAppButton>
             </div>
+            <p style={{ marginTop: 'var(--space-4)', fontSize: 14, color: 'var(--text-inverse-faint)' }}>
+              Presupuesto sin compromiso. Te respondemos en 48 horas.
+            </p>
           </div>
           <div className="ps-hero-photo ps-hero-photo--show">
             <div style={{
@@ -122,107 +134,84 @@ export default function Landing() {
       {/* TRUST STRIP — confianza y trayectoria, sin protagonismo del amarillo */}
       <StatsStrip />
 
-      {/* SERVICES */}
+      {/* LÍNEAS DE TRABAJO */}
       <section ref={servicesReveal.ref} className={servicesReveal.className} style={{ padding: 'var(--space-9) var(--space-5)' }}>
         <div style={{ maxWidth: 1120, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
-            <div className="ps-eyebrow" style={{ marginBottom: 'var(--space-2)' }}>Qué hacemos</div>
-            <h2 style={{ fontSize: 'clamp(22px, 5vw, 34px)', letterSpacing: '-0.01em', fontFamily: 'var(--font-display)',
-                         color: 'var(--text-strong)' }}>Todo lo que tu piscina necesita</h2>
-          </div>
-          <div className="ps-services-grid">
-            {services.map(s => (
-              <Card key={s._id || s.title} accent={s.tone} interactive padding="lg"
-                style={{ display: 'flex', flexDirection: 'column' }}
-                onClick={() => navigate('/servicios')}>
-                {s.tag && (
-                  <Badge tone={s.tone} variant={s.variant || 'soft'} size="sm" style={{ marginBottom: 'var(--space-3)', alignSelf: 'flex-start' }}>
-                    {s.tag}
-                  </Badge>
-                )}
-                <h3 style={{ fontSize: 18, marginBottom: 'var(--space-2)', fontWeight: 600, fontFamily: 'var(--font-display)',
-                             color: 'var(--text-strong)' }}>{s.title}</h3>
-                <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 'var(--space-3)' }}>{s.description}</p>
-                {s.bullets?.length > 0 && (
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}>
-                    {s.bullets.slice(0, 3).map((b) => (
-                      <li key={b} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 13, color: 'var(--text-body)', lineHeight: 1.4 }}>
-                        <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'var(--brand-primary)', marginTop: 7, flexShrink: 0 }} />
-                        {b}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                <div style={{ marginTop: 'var(--space-4)', color: 'var(--text-link)', fontWeight: 700, fontSize: 14 }}>
-                  {s.cta || 'Saber más'} →
-                </div>
-              </Card>
+          <SectionHeading eyebrow="Qué hacemos" title="Todo para construir y cuidar tu piscina" align="left"
+            action={<Button variant="outline" to="/servicios">Ver todos los servicios</Button>} />
+          <div className="ps-services-grid" style={{ '--ps-cols': serviceColumns(services.length) }}>
+            {services.map((s) => (
+              <Link key={s._id || s.title} to="/servicios" className="ps-card-link">
+                <Card accent={s.tone} interactive padding="lg" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                  {s.tag && (
+                    <Badge tone={s.tone} variant={s.variant || 'soft'} size="sm" style={{ marginBottom: 'var(--space-3)', alignSelf: 'flex-start' }}>
+                      {s.tag}
+                    </Badge>
+                  )}
+                  <h3 style={{ fontSize: 18, marginBottom: 'var(--space-2)', fontWeight: 700, fontFamily: 'var(--font-display)',
+                               color: 'var(--text-strong)' }}>{s.title}</h3>
+                  <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 'var(--space-3)' }}>{s.description}</p>
+                  {s.bullets?.length > 0 && (
+                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      {s.bullets.slice(0, 3).map((b) => (
+                        <li key={b} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 13, color: 'var(--text-body)', lineHeight: 1.4 }}>
+                          <span aria-hidden="true" style={{ width: 4, height: 4, borderRadius: '50%', background: 'var(--brand-primary)', marginTop: 7, flexShrink: 0 }} />
+                          {b}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  <div style={{ marginTop: 'auto', paddingTop: 'var(--space-4)', color: 'var(--text-link)', fontWeight: 700, fontSize: 14 }}>
+                    {s.cta || 'Saber más'} <span aria-hidden="true">→</span>
+                  </div>
+                </Card>
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* PROJECTS — el principal argumento de venta, con foto protagonista */}
-      <section ref={projectsReveal.ref} className={projectsReveal.className} style={{ padding: '0 var(--space-5) var(--space-9)' }}>
-        <div style={{ maxWidth: 1120, margin: '0 auto' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end',
-                        marginBottom: 'var(--space-6)', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
-            <div>
-              <div className="ps-eyebrow" style={{ marginBottom: 'var(--space-2)' }}>Proyectos recientes</div>
-              <h2 style={{ fontSize: 'clamp(20px, 4.5vw, 30px)', fontFamily: 'var(--font-display)', color: 'var(--text-strong)' }}>
-                Obra terminada, baño asegurado
-              </h2>
-            </div>
-            <Button variant="outline" onClick={() => navigate('/proyectos')}>Ver galería</Button>
+      {/* PROYECTOS — el principal argumento de venta, con foto protagonista. Sin proyectos destacados la
+          sección no se muestra: un hueco con texto para el admin no le dice nada al visitante. */}
+      {(projectsLoading || featuredProjects.length > 0) && (
+        <section ref={projectsReveal.ref} className={projectsReveal.className} style={{ padding: '0 var(--space-5) var(--space-9)' }}>
+          <div style={{ maxWidth: 1120, margin: '0 auto' }}>
+            <SectionHeading eyebrow="Proyectos" title="Algunas de nuestras obras" align="left"
+              action={<Button variant="outline" to="/proyectos">Ver todos los proyectos</Button>} />
+
+            {projectsLoading ? (
+              <div className="ps-projects-grid">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} style={{
+                    borderRadius: 'var(--radius-lg)', background: 'var(--grey-200)',
+                    ...(i === 0 ? { gridRow: '1 / span 2' } : {}),
+                  }} />
+                ))}
+              </div>
+            ) : (
+              <div className="ps-projects-grid">
+                {featuredProjects.map((p, i) => (
+                  <Link key={p._id} to="/proyectos" aria-label={`${p.title}, ${p.location}. Ver proyectos`}
+                    style={{
+                      position: 'relative', display: 'block', borderRadius: 'var(--radius-lg)', overflow: 'hidden',
+                      ...(i === 0 ? { gridRow: '1 / span 2' } : {}),
+                    }}>
+                    <Photo label={`${p.title} · ${p.location}`} height="100%" src={p.imageUrl || undefined} zoom
+                      sizes="(max-width: 767px) calc(100vw - 40px), (max-width: 1023px) 50vw, 560px" srcSetWidths={[400, 560, 800, 1120]} />
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
+        </section>
+      )}
 
-          {projectsLoading ? (
-            <div className="ps-projects-grid">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} style={{
-                  borderRadius: 'var(--radius-lg)', background: 'var(--grey-200)',
-                  ...(i === 0 ? { gridRow: '1 / span 2' } : {}),
-                }} />
-              ))}
-            </div>
-          ) : featuredProjects.length === 0 ? (
-            <div className="ps-projects-grid">
-              <div style={{ gridRow: '1 / span 2' }}><Photo label="Cargá proyectos desde el admin" height="100%" /></div>
-              <Photo label="Panel › Sitio web" height="100%" />
-              <Photo label="Panel › Sitio web" height="100%" />
-              <Photo label="Panel › Sitio web" height="100%" />
-              <Photo label="Panel › Sitio web" height="100%" />
-            </div>
-          ) : (
-            <div className="ps-projects-grid">
-              {featuredProjects.map((p, i) => (
-                <div key={p._id} style={{
-                  position: 'relative', borderRadius: 'var(--radius-lg)', overflow: 'hidden',
-                  cursor: 'pointer', ...(i === 0 ? { gridRow: '1 / span 2' } : {}),
-                }} onClick={() => navigate('/proyectos')}>
-                  <Photo label={`${p.title} · ${p.location}`} height="100%" src={p.imageUrl || undefined} zoom
-                    sizes="(max-width: 767px) calc(100vw - 40px), (max-width: 1023px) 50vw, 560px" srcSetWidths={[400, 560, 800, 1120]} />
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* FEATURED PRODUCTS */}
+      {/* TIENDA */}
       {featured.length > 0 && (
         <section ref={productsReveal.ref} className={productsReveal.className} style={{ padding: '0 var(--space-5) var(--space-9)' }}>
           <div style={{ maxWidth: 1120, margin: '0 auto' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end',
-                          marginBottom: 'var(--space-6)', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
-              <div>
-                <div className="ps-eyebrow" style={{ marginBottom: 'var(--space-2)' }}>Top picks</div>
-                <h2 style={{ fontSize: 'clamp(20px, 4.5vw, 30px)', fontFamily: 'var(--font-display)', color: 'var(--text-strong)' }}>
-                  Productos destacados
-                </h2>
-              </div>
-              <Button variant="outline" onClick={() => navigate('/tienda')}>Ver todos</Button>
-            </div>
+            <SectionHeading eyebrow="Tienda" title="Accesorios y productos para tu piscina" align="left"
+              action={<Button variant="outline" to="/tienda">Ver la tienda</Button>} />
             <div className="ps-products-grid">
               {featured.map((p) => (
                 <ProductCard key={p._id} product={p} inCartQuantity={inCartByProductId.get(p._id) || 0} />

@@ -6,31 +6,31 @@ export const SITE_NAME = 'Playa & Sol Piscinas';
 export const PAGE_META = {
   '/': {
     title: 'Playa & Sol Piscinas | Piscinas en Villa María, Córdoba',
-    description: 'Playa & Sol — Construcción, reforma y mantenimiento de piscinas en Villa María, Córdoba.',
+    description: 'Piscinas de hormigón y de fibra INDUPLAST, revestimientos, cercos, cobertores, climatización y accesorios. Más de 30 años en Villa María, Córdoba.',
   },
   '/tienda': {
     title: 'Tienda | Playa & Sol Piscinas',
     description: 'Todo para tu piscina: productos de mantenimiento y accesorios. Armá tu pedido y finalizalo por WhatsApp.',
   },
   '/servicios': {
-    title: 'Servicios | Playa & Sol Piscinas',
-    description: 'De la primera idea al último baño: construcción, reforma y mantenimiento de piscinas en Villa María, Córdoba.',
+    title: 'Servicios de piscinas | Playa & Sol Piscinas',
+    description: 'Piscinas de hormigón y de fibra INDUPLAST, revestimientos, cercos, cobertores y climatización en Villa María, Córdoba. Pedí tu presupuesto sin compromiso.',
   },
   '/proyectos': {
-    title: 'Proyectos | Playa & Sol Piscinas',
-    description: 'Conocé las piscinas que construimos y reformamos en Villa María, Córdoba.',
+    title: 'Obras y proyectos de piscinas | Playa & Sol Piscinas',
+    description: 'Obras terminadas de Playa & Sol: piscinas que construimos y reformamos en Villa María, Córdoba, y la región.',
   },
   '/nosotros': {
     title: 'Nosotros | Playa & Sol Piscinas',
-    description: 'Construimos piscinas en Villa María desde hace más de 30 años.',
+    description: 'Construimos piscinas en Villa María, Córdoba, desde hace más de 30 años. Conocé cómo trabajamos.',
   },
   '/presupuesto': {
-    title: 'Pedí tu presupuesto | Playa & Sol Piscinas',
+    title: 'Pedí tu presupuesto de piscina | Playa & Sol Piscinas',
     description: 'Contanos tu proyecto y recibí tu presupuesto sin compromiso. Nos contactamos con vos dentro de 48 horas.',
   },
   '/contacto': {
-    title: 'Contacto | Playa & Sol Piscinas',
-    description: 'Escribinos por WhatsApp, teléfono o email. Corrientes 1210, Villa María, Córdoba.',
+    title: 'Contacto y showroom | Playa & Sol Piscinas',
+    description: 'Escribinos por WhatsApp, teléfono o email, o visitanos en Corrientes 1210, Villa María, Córdoba.',
   },
 };
 

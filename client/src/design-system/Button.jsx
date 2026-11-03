@@ -1,3 +1,6 @@
+import { Link } from 'react-router-dom';
+import { prefetchRoute } from '../utils/routePrefetch';
+
 export function Button({
   children,
   variant = 'primary',
@@ -11,6 +14,7 @@ export function Button({
   type = 'button',
   onClick,
   href,
+  to,
   className,
   style,
   ...rest
@@ -103,6 +107,26 @@ export function Button({
       {iconRight ? <span style={{ display: 'inline-flex' }}>{iconRight}</span> : null}
     </>
   );
+
+  // Con `to` es un enlace de la app (react-router): clic medio, "abrir en pestaña nueva" y rastreadores
+  // funcionan, cosa que un <button onClick={navigate}> no permite. Mismo aspecto que los demás.
+  if (to) {
+    const { onMouseEnter, ...restHover } = hoverHandlers;
+    return (
+      <Link
+        to={to}
+        className={classes}
+        onClick={onClick}
+        style={{ ...base, textDecoration: 'none' }}
+        {...restHover}
+        onMouseEnter={(e) => { onMouseEnter?.(e); prefetchRoute(to); }}
+        onFocus={() => prefetchRoute(to)}
+        {...rest}
+      >
+        {content}
+      </Link>
+    );
+  }
 
   if (href) {
     return (

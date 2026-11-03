@@ -6,6 +6,9 @@ import ProductCard from '../components/ui/ProductCard';
 import ProductDetailModal from '../components/ui/ProductDetailModal';
 import { useCart } from '../context/CartContext';
 import { Button } from '../design-system/Button';
+import PageHeader from '../components/sections/PageHeader';
+import WhatsAppButton from '../components/ui/WhatsAppButton';
+import { whatsappMessageFor } from '../utils/whatsapp';
 import { FALLBACK_CATEGORIES } from '../data/fallbackCategories';
 
 const SORT_OPTIONS = [
@@ -133,22 +136,20 @@ export default function Shop() {
       <div style={{ maxWidth: 1120, margin: '0 auto' }}>
 
         {/* Header */}
-        <div style={{ marginBottom: 36 }}>
-          <div className="ps-eyebrow" style={{ marginBottom: 10 }}>Tienda</div>
-          <h1 style={{ fontSize: 'clamp(26px, 5vw, 42px)', letterSpacing: '-0.02em', marginBottom: 12,
-                       fontFamily: 'var(--font-display)', color: 'var(--text-strong)', overflowWrap: 'break-word' }}>
-            Todo para tu piscina
-          </h1>
-          <p style={{ fontSize: 16, color: 'var(--text-body)', lineHeight: 1.6, maxWidth: 520 }}>
-            Productos de mantenimiento, limpieza, seguridad y climatización. Retirá en local o coordinamos entrega en Villa María.
-          </p>
-        </div>
+        <PageHeader
+          align="left"
+          eyebrow="Tienda"
+          title="Todo para tu piscina"
+          lead="Productos de mantenimiento, limpieza, seguridad y climatización. Retirá en local o coordinamos entrega en Villa María."
+          maxWidth={560}
+          style={{ marginBottom: 36 }}
+        />
 
         {/* Category pills */}
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 24 }}>
-          <button onClick={() => handleCategory('')} style={pillStyle(!selectedCategory)}>Todos</button>
+        <div role="group" aria-label="Categorías" style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 24 }}>
+          <button onClick={() => handleCategory('')} aria-pressed={!selectedCategory} style={pillStyle(!selectedCategory)}>Todos</button>
           {categories.map(cat => (
-            <button key={cat} onClick={() => handleCategory(cat)} style={pillStyle(selectedCategory === cat)}>
+            <button key={cat} onClick={() => handleCategory(cat)} aria-pressed={selectedCategory === cat} style={pillStyle(selectedCategory === cat)}>
               {cat}
             </button>
           ))}
@@ -209,7 +210,7 @@ export default function Shop() {
 
         {/* Result count */}
         {!loading && !error && products.length > 0 && (
-          <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 20 }}>
+          <p aria-live="polite" style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 20 }}>
             {totalProducts} producto{totalProducts !== 1 ? 's' : ''}
             {selectedCategory && (
               <span style={{ color: 'var(--brand-primary)', fontWeight: 600 }}> en "{selectedCategory}"</span>
@@ -260,7 +261,7 @@ export default function Shop() {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, marginTop: 48 }}>
+              <nav aria-label="Paginación" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, marginTop: 48 }}>
                 <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>Página {page} de {totalPages}</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <button
@@ -286,7 +287,7 @@ export default function Shop() {
                       p === '…' ? (
                         <span key={`d${i}`} style={{ color: 'var(--text-muted)', fontSize: 14, padding: '0 4px' }}>…</span>
                       ) : (
-                        <button key={p} onClick={() => setPage(p)}
+                        <button key={p} onClick={() => setPage(p)} aria-current={page === p ? 'page' : undefined}
                           style={{ width: 36, height: 36, borderRadius: 'var(--radius-sm)',
                                    border: page === p ? '2px solid var(--brand-primary)' : '1.5px solid var(--border-default)',
                                    background: page === p ? 'var(--brand-primary)' : '#fff',
@@ -310,9 +311,26 @@ export default function Shop() {
                     Siguiente <FiChevronRight size={14} />
                   </button>
                 </div>
-              </div>
+              </nav>
             )}
           </>
+        )}
+
+        {/* No encontrar un producto es un punto de abandono: se ofrece preguntar directamente. */}
+        {!loading && !error && (
+          <div style={{ marginTop: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap',
+                        gap: 'var(--space-4)', padding: 'var(--space-6)', background: 'var(--surface-card)',
+                        border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-lg)' }}>
+            <div>
+              <h2 style={{ fontSize: 20, fontFamily: 'var(--font-display)', fontWeight: 700, color: 'var(--text-strong)', marginBottom: 'var(--space-1)' }}>
+                ¿No encontrás lo que buscás?
+              </h2>
+              <p style={{ fontSize: 15, color: 'var(--text-body)', lineHeight: 1.6 }}>
+                Consultanos por el producto o por la disponibilidad y te respondemos por WhatsApp.
+              </p>
+            </div>
+            <WhatsAppButton text={whatsappMessageFor('/tienda')} location="tienda">Consultar por WhatsApp</WhatsAppButton>
+          </div>
         )}
       </div>
 

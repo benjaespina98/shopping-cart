@@ -27,19 +27,39 @@ describe('Landing — sección de proyectos destacados', () => {
     servicesAPI.getAll.mockResolvedValue({ data: [] });
   });
 
-  // Regresión: mientras /api/projects todavía no respondía, cualquier visitante veía el
-  // texto "Cargá proyectos desde el admin" — pensado para cuando de verdad no hay ningún
-  // proyecto cargado, no para "la respuesta está en camino".
-  it('no muestra el mensaje de "cargá proyectos desde el admin" mientras la respuesta está en camino', async () => {
+  // Regresión: el visitante veía el texto "Cargá proyectos desde el admin" (una instrucción para quien
+  // administra el sitio). Ahora, mientras la respuesta está en camino se ve el esqueleto, y si no hay
+  // proyectos destacados la sección directamente no se muestra.
+  it('sin proyectos destacados no muestra la sección ni textos del panel de administración', async () => {
     let resolveProjects;
     projectsAPI.getAll.mockReturnValue(new Promise((resolve) => { resolveProjects = resolve; }));
 
     renderLanding();
 
-    expect(screen.queryByText(/Cargá proyectos desde el admin/i)).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Algunas de nuestras obras' })).toBeInTheDocument();
+    expect(screen.queryByText(/admin/i)).not.toBeInTheDocument();
 
     resolveProjects({ data: [] });
-    await waitFor(() => expect(screen.getByText(/Cargá proyectos desde el admin/i)).toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('heading', { name: 'Algunas de nuestras obras' })).not.toBeInTheDocument());
+    expect(screen.queryByText(/admin/i)).not.toBeInTheDocument();
+  });
+
+  it('los accesos principales son enlaces reales (presupuesto y WhatsApp)', () => {
+    projectsAPI.getAll.mockReturnValue(new Promise(() => {}));
+    renderLanding();
+
+    expect(screen.getAllByRole('link', { name: 'Pedir presupuesto' })[0]).toHaveAttribute('href', '/presupuesto');
+    const whatsapp = screen.getAllByRole('link', { name: /WhatsApp/i })[0];
+    expect(whatsapp.getAttribute('href')).toMatch(/^https:\/\/wa\.me\/\d+\?text=/);
+    expect(whatsapp).toHaveAttribute('rel', 'noopener noreferrer');
+  });
+
+  it('muestra todas las líneas de trabajo de respaldo, incluida la fibra INDUPLAST', () => {
+    projectsAPI.getAll.mockReturnValue(new Promise(() => {}));
+    renderLanding();
+
+    expect(screen.getByRole('heading', { name: 'Piscinas de fibra INDUPLAST' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Climatización' })).toBeInTheDocument();
   });
 
   it('muestra los proyectos destacados una vez que responde la API', async () => {
@@ -53,7 +73,6 @@ describe('Landing — sección de proyectos destacados', () => {
     renderLanding();
 
     expect(await screen.findByText('Reforma de borde · Villa Nueva')).toBeInTheDocument();
-    expect(screen.queryByText(/Cargá proyectos desde el admin/i)).not.toBeInTheDocument();
   });
 
   it('un hero sin imageUrl no muestra el blur de otra foto (queda la caja de marca)', async () => {

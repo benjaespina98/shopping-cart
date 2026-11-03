@@ -1,9 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { FiUser, FiPhone, FiMail, FiMapPin, FiSend, FiCheck, FiClock, FiShield, FiMessageSquare, FiTag, FiChevronDown } from 'react-icons/fi';
 import { Button } from '../design-system/Button';
 import { Card } from '../design-system/Card';
 import { Badge } from '../design-system/Badge';
+import PageHeader from '../components/sections/PageHeader';
+import WhatsAppButton from '../components/ui/WhatsAppButton';
+import { FALLBACK_SERVICE_NAMES } from '../data/fallbackServices';
+import { whatsappMessageFor } from '../utils/whatsapp';
 import { Input } from '../design-system/Input';
 import { Checkbox } from '../design-system/Checkbox';
 import Honeypot from '../components/ui/Honeypot';
@@ -12,7 +16,8 @@ import { servicesAPI, quotesAPI } from '../services/api';
 import { trackEvent } from '../utils/analytics';
 import { isValidEmail, isValidPhone } from '../utils/validation';
 
-const FALLBACK_TYPES = ['Piscina nueva', 'Reforma', 'Cerco / Seguridad'];
+// Mismos nombres que las líneas de trabajo del sitio (ver data/fallbackServices.js).
+const FALLBACK_TYPES = FALLBACK_SERVICE_NAMES;
 const OTHER_TYPE = 'Otra consulta';
 
 const STEPS = [
@@ -22,7 +27,7 @@ const STEPS = [
 ];
 
 export default function Quote() {
-  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const reveal = useReveal();
   const thanksRef = useRef(null);
   const [sent, setSent] = useState(false);
@@ -38,18 +43,23 @@ export default function Quote() {
   // nadie lo nota ni lo lee. Tiene que partir destildado para que aceptarlo signifique algo.
   const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
 
+  // Desde Servicios llega ?servicio=<título>: si existe entre las opciones, el formulario ya lo trae elegido.
+  const requested = searchParams.get('servicio');
+  const pick = (list) => (requested && list.includes(requested) ? requested : list[0]);
+
   useEffect(() => {
     servicesAPI.getAll()
       .then(({ data }) => {
         if (data?.length > 0) {
           const fromServices = data.map((s) => s.title);
           setTypes(fromServices);
-          setTipo(fromServices[0]);
+          setTipo(pick(fromServices));
         } else {
-          setTipo(FALLBACK_TYPES[0]);
+          setTipo(pick(FALLBACK_TYPES));
         }
       })
-      .catch(() => setTipo(FALLBACK_TYPES[0]));
+      .catch(() => setTipo(pick(FALLBACK_TYPES)));
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- solo al montar: `requested` no cambia sin cambiar de ruta
   }, []);
 
   // Al enviar bien se desmonta el formulario: el foco pasaría al body y el "¡Gracias!" no se anunciaría.
@@ -115,15 +125,13 @@ export default function Quote() {
 
         {/* Left */}
         <div>
-          <div className="ps-eyebrow" style={{ marginBottom: 'var(--space-3)' }}>Presupuesto sin compromiso</div>
-          <h1 style={{ fontSize: 'clamp(22px, 5.5vw, 38px)', lineHeight: 1.1, letterSpacing: '-0.02em',
-                       marginBottom: 'var(--space-4)', fontFamily: 'var(--font-display)', color: 'var(--text-strong)',
-                       overflowWrap: 'break-word' }}>
-            Contanos tu proyecto
-          </h1>
-          <p style={{ fontSize: 16, color: 'var(--text-body)', lineHeight: 1.6, marginBottom: 'var(--space-6)' }}>
-            Completá el formulario y nos contactamos en 48 horas. Sin costo y sin compromiso.
-          </p>
+          <PageHeader
+            align="left"
+            eyebrow="Presupuesto sin compromiso"
+            title="Contanos tu proyecto"
+            lead="Completá el formulario y nos contactamos en 48 horas. Sin costo y sin compromiso."
+            style={{ marginBottom: 'var(--space-6)' }}
+          />
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', marginBottom: 'var(--space-6)' }}>
             {STEPS.map(({ Icon, text }, i) => (
@@ -142,9 +150,16 @@ export default function Quote() {
             ))}
           </div>
 
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            <Badge tone="teal" dot>Respuesta en 48h</Badge>
-            <Badge tone="sun" variant="solid">Garantía 10 años</Badge>
+          <Badge tone="teal" dot>Respuesta en 48 h</Badge>
+
+          {/* Quien prefiere no completar un formulario tiene una salida directa. */}
+          <div style={{ marginTop: 'var(--space-6)', paddingTop: 'var(--space-5)', borderTop: '1px solid var(--border-subtle)' }}>
+            <p style={{ fontSize: 15, color: 'var(--text-body)', marginBottom: 'var(--space-3)' }}>
+              ¿Preferís escribirnos directamente?
+            </p>
+            <WhatsAppButton text={whatsappMessageFor('/presupuesto')} location="presupuesto">
+              Escribinos por WhatsApp
+            </WhatsAppButton>
           </div>
         </div>
 
@@ -157,11 +172,12 @@ export default function Quote() {
               <h2 ref={thanksRef} tabIndex={-1} style={{ fontSize: 26, marginBottom: 10, fontFamily: 'var(--font-display)',
                            color: 'var(--text-strong)', outline: 'none' }}>¡Gracias!</h2>
               <p style={{ color: 'var(--text-muted)', marginBottom: 28, fontSize: 15, lineHeight: 1.6 }}>
-                Hemos recibido tu solicitud. Nos contactaremos con vos brevemente.
+                Recibimos tu solicitud. Te vamos a contactar dentro de las próximas 48 horas.
               </p>
-              <Button variant="secondary" onClick={() => { setSent(false); navigate('/'); }}>
-                Volver al inicio
-              </Button>
+              <div style={{ display: 'flex', gap: 'var(--space-3)', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <Button variant="secondary" to="/">Volver al inicio</Button>
+                <Button variant="outline" to="/proyectos">Ver proyectos</Button>
+              </div>
             </div>
           ) : (
             <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
@@ -205,12 +221,12 @@ export default function Quote() {
               <div className="ps-form-row">
                 <Input id="quote-name" label="Nombre y apellido" placeholder="Tu nombre completo" required value={form.name} onChange={setField('name')}
                   leading={<FiUser size={16} />} error={fieldErrors.name} />
-                <Input id="quote-phone" label="Teléfono / WhatsApp" placeholder="600 123 456" required value={form.phone} onChange={setField('phone')}
+                <Input id="quote-phone" label="Teléfono / WhatsApp" placeholder="Ej: 3534 123456" required value={form.phone} onChange={setField('phone')}
                   leading={<FiPhone size={16} />} error={fieldErrors.phone} />
               </div>
-              <Input id="quote-email" label="Email" placeholder="hola@ejemplo.com" type="email" required value={form.email} onChange={setField('email')}
+              <Input id="quote-email" label="Email" placeholder="nombre@ejemplo.com" type="email" required value={form.email} onChange={setField('email')}
                 leading={<FiMail size={16} />} error={fieldErrors.email} />
-              <Input label="Localidad de la obra" placeholder="Corrientes 1210, Villa María…" value={form.location} onChange={setField('location')}
+              <Input label="Localidad de la obra" placeholder="Ej: Villa María, Córdoba" value={form.location} onChange={setField('location')}
                 leading={<FiMapPin size={16} />} helper="Dónde sería el trabajo (opcional)." />
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -244,7 +260,7 @@ export default function Quote() {
               )}
               <Button type="submit" variant="primary" size="lg" fullWidth disabled={sending}
                 iconLeft={!sending && <FiSend size={16} />}>
-                {sending ? 'Enviando...' : 'Solicitar presupuesto'}
+                {sending ? 'Enviando...' : 'Enviar solicitud'}
               </Button>
             </form>
           )}

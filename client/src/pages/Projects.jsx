@@ -4,6 +4,9 @@ import { Lightbox } from '../components/ui/Lightbox';
 import { projectsAPI } from '../services/api';
 import { takePrefetched } from '../utils/routePrefetch';
 import { PROJECT_PHOTO } from '../utils/imageSpecs';
+import PageHeader from '../components/sections/PageHeader';
+import CtaBlock from '../components/sections/CtaBlock';
+import { Button } from '../design-system/Button';
 
 export default function Projects() {
   const [projects, setProjects] = useState([]);
@@ -24,12 +27,12 @@ export default function Projects() {
   return (
     <section style={{ background: 'var(--bg-page)', padding: '52px 20px 72px', fontFamily: 'var(--font-body)' }}>
       <div style={{ maxWidth: 1120, margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: 40 }}>
-          <div className="ps-eyebrow" style={{ marginBottom: 10 }}>Proyectos</div>
-          <h1 style={{ fontSize: 'clamp(20px, 5vw, 40px)', letterSpacing: '-0.02em',
-                       fontFamily: 'var(--font-display)', color: 'var(--text-strong)',
-                       overflowWrap: 'break-word' }}>Cada piscina, una historia</h1>
-        </div>
+        <PageHeader
+          eyebrow="Proyectos"
+          title="Obras terminadas"
+          lead="Piscinas que construimos y reformamos en Villa María y la región."
+          style={{ marginBottom: 40 }}
+        />
 
         {loading ? (
           <div className="ps-masonry">
@@ -40,20 +43,28 @@ export default function Projects() {
             ))}
           </div>
         ) : projects.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '56px 0', color: 'var(--text-muted)' }}>
-            <p style={{ fontSize: 17 }}>Todavía no hay proyectos cargados.</p>
-            <p style={{ fontSize: 14, marginTop: 8 }}>Cargalos desde el panel de administración.</p>
+          <div style={{ textAlign: 'center', padding: '40px 0 24px', color: 'var(--text-body)' }}>
+            <p style={{ fontSize: 17, marginBottom: 'var(--space-4)' }}>Estamos actualizando la galería de obras.</p>
+            <Button variant="outline" to="/contacto">Consultanos por nuestros trabajos</Button>
           </div>
         ) : (
           <div className="ps-masonry">
             {projects.map((p, i) => {
               const lightboxIdx = lightboxImages.findIndex((img) => img.src === p.imageUrl);
+              const canOpen = p.imageUrl && lightboxIdx !== -1;
+              // Con foto la tarjeta es un botón (teclado y lectores de pantalla); sin foto, un bloque estático.
+              const Tag = canOpen ? 'button' : 'div';
               return (
-                <div key={p._id}
-                  onClick={() => p.imageUrl && lightboxIdx !== -1 && setLightboxIndex(lightboxIdx)}
+                <Tag key={p._id}
+                  {...(canOpen ? {
+                    type: 'button',
+                    onClick: () => setLightboxIndex(lightboxIdx),
+                    'aria-label': `Ampliar la foto de ${p.title}, ${p.location}`,
+                  } : {})}
                   style={{
+                    display: 'block', width: '100%', padding: 0, border: 0, background: 'none', textAlign: 'left',
                     breakInside: 'avoid', marginBottom: 16, borderRadius: 'var(--radius-lg)', overflow: 'hidden',
-                    cursor: p.imageUrl ? 'pointer' : 'default',
+                    cursor: canOpen ? 'zoom-in' : 'default',
                   }}>
                   <Photo
                     label={`${p.title} · ${p.location}`}
@@ -64,7 +75,7 @@ export default function Projects() {
                     sizes={PROJECT_PHOTO.sizes}
                     srcSetWidths={PROJECT_PHOTO.widths}
                   />
-                </div>
+                </Tag>
               );
             })}
           </div>
@@ -74,6 +85,13 @@ export default function Projects() {
       {lightboxIndex !== null && (
         <Lightbox images={lightboxImages} index={lightboxIndex} onClose={() => setLightboxIndex(null)} />
       )}
+
+      <div style={{ marginTop: 64 }}>
+        <CtaBlock
+          title="¿Querés una piscina como estas?"
+          text="Contanos qué tenés en mente y te respondemos en 48 horas con un presupuesto sin compromiso."
+        />
+      </div>
     </section>
   );
 }

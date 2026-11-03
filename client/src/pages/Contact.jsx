@@ -9,7 +9,10 @@ import { Input } from '../design-system/Input';
 import { Photo } from '../design-system/Photo';
 import { CONTACT_PHOTO } from '../utils/imageSpecs';
 import Honeypot from '../components/ui/Honeypot';
+import PageHeader from '../components/sections/PageHeader';
 import { useReveal } from '../hooks/useReveal';
+import { trackEvent } from '../utils/analytics';
+import { whatsappUrl as waLink } from '../utils/whatsapp';
 import { useSettings } from '../context/SettingsContext';
 import { isValidEmail, isValidPhone } from '../utils/validation';
 
@@ -22,6 +25,13 @@ const LOCATION = {
   embedUrl:
     'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d210.51818044720216!2d-63.24136445912394!3d-32.41136540202374!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95cc42e708785177%3A0x7029a4a01828b49f!2sPlaya%20y%20Sol%20S.A.S.!5e0!3m2!1ses-419!2sar!4v1771459205088!5m2!1ses-419!2sar',
 };
+
+// Botones de un solo estilo (los colores de cada red competían con la paleta de la marca).
+const SOCIAL_LINKS = [
+  { href: 'https://www.instagram.com/playaysol.piscinas/', label: 'Instagram', Icon: FiInstagram },
+  { href: 'https://www.facebook.com/playaysol.piscinas', label: 'Facebook', Icon: FiFacebook },
+  { href: 'https://www.tiktok.com/@playaysolpiscinas', label: 'TikTok', Icon: FaTiktok },
+];
 
 export default function Contact() {
   const reveal = useReveal();
@@ -98,7 +108,7 @@ export default function Contact() {
   // WhatsApp es un enlace real (<a target="_blank" rel="noopener noreferrer">): el navegador abre la
   // pestaña con la URL final dentro del gesto del usuario. Antes se hacía window.open('', '_blank',
   // 'noopener'), que devuelve null y dejaba una pestaña en blanco mientras esta navegaba a WhatsApp.
-  const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(getTextMessage())}`;
+  const whatsappUrl = waLink(WHATSAPP_NUMBER, getTextMessage());
 
   const handleWhatsApp = (event) => {
     if (!validateForm()) {
@@ -123,14 +133,14 @@ export default function Contact() {
   };
 
   const channels = [
-    { Icon: FaWhatsapp, label: 'WhatsApp', href: `https://wa.me/${WHATSAPP_NUMBER}`, value: contactSettings.phoneNumberDisplay },
+    { Icon: FaWhatsapp, label: 'WhatsApp', href: waLink(WHATSAPP_NUMBER), value: contactSettings.phoneNumberDisplay },
     { Icon: FiMail,     label: 'Email',    href: `mailto:${CONTACT_EMAIL}`,          value: CONTACT_EMAIL },
   ];
   if (contactSettings.secondaryContactWhatsapp) {
     channels.push({
       Icon: FaWhatsapp,
       label: contactSettings.secondaryContactLabel || 'Otro contacto',
-      href: `https://wa.me/${contactSettings.secondaryContactWhatsapp}`,
+      href: waLink(contactSettings.secondaryContactWhatsapp),
       value: contactSettings.secondaryContactWhatsapp.replace(/^549/, ''),
     });
   }
@@ -138,16 +148,11 @@ export default function Contact() {
   return (
     <section style={{ background: 'var(--bg-page)', padding: '52px 20px 72px', fontFamily: 'var(--font-body)' }}>
       <div ref={reveal.ref} className={reveal.className}>
-      <div style={{ textAlign: 'center', maxWidth: 640, margin: '0 auto var(--space-8)' }}>
-        <div className="ps-eyebrow" style={{ marginBottom: 'var(--space-3)' }}>Hablemos</div>
-        <h1 style={{ fontSize: 'clamp(22px, 5.5vw, 38px)', lineHeight: 1.1, letterSpacing: '-0.02em',
-                     marginBottom: 'var(--space-3)', fontFamily: 'var(--font-display)', color: 'var(--text-strong)' }}>
-          ¿Tenés una consulta?
-        </h1>
-        <p style={{ fontSize: 16, color: 'var(--text-body)', lineHeight: 1.6 }}>
-          Escribinos por WhatsApp o email. Te respondemos directamente, sin intermediarios.
-        </p>
-      </div>
+      <PageHeader
+        eyebrow="Contacto"
+        title="¿Tenés una consulta?"
+        lead="Escribinos por WhatsApp o email. Te respondemos directamente, sin intermediarios."
+      />
 
       <div className="ps-quote-grid" style={{ maxWidth: 1000, margin: '0 auto' }}>
         {/* Left — contact info */}
@@ -163,7 +168,8 @@ export default function Contact() {
             </h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
               {channels.map(({ Icon, label, href, value }) => (
-                <a key={label} href={href} target="_blank" rel="noreferrer"
+                <a key={label} href={href} {...(href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                  onClick={() => label !== 'Email' && trackEvent('click_whatsapp', { location: 'contacto' })}
                   style={{
                     display: 'flex', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-3)',
                     borderRadius: 'var(--radius-md)', textDecoration: 'none',
@@ -212,24 +218,12 @@ export default function Contact() {
               Mirá nuestras últimas obras terminadas y en construcción.
             </p>
             <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
-              <a href="https://www.instagram.com/playaysol.piscinas/" target="_blank" rel="noreferrer"
-                style={{ flex: '1 1 100px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                         padding: '12px', borderRadius: 'var(--radius-md)', color: '#fff', fontWeight: 700, fontSize: 14,
-                         textDecoration: 'none', background: 'linear-gradient(135deg, #FEDA75, #FA7E1E, #D62976, #962FBF, #4F5BD5)' }}>
-                <FiInstagram size={18} /> Instagram
-              </a>
-              <a href="https://www.facebook.com/playaysol.piscinas" target="_blank" rel="noreferrer"
-                style={{ flex: '1 1 100px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                         padding: '12px', borderRadius: 'var(--radius-md)', color: '#fff', fontWeight: 700, fontSize: 14,
-                         textDecoration: 'none', background: '#1877F2' }}>
-                <FiFacebook size={18} /> Facebook
-              </a>
-              <a href="https://www.tiktok.com/@playaysolpiscinas" target="_blank" rel="noreferrer"
-                style={{ flex: '1 1 100px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                         padding: '12px', borderRadius: 'var(--radius-md)', color: '#fff', fontWeight: 700, fontSize: 14,
-                         textDecoration: 'none', background: '#000000' }}>
-                <FaTiktok size={16} /> TikTok
-              </a>
+              {SOCIAL_LINKS.map(({ href, label, Icon }) => (
+                <Button key={label} variant="outline" size="sm" href={href} target="_blank" rel="noopener noreferrer"
+                  iconLeft={<Icon size={16} />} style={{ flex: '1 1 100px' }}>
+                  {label}
+                </Button>
+              ))}
             </div>
           </Card>
         </div>

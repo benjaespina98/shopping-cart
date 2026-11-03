@@ -1,38 +1,50 @@
 // Servicios de respaldo: lo que se muestra mientras carga la API o si todavía no se
 // cargó ninguno desde /admin/servicios.
 //
-// Estaban duplicados en Landing.jsx y Services.jsx con textos que ya habían empezado a
-// divergir entre sí (mismo servicio, distinta descripción según la página). Acá viven
-// una sola vez: `description` es la versión corta para las tarjetas del inicio y
-// `descriptionLong` la extendida para la página de servicios.
+// Son las líneas de trabajo de la empresa con los mismos textos que se cargaron en el panel, así la
+// home no "cambia de contenido" cuando llega la respuesta de la API (antes el respaldo tenía otros
+// servicios y otras descripciones, y se veía un salto en cada carga). Los accesorios y productos
+// viven en la Tienda, no acá.
+//
+// `description` es la versión para las tarjetas del inicio y `descriptionLong` la de la página de
+// servicios (si falta, esa página usa `description`). Los textos no prometen plazos, garantías ni
+// precios: lo que no está confirmado por la empresa no va en el respaldo.
 export const FALLBACK_SERVICES = [
   {
-    title: 'Piscinas de obra', tag: 'Diseño y obra', tone: 'sun', variant: 'solid',
-    description: 'Relevamos el terreno, proyectamos la forma y construimos en hormigón gunitado: la técnica que más años de vida le da a una pileta.',
-    descriptionLong: 'Relevamos el terreno, proyectamos la forma y construimos en hormigón gunitado: la técnica que más años de vida le da a una pileta. Cada decisión, pensada para que dure generaciones.',
-    bullets: ['Proyecto 3D antes de iniciar la obra', 'Hormigón gunitado, sin uniones ni filtraciones', 'Garantía escrita de 10 años en el vaso'],
-    cta: 'Quiero mi piscina',
+    title: 'Piscinas de hormigón', tag: 'Diseño y obra', tone: 'teal', variant: 'soft',
+    description: 'Diseñamos y construimos piscinas de hormigón a medida, adaptadas a tu terreno, tu estilo de vida y el resultado que imaginás. Nos ocupamos de todo el proceso, desde el proyecto hasta la entrega final.',
+    bullets: ['Proyecto y diseño personalizado', 'Construcción en hormigón', 'Revestimientos y terminaciones'],
+    cta: 'Pedir presupuesto',
   },
   {
-    title: 'Reformas', tag: 'Puesta a punto', tone: 'teal', variant: 'soft',
-    description: 'Una pileta envejecida pierde agua, color y seguridad. Recuperamos el vaso, la coronación y la depuración con materiales actuales.',
-    descriptionLong: 'Una pileta envejecida pierde agua, color y seguridad. Recuperamos el vaso, la coronación y la depuración con materiales actuales, sin romper más de lo necesario.',
-    bullets: ['Diagnóstico real antes de presupuestar', 'Cambio de revestimiento sin demoler el vaso', 'Filtros y bombas al día con la normativa'],
-    cta: 'Solicitar presupuesto',
+    title: 'Piscinas de fibra INDUPLAST', tag: 'Fibra', tone: 'teal', variant: 'soft',
+    description: 'Trabajamos con piscinas de fibra INDUPLAST. Consultanos por los modelos y medidas disponibles y te ayudamos a elegir el que mejor se adapte a tu espacio.',
+    bullets: [],
+    cta: 'Consultar modelos',
   },
   {
-    title: 'Climatización', tag: 'Más temporada', tone: 'sun', variant: 'solid',
-    description: 'Con la bomba de calor correcta y una cubierta bien elegida, el agua se mantiene a temperatura semanas antes y después de la temporada.',
-    descriptionLong: 'Octubre a abril ya no alcanza. Con la bomba de calor correcta y una cubierta bien elegida, el agua se mantiene a temperatura semanas antes y después de la temporada.',
-    bullets: ['Bombas de calor de bajo consumo eléctrico', 'Cubiertas automáticas que cortan la evaporación', 'Hasta dos meses más de baño al año'],
-    cta: 'Asesorarme',
+    title: 'Revestimientos', tag: 'Renovación', tone: 'teal', variant: 'soft',
+    description: 'Renová la estética y la protección de tu piscina con revestimientos de calidad. Trabajamos con materiales resistentes y acabados que combinan diseño, durabilidad y fácil mantenimiento.',
+    bullets: ['Cerámicos', 'Travertino', 'Acabados resistentes y de larga vida útil'],
+    cta: 'Quiero renovar mi piscina',
   },
   {
-    title: 'Cercos y seguridad', tag: 'Tranquilidad en casa', tone: 'teal', variant: 'soft',
-    description: 'Instalamos barreras físicas certificadas, pensadas para frenar a los más chicos sin tapar la vista de la pileta.',
-    descriptionLong: 'Un descuido de segundos puede ser grave. Instalamos barreras físicas certificadas, pensadas para frenar a los más chicos sin tapar la vista de la pileta.',
-    bullets: ['Barreras removibles o fijas, según el espacio', 'Resistentes a impacto y a la intemperie', 'Instalación con cierre de seguridad certificado'],
-    cta: 'Hablar con un especialista',
+    title: 'Cercos perimetrales', tag: 'Seguridad', tone: 'teal', variant: 'soft',
+    description: 'Instalamos cercos de seguridad que protegen a niños y mascotas sin afectar la estética de tu espacio exterior. Soluciones resistentes, discretas y adaptadas a cada proyecto.',
+    bullets: ['Cercos removibles', 'Materiales resistentes a la intemperie', 'Instalación profesional'],
+    cta: 'Consultar opciones',
+  },
+  {
+    title: 'Cobertores', tag: 'Protección', tone: 'teal', variant: 'soft',
+    description: 'Protegé tu piscina durante todo el año y reducí el mantenimiento diario. Contamos con cobertores pensados para mejorar la seguridad, conservar la temperatura y mantener el agua limpia por más tiempo.',
+    bullets: ['Menor evaporación y pérdida de calor', 'Más seguridad y menos mantenimiento'],
+    cta: 'Quiero asesoramiento',
+  },
+  {
+    title: 'Climatización', tag: 'Confort', tone: 'teal', variant: 'soft',
+    description: 'Soluciones de climatización para tu piscina. Contanos cómo la usás y te orientamos sobre la opción más adecuada.',
+    bullets: [],
+    cta: 'Consultar opciones',
   },
 ];
 
