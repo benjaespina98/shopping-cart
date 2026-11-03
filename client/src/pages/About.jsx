@@ -4,6 +4,7 @@ import { Photo } from '../design-system/Photo';
 import { ABOUT_PHOTO } from '../utils/imageSpecs';
 import StatsStrip from '../components/sections/StatsStrip';
 import CtaBlock from '../components/sections/CtaBlock';
+import { SectionHeading } from '../components/sections/PageHeader';
 import { useReveal } from '../hooks/useReveal';
 import { useSettings } from '../context/SettingsContext';
 
@@ -46,9 +47,9 @@ export default function About() {
                           letterSpacing: '0.12em', textTransform: 'uppercase', fontSize: 13, marginBottom: 'var(--space-4)' }}>
               Nosotros
             </div>
-            <h1 style={{ color: 'var(--text-inverse)', fontSize: 'clamp(28px, 6vw, 44px)', lineHeight: 1.12,
+            <h1 style={{ color: 'var(--text-inverse)', fontSize: 'clamp(30px, 6.5vw, 46px)', lineHeight: 1.1,
                          letterSpacing: '-0.02em', marginBottom: 'var(--space-5)',
-                         fontFamily: 'var(--font-display)', fontWeight: 600 }}>
+                         fontFamily: 'var(--font-display)', fontWeight: 700 }}>
               Construimos piscinas en Villa María desde hace más de 30 años
             </h1>
             <p style={{ fontSize: 'clamp(14px, 4vw, 18px)', lineHeight: 1.65,
@@ -84,11 +85,7 @@ export default function About() {
       {/* STORY */}
       <section style={{ padding: 'var(--space-9) var(--space-5)' }}>
         <div style={{ maxWidth: 760, margin: '0 auto' }}>
-          <div className="ps-eyebrow" style={{ marginBottom: 'var(--space-3)', textAlign: 'center' }}>Cómo trabajamos</div>
-          <h2 style={{ fontSize: 'clamp(22px, 5vw, 32px)', letterSpacing: '-0.01em', fontFamily: 'var(--font-display)',
-                       color: 'var(--text-strong)', textAlign: 'center', marginBottom: 'var(--space-6)' }}>
-            Un mismo equipo, de la visita técnica al último detalle
-          </h2>
+          <SectionHeading eyebrow="Cómo trabajamos" title="Un mismo equipo, de la visita técnica al último detalle" style={{ marginBottom: 'var(--space-6)' }} />
           <p style={{ fontSize: 16, color: 'var(--text-body)', lineHeight: 1.75, textAlign: 'center' }}>
             En Playa & Sol no tercerizamos cuadrillas para cada obra. El mismo equipo que te visita y proyecta tu piscina es el que después la construye, la repara o la pone a punto cuando hace falta. Eso significa una sola persona de contacto, sin intermediarios y sin pases de responsabilidad cuando algo necesita ajustarse.
           </p>
@@ -98,11 +95,7 @@ export default function About() {
       {/* VALUES */}
       <section ref={valuesReveal.ref} className={valuesReveal.className} style={{ padding: '0 var(--space-5) var(--space-9)', background: 'var(--surface-sunken)', paddingTop: 'var(--space-9)' }}>
         <div style={{ maxWidth: 1120, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
-            <div className="ps-eyebrow" style={{ marginBottom: 'var(--space-2)' }}>Por qué elegirnos</div>
-            <h2 style={{ fontSize: 'clamp(22px, 5vw, 34px)', letterSpacing: '-0.01em', fontFamily: 'var(--font-display)',
-                         color: 'var(--text-strong)' }}>Lo que no cambia, obra tras obra</h2>
-          </div>
+          <SectionHeading eyebrow="Por qué elegirnos" title="Lo que no cambia, obra tras obra" style={{ marginBottom: 'var(--space-8)' }} />
           <div className="ps-services-grid">
             {values.map((v) => (
               <Card key={v.title} padding="lg">
@@ -126,7 +119,7 @@ export default function About() {
       <CtaBlock
         title="¿Hablamos de tu proyecto?"
         text="Conocé nuestros trabajos terminados o contanos qué tenés en mente."
-        primaryLabel="Empezar mi proyecto"
+        primaryLabel="Pedir presupuesto"
         secondaryLabel="Ver proyectos"
         secondaryTo="/proyectos"
       />

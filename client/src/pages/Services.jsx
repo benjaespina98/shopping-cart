@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '../design-system/Button';
 import { Badge } from '../design-system/Badge';
 import { Photo } from '../design-system/Photo';
@@ -7,10 +6,11 @@ import { servicesAPI } from '../services/api';
 import { takePrefetched } from '../utils/routePrefetch';
 import { SERVICE_PHOTO } from '../utils/imageSpecs';
 import CtaBlock from '../components/sections/CtaBlock';
+import PageHeader from '../components/sections/PageHeader';
+import WhatsAppButton from '../components/ui/WhatsAppButton';
 import { FALLBACK_SERVICES } from '../data/fallbackServices';
 
 export default function Services() {
-  const navigate = useNavigate();
   const [rows, setRows] = useState(FALLBACK_SERVICES);
   const [loading, setLoading] = useState(true);
 
@@ -25,12 +25,12 @@ export default function Services() {
   return (
     <section style={{ background: 'var(--bg-page)', padding: '52px 20px 72px', fontFamily: 'var(--font-body)' }}>
       <div style={{ maxWidth: 1120, margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: 52 }}>
-          <div className="ps-eyebrow" style={{ marginBottom: 10 }}>Servicios</div>
-          <h1 style={{ fontSize: 'clamp(20px, 5vw, 40px)', letterSpacing: '-0.02em',
-                       fontFamily: 'var(--font-display)', color: 'var(--text-strong)',
-                       overflowWrap: 'break-word' }}>De la primera idea al último baño</h1>
-        </div>
+        <PageHeader
+          eyebrow="Servicios"
+          title="De la primera idea al último baño"
+          lead="Construimos piscinas de hormigón y de fibra INDUSPLAST, y nos ocupamos de revestimientos, cercos, cobertores y climatización."
+          style={{ marginBottom: 52 }}
+        />
 
         {loading ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 52 }}>
@@ -80,7 +80,17 @@ export default function Services() {
                       ))}
                     </ul>
                   )}
-                  <Button variant="primary" onClick={() => navigate('/presupuesto')}>{r.cta || 'Solicitar presupuesto'}</Button>
+                  <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
+                    {/* El servicio viaja en la URL: el formulario de presupuesto lo deja ya elegido. */}
+                    <Button variant="primary" to={`/presupuesto?servicio=${encodeURIComponent(r.title)}`}
+                      aria-label={`${r.cta || 'Pedir presupuesto'}: ${r.title}`}>
+                      {r.cta || 'Pedir presupuesto'}
+                    </Button>
+                    <WhatsAppButton text={`Hola, quiero consultar por: ${r.title}.`} location="servicios"
+                      aria-label={`Consultar por WhatsApp: ${r.title}`}>
+                      Consultar por WhatsApp
+                    </WhatsAppButton>
+                  </div>
                 </div>
               </div>
             ))}
@@ -88,13 +98,32 @@ export default function Services() {
         )}
       </div>
 
+      {/* Accesorios: no son un servicio sino productos, y viven en la tienda. */}
+      {!loading && (
+        <div style={{ maxWidth: 1120, margin: '52px auto 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 'var(--space-4)',
+                        padding: 'var(--space-6)', background: 'var(--surface-card)', border: '1px solid var(--border-subtle)',
+                        borderRadius: 'var(--radius-lg)' }}>
+            <div>
+              <h2 style={{ fontSize: 20, fontFamily: 'var(--font-display)', fontWeight: 700, color: 'var(--text-strong)', marginBottom: 'var(--space-1)' }}>
+                Accesorios para tu piscina
+              </h2>
+              <p style={{ fontSize: 15, color: 'var(--text-body)', lineHeight: 1.6 }}>
+                Consultá los productos disponibles y armá tu pedido: lo finalizás por WhatsApp.
+              </p>
+            </div>
+            <Button variant="outline" to="/tienda">Ver la tienda</Button>
+          </div>
+        </div>
+      )}
+
       {/* Cierre consistente con el resto del sitio: todas las páginas informativas
           terminan ofreciendo el mismo próximo paso. */}
       <div style={{ marginTop: 64 }}>
         <CtaBlock
-          title="¿Cuál de estos necesitás?"
-          text="Contanos qué tenés en mente y te armamos un presupuesto sin compromiso."
-          primaryLabel="Solicitar presupuesto"
+          title="¿Qué servicio te interesa?"
+          text="Contanos qué necesitás y armamos un presupuesto a tu medida."
+          primaryLabel="Pedir presupuesto"
           secondaryLabel="Ver proyectos"
           secondaryTo="/proyectos"
         />

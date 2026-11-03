@@ -5,6 +5,7 @@ import {
   createProduct,
   updateProduct,
   updateStock,
+  updatePrices,
   deleteProduct,
   getAllProductsAdmin,
 } from '../controllers/productController.js';
@@ -24,6 +25,8 @@ router.get('/:id', getProductById);
 router.get('/admin/all', protect, adminOnly, getAllProductsAdmin);
 router.post('/', protect, adminOnly, upload.array('images', 5), createProduct);
 router.put('/:id', protect, adminOnly, upload.array('images', 5), updateProduct);
+// /prices antes que cualquier ruta con :id.
+router.patch('/prices', protect, adminOnly, updatePrices);
 router.patch('/:id/stock', protect, adminOnly, updateStock);
 router.delete('/:id', protect, adminOnly, deleteProduct);
 

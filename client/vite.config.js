@@ -1,5 +1,8 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { renderRouteHtml, routeHtmlPaths } from './src/seo/routeHtml.js';
 
 // Precarga el subset latin de las dos tipografías propias. El nombre lleva hash, así que se toma del
 // bundle en build (en dev no hace falta). crossorigin es obligatorio en los preload de fuentes, aunque
@@ -23,8 +26,29 @@ function fontPreload() {
   };
 }
 
+// Escribe dist/<ruta>/index.html con el título, la description, el canonical y los og:* de cada ruta
+// pública (ver src/seo/routeHtml.js). Corre al cerrar el bundle, ya con el index.html final en disco
+// (hashes de assets y preloads incluidos). Si el hosting no sirviera esos archivos, cae al rewrite a
+// /index.html y el sitio sigue funcionando igual: usePageMeta corrige las metas en el navegador.
+function routeHtml() {
+  let outDir;
+  return {
+    name: 'route-html',
+    apply: 'build',
+    configResolved(config) { outDir = path.resolve(config.root, config.build.outDir); },
+    closeBundle() {
+      const html = fs.readFileSync(path.join(outDir, 'index.html'), 'utf8');
+      for (const route of routeHtmlPaths()) {
+        const dir = path.join(outDir, route);
+        fs.mkdirSync(dir, { recursive: true });
+        fs.writeFileSync(path.join(dir, 'index.html'), renderRouteHtml(html, route));
+      }
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [react(), fontPreload()],
+  plugins: [react(), fontPreload(), routeHtml()],
   build: {
     sourcemap: false,
     rollupOptions: {

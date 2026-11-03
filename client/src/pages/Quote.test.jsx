@@ -11,9 +11,9 @@ vi.mock('../services/api', () => ({
 }));
 vi.mock('../utils/analytics', () => ({ trackEvent: vi.fn(), trackPageview: vi.fn() }));
 
-const renderQuote = () =>
+const renderQuote = (url = '/presupuesto') =>
   render(
-    <MemoryRouter>
+    <MemoryRouter initialEntries={[url]}>
       <Quote />
     </MemoryRouter>
   );
@@ -45,7 +45,7 @@ describe('Quote — campo trampa anti-spam', () => {
     await user.type(screen.getByLabelText('Email'), 'juana@test.com');
     if (trapValue) await user.type(container.querySelector('input[name="website"]'), trapValue);
     await user.click(screen.getByRole('checkbox'));
-    await user.click(screen.getByRole('button', { name: /solicitar presupuesto/i }));
+    await user.click(screen.getByRole('button', { name: /enviar solicitud/i }));
 
     await waitFor(() => expect(quotesAPI.create).toHaveBeenCalledTimes(1));
   };
@@ -68,7 +68,7 @@ describe('Quote — campo trampa anti-spam', () => {
       renderQuote();
       await waitFor(() => expect(servicesAPI.getAll).toHaveBeenCalled());
 
-      await user.click(screen.getByRole('button', { name: /solicitar presupuesto/i }));
+      await user.click(screen.getByRole('button', { name: /enviar solicitud/i }));
 
       const name = screen.getByLabelText(/nombre y apellido/i);
       expect(name).toHaveFocus();
@@ -87,7 +87,7 @@ describe('Quote — campo trampa anti-spam', () => {
       await user.type(screen.getByLabelText(/nombre y apellido/i), 'Juana Pérez');
       await user.type(screen.getByLabelText(/teléfono/i), '3534224605');
       await user.type(screen.getByLabelText('Email'), 'juana@test.com');
-      await user.click(screen.getByRole('button', { name: /solicitar presupuesto/i }));
+      await user.click(screen.getByRole('button', { name: /enviar solicitud/i }));
 
       expect(screen.getByRole('alert')).toHaveTextContent(/aceptar el uso de tus datos/i);
       expect(screen.getByRole('checkbox')).toHaveFocus();
@@ -99,7 +99,7 @@ describe('Quote — campo trampa anti-spam', () => {
       renderQuote();
       await waitFor(() => expect(servicesAPI.getAll).toHaveBeenCalled());
 
-      await user.click(screen.getByRole('button', { name: /solicitar presupuesto/i }));
+      await user.click(screen.getByRole('button', { name: /enviar solicitud/i }));
       const name = screen.getByLabelText(/nombre y apellido/i);
       await user.type(name, 'Juana');
 
@@ -115,10 +115,41 @@ describe('Quote — campo trampa anti-spam', () => {
       await user.type(screen.getByLabelText(/teléfono/i), '3534224605');
       await user.type(screen.getByLabelText('Email'), 'juana@test.com');
       await user.click(screen.getByRole('checkbox'));
-      await user.click(screen.getByRole('button', { name: /solicitar presupuesto/i }));
+      await user.click(screen.getByRole('button', { name: /enviar solicitud/i }));
 
       const thanks = await screen.findByRole('heading', { name: '¡Gracias!' });
       await waitFor(() => expect(thanks).toHaveFocus());
     });
+  });
+});
+
+describe('Quote — servicio preseleccionado', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    quotesAPI.create.mockResolvedValue({ data: {} });
+  });
+
+  // Desde Servicios el botón lleva a /presupuesto?servicio=<título>: el formulario ya trae ese tipo elegido.
+  it('elige el tipo de proyecto que viene en ?servicio=', async () => {
+    servicesAPI.getAll.mockResolvedValue({ data: [{ title: 'Revestimientos' }, { title: 'Cobertores' }] });
+    renderQuote('/presupuesto?servicio=Cobertores');
+
+    await waitFor(() => expect(screen.getByLabelText(/tipo de proyecto/i)).toHaveValue('Cobertores'));
+  });
+
+  it('si el servicio pedido no existe, queda el primero de la lista', async () => {
+    servicesAPI.getAll.mockResolvedValue({ data: [{ title: 'Revestimientos' }, { title: 'Cobertores' }] });
+    renderQuote('/presupuesto?servicio=Inexistente');
+
+    await waitFor(() => expect(screen.getByLabelText(/tipo de proyecto/i)).toHaveValue('Revestimientos'));
+  });
+
+  it('ofrece escribir por WhatsApp como alternativa al formulario', async () => {
+    servicesAPI.getAll.mockResolvedValue({ data: [] });
+    renderQuote();
+    await waitFor(() => expect(servicesAPI.getAll).toHaveBeenCalled());
+
+    const link = screen.getByRole('link', { name: /whatsapp/i });
+    expect(link.getAttribute('href')).toMatch(/^https:\/\/wa\.me\/\d+\?text=/);
   });
 });
