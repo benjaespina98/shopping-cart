@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import { prefetchRoute } from '../../utils/routePrefetch';
 import { FiShoppingCart, FiMenu, FiX } from 'react-icons/fi';
 import { useCart } from '../../context/CartContext';
 import { Button } from '../../design-system/Button';
+import WhatsAppButton from '../ui/WhatsAppButton';
 
 const navLinks = [
   { to: '/',          label: 'Inicio',    end: true },
@@ -48,12 +49,9 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartHover, setCartHover] = useState(false);
   const [menuHover, setMenuHover] = useState(false);
-  const navigate = useNavigate();
   const location = useLocation();
   const showCart = location.pathname.startsWith('/tienda');
   const headerRef = useRef(null);
-
-  const handleNav = (to) => { navigate(to); setMenuOpen(false); };
 
   // El resto de los overlays del sitio (carrito, lightbox, modal de producto) se cierran
   // con Escape o tocando afuera — este menú solo se cerraba eligiendo un link o volviendo
@@ -85,14 +83,13 @@ export default function Navbar() {
            className="px-5 sm:px-10">
 
         {/* Logo */}
-        <button onClick={() => handleNav('/')}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0,
-                   display: 'flex', alignItems: 'center' }}>
-          <img src="/brand/logo-horizontal.png" alt="Playa & Sol" width={197} height={34} style={{ height: 34, width: 'auto', display: 'block' }} />
-        </button>
+        <Link to="/" aria-label="Playa & Sol, ir al inicio" onClick={() => setMenuOpen(false)}
+          style={{ display: 'flex', alignItems: 'center' }}>
+          <img src="/brand/logo-horizontal.png" alt="" width={197} height={34} style={{ height: 34, width: 'auto', display: 'block' }} />
+        </Link>
 
         {/* Desktop nav — hidden below lg to avoid cramming 6 links on tablet widths */}
-        <nav className="hidden lg:flex" style={{ alignItems: 'center', gap: 'var(--space-6)' }}>
+        <nav aria-label="Principal" className="hidden lg:flex" style={{ alignItems: 'center', gap: 'var(--space-6)' }}>
           {navLinks.map((link) => <NavItem key={link.to} {...link} />)}
         </nav>
 
@@ -121,8 +118,8 @@ export default function Navbar() {
 
           {/* Desktop CTA — hidden below lg */}
           <div className="hidden lg:block">
-            <Button variant="primary" size="sm" onClick={() => handleNav('/presupuesto')}>
-              Solicitar presupuesto
+            <Button variant="primary" size="sm" to="/presupuesto">
+              Pedir presupuesto
             </Button>
           </div>
 
@@ -133,7 +130,8 @@ export default function Navbar() {
             style={{ padding: 8, borderRadius: 12, background: menuHover ? 'var(--grey-50)' : 'transparent',
                      border: 'none', cursor: 'pointer', color: 'var(--text-body)',
                      transition: 'background var(--duration-fast) var(--ease-out)' }}
-            onClick={() => setMenuOpen(o => !o)} aria-label="Menú">
+            onClick={() => setMenuOpen(o => !o)} aria-label="Menú"
+            aria-expanded={menuOpen} aria-controls="menu-movil">
             {menuOpen ? <FiX size={22} /> : <FiMenu size={22} />}
           </button>
         </div>
@@ -141,16 +139,19 @@ export default function Navbar() {
 
       {/* Mobile dropdown */}
       {menuOpen && (
-        <div style={{ borderTop: '1px solid var(--border-subtle)', background: 'var(--surface-card)',
+        <div id="menu-movil" style={{ borderTop: '1px solid var(--border-subtle)', background: 'var(--surface-card)',
                       padding: '12px 20px 16px', boxShadow: 'var(--shadow-md)' }}>
-          <nav style={{ display: 'flex', flexDirection: 'column', gap: 2, marginBottom: 12 }}>
+          <nav aria-label="Principal (móvil)" style={{ display: 'flex', flexDirection: 'column', gap: 2, marginBottom: 12 }}>
             {navLinks.map((link) => (
               <NavItem key={link.to} {...link} mobile onClick={() => setMenuOpen(false)} />
             ))}
           </nav>
-          <Button variant="primary" fullWidth onClick={() => handleNav('/presupuesto')}>
-            Solicitar presupuesto
-          </Button>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <Button variant="primary" fullWidth to="/presupuesto" onClick={() => setMenuOpen(false)}>
+              Pedir presupuesto
+            </Button>
+            <WhatsAppButton fullWidth location="menu" onClick={() => setMenuOpen(false)}>Escribinos por WhatsApp</WhatsAppButton>
+          </div>
         </div>
       )}
     </header>

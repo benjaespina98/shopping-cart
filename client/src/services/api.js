@@ -75,6 +75,8 @@ export const productsAPI = {
   update: (id, formData) =>
     api.put(`/products/${id}`, formData),
   updateStock: (id, stock) => api.patch(`/products/${id}/stock`, { stock }),
+  // Editor masivo: [{ id, price }] con precios finales (el panel calcula y muestra antes de confirmar).
+  updatePrices: (updates) => api.patch('/products/prices', { updates }),
   delete: (id) => api.delete(`/products/${id}`),
 };
 

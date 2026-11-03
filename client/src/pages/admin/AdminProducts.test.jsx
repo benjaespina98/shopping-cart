@@ -11,6 +11,7 @@ vi.mock('../../services/api', () => ({
     update: vi.fn(),
     delete: vi.fn(),
     updateStock: vi.fn(),
+    updatePrices: vi.fn(),
   },
   categoriesAPI: { getAll: vi.fn(), create: vi.fn(), update: vi.fn(), delete: vi.fn() },
 }));
@@ -181,5 +182,100 @@ describe('AdminProducts — CRUD', () => {
 
     expect(productsAPI.updateStock).not.toHaveBeenCalled();
     expect(toast.error).toHaveBeenCalledWith('Ingresá un stock válido (0 o mayor)');
+  });
+});
+
+describe('AdminProducts — editor masivo de precios', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    categoriesAPI.getAll.mockResolvedValue({ data: [{ _id: 'c1', name: 'Limpieza' }] });
+    productsAPI.getAllAdmin.mockResolvedValue({
+      data: {
+        products: [
+          producto({ _id: 'p1', name: 'Cloro', price: 1000 }),
+          producto({ _id: 'p2', name: 'Alguicida', price: 2000, category: 'Limpieza' }),
+        ],
+      },
+    });
+  });
+
+  const abrir = async (user) => {
+    renderPage();
+    await screen.findByText('Cloro');
+    await user.click(screen.getByRole('button', { name: /editar precios/i }));
+    return screen.getByRole('dialog', { name: /editar precios en bloque/i });
+  };
+
+  it('calcula el precio nuevo de cada fila y envía solo precios finales al server', async () => {
+    const user = userEvent.setup();
+    productsAPI.updatePrices.mockResolvedValue({ data: { updated: 2 } });
+    const dialog = await abrir(user);
+
+    await user.type(within(dialog).getByLabelText(/^valor/i), '10');
+
+    expect(within(dialog).getByLabelText('Precio nuevo de Cloro')).toHaveValue('1100');
+    expect(within(dialog).getByLabelText('Precio nuevo de Alguicida')).toHaveValue('2200');
+
+    await user.click(within(dialog).getByRole('button', { name: /aplicar a 2/i }));
+
+    expect(window.confirm).toHaveBeenCalled();
+    expect(productsAPI.updatePrices).toHaveBeenCalledWith([
+      { id: 'p1', price: 1100 },
+      { id: 'p2', price: 2200 },
+    ]);
+    expect(toast.success).toHaveBeenCalled();
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
+  it('no envía los productos desmarcados y permite retocar un precio a mano', async () => {
+    const user = userEvent.setup();
+    productsAPI.updatePrices.mockResolvedValue({ data: { updated: 1 } });
+    const dialog = await abrir(user);
+
+    await user.type(within(dialog).getByLabelText(/^valor/i), '10');
+    await user.click(within(dialog).getByLabelText('Incluir Alguicida'));
+    const cloro = within(dialog).getByLabelText('Precio nuevo de Cloro');
+    await user.clear(cloro);
+    await user.type(cloro, '1234,5');
+    await user.click(within(dialog).getByRole('button', { name: /aplicar a 1/i }));
+
+    expect(productsAPI.updatePrices).toHaveBeenCalledWith([{ id: 'p1', price: 1234.5 }]);
+  });
+
+  it('sin valor no deja aplicar; con un precio manual inválido tampoco', async () => {
+    const user = userEvent.setup();
+    const dialog = await abrir(user);
+
+    expect(within(dialog).getByRole('button', { name: /aplicar a 0/i })).toBeDisabled();
+
+    const cloro = within(dialog).getByLabelText('Precio nuevo de Cloro');
+    await user.clear(cloro);
+    await user.type(cloro, 'abc');
+    expect(cloro).toHaveAttribute('aria-invalid', 'true');
+    expect(within(dialog).getByRole('button', { name: /aplicar/i })).toBeDisabled();
+    expect(productsAPI.updatePrices).not.toHaveBeenCalled();
+  });
+
+  it('si el usuario no confirma, no se guarda nada; si el server falla, avisa y deja abierto', async () => {
+    const user = userEvent.setup();
+    const dialog = await abrir(user);
+    await user.type(within(dialog).getByLabelText(/^valor/i), '5');
+
+    window.confirm.mockReturnValueOnce(false);
+    await user.click(within(dialog).getByRole('button', { name: /aplicar a 2/i }));
+    expect(productsAPI.updatePrices).not.toHaveBeenCalled();
+
+    productsAPI.updatePrices.mockRejectedValue({ response: { data: { message: 'Algunos productos ya no existen.' } } });
+    await user.click(within(dialog).getByRole('button', { name: /aplicar a 2/i }));
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Algunos productos ya no existen.'));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+  });
+
+  it('se cierra con Escape', async () => {
+    const user = userEvent.setup();
+    await abrir(user);
+    await user.keyboard('{Escape}');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 });

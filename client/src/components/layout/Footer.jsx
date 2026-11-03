@@ -6,6 +6,7 @@ import { servicesAPI } from '../../services/api';
 import { useSettings } from '../../context/SettingsContext';
 import { FALLBACK_SERVICE_NAMES } from '../../data/fallbackServices';
 import { prefetchRoute } from '../../utils/routePrefetch';
+import { whatsappUrl } from '../../utils/whatsapp';
 
 const empresaLinks = [
   ['/nosotros', 'Nosotros'],
@@ -19,10 +20,6 @@ const linkStyle = {
   transition: 'color var(--duration-fast) var(--ease-out)',
 };
 const linkHover = (e, on) => { e.currentTarget.style.color = on ? 'var(--text-inverse)' : 'var(--text-inverse-muted)'; };
-const socialHover = (e, on) => {
-  e.currentTarget.style.transform = on ? 'translateY(-3px) scale(1.06)' : 'translateY(0) scale(1)';
-  e.currentTarget.style.boxShadow = on ? 'var(--shadow-lg)' : 'var(--shadow-sm)';
-};
 
 // Las rutas internas se navegan con <Link>; teléfonos, mails y redes con <a>.
 // Todo el footer usaba <a href="/...">, así que cada click recargaba la aplicación
@@ -36,7 +33,7 @@ function FooterLink({ to, label }) {
 
   return to.startsWith('/')
     ? <Link to={to} style={linkStyle} {...handlers}>{label}</Link>
-    : <a href={to} target="_blank" rel="noreferrer" style={linkStyle} {...handlers}>{label}</a>;
+    : <a href={to} {...(to.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})} style={linkStyle} {...handlers}>{label}</a>;
 }
 
 export default function Footer() {
@@ -48,16 +45,18 @@ export default function Footer() {
     // nunca queda desactualizado respecto a lo que realmente se ofrece.
     servicesAPI.getAll()
       .then(({ data }) => {
-        if (data?.length > 0) setServiceNames(data.slice(0, 4).map((s) => s.title));
+        if (data?.length > 0) setServiceNames(data.slice(0, 8).map((s) => s.title));
       })
       .catch(() => {});
   }, []);
 
+  // Íconos de un solo tono: los colores de cada red (degradado de Instagram, azul, negro, verde) competían
+  // con la paleta de la marca y eran lo más llamativo del pie.
   const socialLinks = [
-    { href: 'https://www.instagram.com/playaysol.piscinas/', Icon: FiInstagram, label: 'Instagram', bg: 'linear-gradient(135deg, #FEDA75, #FA7E1E, #D62976, #962FBF, #4F5BD5)' },
-    { href: 'https://www.facebook.com/playaysol.piscinas', Icon: FiFacebook, label: 'Facebook', bg: '#1877F2' },
-    { href: 'https://www.tiktok.com/@playaysolpiscinas', Icon: FaTiktok, label: 'TikTok', bg: '#000000' },
-    { href: `https://wa.me/${settings.whatsappNumber}`, Icon: FaWhatsapp, label: 'WhatsApp', bg: '#25D366' },
+    { href: 'https://www.instagram.com/playaysol.piscinas/', Icon: FiInstagram, label: 'Instagram' },
+    { href: 'https://www.facebook.com/playaysol.piscinas', Icon: FiFacebook, label: 'Facebook' },
+    { href: 'https://www.tiktok.com/@playaysolpiscinas', Icon: FaTiktok, label: 'TikTok' },
+    { href: whatsappUrl(settings.whatsappNumber), Icon: FaWhatsapp, label: 'WhatsApp' },
   ];
 
   const cols = [
@@ -66,7 +65,7 @@ export default function Footer() {
     { title: 'Contacto',  items: [
       ['/contacto', 'Escribinos'],
       [settings.phoneNumberLink, settings.phoneNumberDisplay],
-      [`https://wa.me/${settings.whatsappNumber}`, 'WhatsApp'],
+      [whatsappUrl(settings.whatsappNumber), 'WhatsApp'],
       [`mailto:${settings.contactEmail}`, settings.contactEmail],
     ] },
   ];
@@ -90,15 +89,9 @@ export default function Footer() {
             Seguinos
           </p>
           <div style={{ display: 'flex', gap: 12 }}>
-            {socialLinks.map(({ href, Icon, label, bg }) => (
-              <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={label}
-                style={{ width: 42, height: 42, borderRadius: 12, background: bg,
-                         color: 'var(--text-inverse)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                         boxShadow: 'var(--shadow-sm)',
-                         transition: 'transform 180ms ease, box-shadow 180ms ease' }}
-                onMouseEnter={e => socialHover(e, true)}
-                onMouseLeave={e => socialHover(e, false)}>
-                <Icon size={20} />
+            {socialLinks.map(({ href, Icon, label }) => (
+              <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label} className="ps-social-link">
+                <Icon size={19} />
               </a>
             ))}
           </div>
@@ -131,7 +124,7 @@ export default function Footer() {
                     flexWrap: 'wrap', gap: 8, fontSize: 13 }}
            className="ps-section">
         <span>© {new Date().getFullYear()} Playa & Sol Piscinas</span>
-        <span style={{ opacity: 0.6 }}>Corrientes 1210, Villa María, Córdoba</span>
+        <span style={{ color: 'var(--text-inverse-faint)' }}>Corrientes 1210, Villa María, Córdoba</span>
       </div>
     </footer>
   );

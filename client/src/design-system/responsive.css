@@ -36,7 +36,7 @@
 /* ── Trust strip (stats) ───────────────────────────────── */
 .ps-stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(var(--ps-stat-cols, 4), 1fr);
   gap: 32px;
 }
 .ps-stat-item { border-left: 1px solid var(--divider); }
@@ -45,16 +45,21 @@
   .ps-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 28px 14px; }
   .ps-stat-item  { border-left: none; border-top: 1px solid var(--divider); padding-top: 20px !important; }
   .ps-stat-item:nth-child(1), .ps-stat-item:nth-child(2) { border-top: none; padding-top: 0 !important; }
+  /* Con una cantidad impar de cifras, la última ocupa todo el ancho en vez de quedar suelta a la izquierda. */
+  .ps-stat-item:last-child:nth-child(odd) { grid-column: 1 / -1; }
 }
 
 /* ── Services cards (home) ─────────────────────────────── */
+/* --ps-cols lo fija Landing según la cantidad de tarjetas (evita una huérfana en la última fila). */
 .ps-services-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(var(--ps-cols, 4), minmax(0, 1fr));
   gap: 20px;
 }
-@media (max-width: 1023px) { .ps-services-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 480px)  { .ps-services-grid { grid-template-columns: 1fr; } }
+@media (max-width: 1023px) { .ps-services-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px)  { .ps-services-grid { grid-template-columns: minmax(0, 1fr); } }
+/* La tarjeta entera es un enlace real (clic medio, abrir en pestaña nueva, lectores de pantalla). */
+.ps-card-link { display: block; color: inherit; text-decoration: none; border-radius: var(--radius-lg); }
 
 /* ── Projects grid (home) ──────────────────────────────── */
 .ps-projects-grid {
@@ -66,7 +71,7 @@
 @media (max-width: 767px) {
   .ps-projects-grid                    { grid-template-columns: 1fr 1fr;
                                          grid-template-rows: repeat(3, 170px); }
-  .ps-projects-grid > div:first-child  { grid-row: auto !important; }
+  .ps-projects-grid > :first-child     { grid-row: auto !important; }
 }
 @media (max-width: 480px) {
   .ps-projects-grid { grid-template-columns: 1fr; grid-template-rows: repeat(5, 200px); }
@@ -83,8 +88,10 @@
 @media (max-width: 767px) {
   .ps-cta-block   { flex-direction: column; align-items: flex-start; gap: 20px;
                     padding: 32px 24px !important; border-radius: 20px !important; }
-  .ps-cta-block > button,
-  .ps-cta-block > a { width: 100%; justify-content: center; }
+  .ps-cta-block > div:last-child { width: 100%; flex-direction: column; }
+  .ps-cta-block > div:last-child > * { width: 100%; justify-content: center; }
+  /* Con 320–360 px "Escribinos por WhatsApp" no entra en una línea: que el texto baje en vez de salirse del botón. */
+  .ps-cta-actions .ps-btn, .ps-hero-btns .ps-btn { white-space: normal !important; text-align: center; line-height: 1.2 !important; }
 }
 
 /* ── Services page rows ────────────────────────────────── */
@@ -126,6 +133,21 @@
 }
 @media (max-width: 1023px) { .ps-footer-grid { grid-template-columns: 1fr 1fr; gap: 28px; } }
 @media (max-width: 480px)  { .ps-footer-grid { grid-template-columns: 1fr; gap: 24px; } }
+
+/* Redes del pie: íconos de un solo tono sobre el petróleo; el amarillo de marca solo al enfocar o pasar el mouse. */
+.ps-social-link {
+  width: 42px; height: 42px; border-radius: var(--radius-md);
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--text-inverse);
+  background: var(--surface-on-dark);
+  border: 1px solid var(--border-on-dark-subtle);
+  transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
+}
+.ps-social-link:hover {
+  background: var(--brand-accent);
+  color: var(--text-on-accent);
+  border-color: var(--brand-accent);
+}
 
 /* ── Page typography ────────────────────────────────────── */
 /* font sizes use clamp() in inline styles — no overrides needed here */
