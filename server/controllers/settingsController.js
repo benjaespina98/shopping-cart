@@ -3,9 +3,24 @@ import Settings from '../models/Settings.js';
 import User from '../models/User.js';
 import { cloudinary } from '../config/cloudinary.js';
 import { writeAuditLog } from '../utils/auditLogger.js';
-import { MIN_PASSWORD_LENGTH } from '../utils/validation.js';
+import { MIN_PASSWORD_LENGTH, hasControlChars, isValidEmail } from '../utils/validation.js';
 
 const VALID_THEMES = ['default', 'elegante', 'moderno'];
+
+// Estos campos llegan al sitio público como `href` (tel:, wa.me, mailto:) o como texto: se validan el
+// formato y el largo acá, no solo en el panel. Un valor como "javascript:..." o "//otro-sitio" no pasa.
+const WHATSAPP_RE = /^\d{8,15}$/;
+const PHONE_LINK_RE = /^tel:\+?[\d-]{6,20}$/;
+// El email se publica dentro de un mailto:: sin `? & = / % #` en la parte local, que agregarían parámetros (bcc, cc, body).
+const CONTACT_EMAIL_RE = /^[A-Za-z0-9._+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)+$/;
+
+const badRequest = (res, message) => {
+  res.status(400);
+  throw new Error(message);
+};
+
+// WhatsApp admite que se pegue con +, espacios o guiones: se normaliza a solo dígitos.
+const normalizeWhatsapp = (value) => String(value).replace(/[\s+()-]/g, '');
 
 const defaultSettings = {
   singletonKey: 'main',
@@ -40,19 +55,25 @@ const sanitizeBusinessHours = (hours) => {
       hours: String(item?.hours || '').trim(),
     }))
     .filter((item) => item.day && item.hours)
+    .filter((item) => item.day.length <= 60 && item.hours.length <= 60)
+    .filter((item) => !hasControlChars(item.day) && !hasControlChars(item.hours))
     .slice(0, 14);
 
   return normalized.length > 0 ? normalized : defaultSettings.businessHours;
 };
 
+// Lo que ya estuviera guardado antes de que existiera la validación (o escrito directo en la base) no se
+// publica si no tiene el formato esperado: el sitio usa estos valores como `href`.
+const onlyIfValid = (value, pattern, fallback) => (pattern.test(String(value ?? '')) ? value : fallback);
+
 const toPublicResponse = (settings) => ({
   theme: settings.theme || 'default',
-  contactEmail: settings.contactEmail,
-  whatsappNumber: settings.whatsappNumber,
+  contactEmail: onlyIfValid(settings.contactEmail, CONTACT_EMAIL_RE, defaultSettings.contactEmail),
+  whatsappNumber: onlyIfValid(settings.whatsappNumber, WHATSAPP_RE, defaultSettings.whatsappNumber),
   phoneNumberDisplay: settings.phoneNumberDisplay,
-  phoneNumberLink: settings.phoneNumberLink,
+  phoneNumberLink: onlyIfValid(settings.phoneNumberLink, PHONE_LINK_RE, defaultSettings.phoneNumberLink),
   secondaryContactLabel: settings.secondaryContactLabel || '',
-  secondaryContactWhatsapp: settings.secondaryContactWhatsapp || '',
+  secondaryContactWhatsapp: onlyIfValid(settings.secondaryContactWhatsapp || '', /^(\d{8,15})?$/, ''),
   contactPhotoUrl: settings.contactPhotoUrl || '',
   aboutPhotoUrl: settings.aboutPhotoUrl || '',
   businessHours: settings.businessHours,
@@ -88,13 +109,47 @@ export const updateAdminSettings = asyncHandler(async (req, res) => {
   if (theme && VALID_THEMES.includes(theme)) {
     settings.theme = theme;
   }
+  if (contactEmail && !(isValidEmail(contactEmail) && CONTACT_EMAIL_RE.test(contactEmail))) {
+    badRequest(res, 'El email de contacto no es válido (solo letras, números, punto, guion, guion bajo y +)');
+  }
+
+  const whatsappDigits = whatsappNumber ? normalizeWhatsapp(whatsappNumber) : '';
+  if (whatsappDigits && !WHATSAPP_RE.test(whatsappDigits)) {
+    badRequest(res, 'El WhatsApp debe tener entre 8 y 15 dígitos, con código de país (ej: 5493534224605)');
+  }
+
+  const phoneLink = phoneNumberLink.replace(/\s+/g, '');
+  if (phoneLink && !PHONE_LINK_RE.test(phoneLink)) {
+    badRequest(res, 'El enlace del teléfono debe tener el formato tel:+543534224605');
+  }
+  if (phoneNumberDisplay && (phoneNumberDisplay.length > 40 || hasControlChars(phoneNumberDisplay))) {
+    badRequest(res, 'El teléfono a mostrar no es válido (máximo 40 caracteres)');
+  }
+
+  let secondaryLabel;
+  if (secondaryContactLabel !== undefined) {
+    secondaryLabel = String(secondaryContactLabel).trim();
+    if (secondaryLabel.length > 80 || hasControlChars(secondaryLabel)) {
+      badRequest(res, 'La etiqueta del contacto secundario no es válida (máximo 80 caracteres)');
+    }
+  }
+
+  let secondaryWhatsapp;
+  if (secondaryContactWhatsapp !== undefined) {
+    secondaryWhatsapp = normalizeWhatsapp(String(secondaryContactWhatsapp).trim());
+    if (secondaryWhatsapp && !WHATSAPP_RE.test(secondaryWhatsapp)) {
+      badRequest(res, 'El WhatsApp secundario debe tener entre 8 y 15 dígitos, o quedar vacío');
+    }
+  }
+
   settings.contactEmail = contactEmail || settings.contactEmail;
-  settings.whatsappNumber = whatsappNumber || settings.whatsappNumber;
+  settings.whatsappNumber = whatsappDigits || settings.whatsappNumber;
   settings.phoneNumberDisplay = phoneNumberDisplay || settings.phoneNumberDisplay;
-  settings.phoneNumberLink = phoneNumberLink || settings.phoneNumberLink;
-  if (secondaryContactLabel !== undefined) settings.secondaryContactLabel = String(secondaryContactLabel).trim();
-  if (secondaryContactWhatsapp !== undefined) settings.secondaryContactWhatsapp = String(secondaryContactWhatsapp).trim();
-  settings.businessHours = sanitizeBusinessHours(req.body?.businessHours);
+  settings.phoneNumberLink = phoneLink || settings.phoneNumberLink;
+  if (secondaryLabel !== undefined) settings.secondaryContactLabel = secondaryLabel;
+  if (secondaryWhatsapp !== undefined) settings.secondaryContactWhatsapp = secondaryWhatsapp;
+  // Un guardado parcial (sin horarios) no pisa los horarios cargados.
+  if (req.body?.businessHours !== undefined) settings.businessHours = sanitizeBusinessHours(req.body.businessHours);
 
   await settings.save();
 

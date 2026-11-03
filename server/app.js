@@ -136,7 +136,7 @@ app.use((err, req, res, next) => {
   if (err.name === 'MulterError') {
     statusCode = 400;
     if (err.code === 'LIMIT_FILE_SIZE') {
-      message = 'La imagen es demasiado grande. El máximo permitido es 8 MB.';
+      message = 'La imagen es demasiado grande. Probá con un archivo más liviano (hasta 5 MB en productos y 8 MB en el resto).';
     } else if (err.code === 'LIMIT_UNEXPECTED_FILE') {
       message = 'Se recibió un archivo en un campo inesperado.';
     } else if (err.code === 'LIMIT_FILE_COUNT') {
