@@ -1,4 +1,5 @@
 import asyncHandler from 'express-async-handler';
+import mongoose from 'mongoose';
 import Product from '../models/Product.js';
 import Category from '../models/Category.js';
 import { cloudinary } from '../config/cloudinary.js';
@@ -224,6 +225,90 @@ export const updateStock = asyncHandler(async (req, res) => {
   });
 
   res.json(product);
+});
+
+// Tope por pedido: el panel edita lo que se ve en pantalla (50–100 filas); más que eso es un error o un abuso.
+const MAX_PRICE_UPDATES = 200;
+// Tope de un precio: evita que un dedo de más (1000000000) llegue a la tienda.
+const MAX_PRICE = 100_000_000;
+
+// PATCH /api/products/prices — admin. Cuerpo: { updates: [{ id, price }] } con precios finales: el
+// cálculo (porcentaje, monto, redondeo) lo hace y muestra el panel antes de confirmar; acá se
+// valida cada fila y se guarda. Lista blanca: solo se toca `price`. Todo o nada: si una fila es
+// inválida no se guarda ninguna, así una lista a medias no deja la tienda con precios mezclados.
+export const updatePrices = asyncHandler(async (req, res) => {
+  const { updates } = req.body || {};
+
+  if (!Array.isArray(updates) || updates.length === 0) {
+    res.status(400);
+    throw new Error('Enviá al menos un producto con su nuevo precio');
+  }
+  if (updates.length > MAX_PRICE_UPDATES) {
+    res.status(400);
+    throw new Error(`Podés actualizar hasta ${MAX_PRICE_UPDATES} productos por vez`);
+  }
+
+  const seen = new Set();
+  const rows = updates.map((row) => {
+    const id = typeof row?.id === 'string' ? row.id : '';
+    const price = typeof row?.price === 'number' ? row.price : NaN;
+
+    if (!mongoose.isValidObjectId(id) || id.length !== 24) {
+      res.status(400);
+      throw new Error('Hay un producto con un identificador inválido');
+    }
+    if (seen.has(id)) {
+      res.status(400);
+      throw new Error('Hay un producto repetido en la lista');
+    }
+    seen.add(id);
+    if (!Number.isFinite(price) || price < 0 || price > MAX_PRICE) {
+      res.status(400);
+      throw new Error('Todos los precios deben ser números entre 0 y 100.000.000');
+    }
+    return { id, price: Math.round(price * 100) / 100 };
+  });
+
+  const existing = await Product.find({ _id: { $in: rows.map((r) => r.id) } }).select('name price').lean();
+  const byId = new Map(existing.map((p) => [String(p._id), p]));
+  const missing = rows.filter((r) => !byId.has(r.id)).map((r) => r.id);
+  if (missing.length > 0) {
+    res.status(404);
+    throw new Error('Algunos productos ya no existen. Recargá la lista e intentá de nuevo.');
+  }
+
+  const changed = rows.filter((r) => byId.get(r.id).price !== r.price);
+  // Compare-and-set: solo se escribe si el precio sigue siendo el que se leyó. Si otro admin lo cambió o
+  // borró el producto mientras tanto, esa fila no se pisa y no se cuenta como actualizada.
+  let applied = changed;
+  if (changed.length > 0) {
+    const result = await Product.bulkWrite(
+      changed.map((r) => ({
+        updateOne: { filter: { _id: r.id, price: byId.get(r.id).price }, update: { $set: { price: r.price } } },
+      }))
+    );
+    if (result.modifiedCount !== changed.length) {
+      const now = await Product.find({ _id: { $in: changed.map((r) => r.id) } }).select('price').lean();
+      const current = new Map(now.map((p) => [String(p._id), p.price]));
+      applied = changed.filter((r) => current.get(r.id) === r.price);
+    }
+  }
+
+  await writeAuditLog({
+    req,
+    action: 'PRODUCT_PRICES_UPDATED',
+    entity: 'product',
+    message: `Precios actualizados en ${applied.length} producto${applied.length === 1 ? '' : 's'}`,
+    meta: {
+      count: applied.length,
+      // Hasta 200 filas (MAX_PRICE_UPDATES): se registran todas, para poder reconstruir el "antes" de un error masivo.
+      changes: applied.map((r) => ({
+        id: r.id, name: byId.get(r.id).name, from: byId.get(r.id).price, to: r.price,
+      })),
+    },
+  });
+
+  res.json({ updated: applied.length, unchanged: rows.length - changed.length, skipped: changed.length - applied.length });
 });
 
 // DELETE /api/products/:id — admin

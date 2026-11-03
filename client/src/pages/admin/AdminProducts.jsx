@@ -1,7 +1,8 @@
 import { useEffect, useId, useMemo, useState, useRef } from 'react';
-import { FiPlus, FiEdit2, FiTrash2, FiX, FiUpload, FiCheck, FiAlertCircle, FiSave, FiSearch, FiPackage, FiTag } from 'react-icons/fi';
+import { FiDollarSign, FiPlus, FiEdit2, FiTrash2, FiX, FiUpload, FiCheck, FiAlertCircle, FiSave, FiSearch, FiPackage, FiTag } from 'react-icons/fi';
 import { productsAPI, categoriesAPI } from '../../services/api';
 import CategoryManager from '../../components/admin/CategoryManager';
+import BulkPriceModal from '../../components/admin/BulkPriceModal';
 import CldImage from '../../components/ui/CldImage';
 import { FALLBACK_CATEGORIES } from '../../data/fallbackCategories';
 import { toast } from 'react-toastify';
@@ -284,6 +285,7 @@ export default function AdminProducts() {
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState(null); // null | 'create' | product
+  const [bulkPrices, setBulkPrices] = useState(false);
   const [deleting, setDeleting] = useState(null);
   const [editingStockId, setEditingStockId] = useState(null);
   const [draftStocks, setDraftStocks] = useState({});
@@ -411,9 +413,15 @@ export default function AdminProducts() {
           </p>
         </div>
         {tab === 'products' && (
-          <button onClick={() => setModal('create')} className="btn-primary flex items-center gap-2 self-start sm:self-auto">
-            <FiPlus size={17} /> Nuevo producto
-          </button>
+          <div className="flex flex-wrap gap-2 self-start sm:self-auto">
+            <button onClick={() => setBulkPrices(true)} disabled={visibleProducts.length === 0}
+              className="btn-ghost flex items-center gap-2">
+              <FiDollarSign size={16} /> Editar precios
+            </button>
+            <button onClick={() => setModal('create')} className="btn-primary flex items-center gap-2">
+              <FiPlus size={17} /> Nuevo producto
+            </button>
+          </div>
         )}
       </div>
 
@@ -602,6 +610,10 @@ export default function AdminProducts() {
         </div>
           )}
         </>
+      )}
+
+      {bulkPrices && (
+        <BulkPriceModal products={visibleProducts} onClose={() => setBulkPrices(false)} onSaved={fetchProducts} />
       )}
 
       {/* Modal */}
