@@ -34,6 +34,11 @@ export function renderRouteHtml(html, route) {
   out = replaceTag(out, /<meta property="og:description" content="[^"]*"\s*\/?>/, `<meta property="og:description" content="${description}" />`, 'og:description');
   out = replaceTag(out, /<meta name="twitter:title" content="[^"]*"\s*\/?>/, `<meta name="twitter:title" content="${title}" />`, 'twitter:title');
   out = replaceTag(out, /<meta name="twitter:description" content="[^"]*"\s*\/?>/, `<meta name="twitter:description" content="${description}" />`, 'twitter:description');
+  // El <noscript> también habla de la página: sin JavaScript, un rastreador ve su título y su descripción.
+  out = replaceTag(out, /<noscript>\s*<div>\s*<h1>[^<]*<\/h1>/, `<noscript>
+      <div>
+        <h1>${escapeText(meta.title)}</h1>
+        <p>${escapeText(meta.description)}</p>`, '<noscript>');
   return out;
 }
 

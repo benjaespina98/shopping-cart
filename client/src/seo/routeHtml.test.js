@@ -28,6 +28,13 @@ describe('renderRouteHtml', () => {
     expect(attr(html, /<meta name="twitter:title" content="([^"]*)"/)).toBe(esc(meta.title));
   });
 
+  it('el <noscript> de cada ruta lleva su propio título y descripción', () => {
+    const html = renderRouteHtml(indexHtml, '/servicios');
+    const noscript = html.match(/<noscript>[\s\S]*?<\/noscript>/)[0];
+    expect(noscript).toContain('<h1>Servicios de piscinas | Playa &amp; Sol Piscinas</h1>');
+    expect(noscript).toContain('Corrientes 1210');
+  });
+
   it('conserva todo lo demás: JSON-LD, imagen social y el script del bundle', () => {
     const html = renderRouteHtml(indexHtml, '/servicios');
     expect(html).toContain('"@type": "LocalBusiness"');

@@ -124,7 +124,7 @@ export default function Footer() {
                     flexWrap: 'wrap', gap: 8, fontSize: 13 }}
            className="ps-section">
         <span>© {new Date().getFullYear()} Playa & Sol Piscinas</span>
-        <span style={{ opacity: 0.6 }}>Corrientes 1210, Villa María, Córdoba</span>
+        <span style={{ color: 'var(--text-inverse-faint)' }}>Corrientes 1210, Villa María, Córdoba</span>
       </div>
     </footer>
   );

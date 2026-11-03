@@ -18,7 +18,12 @@ export default function BulkPriceModal({ products, onClose, onSaved }) {
   const [overrides, setOverrides] = useState({});
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => { valueRef.current?.focus(); }, []);
+  // Foco inicial en el valor y, al cerrar, de vuelta en el botón que abrió el modal.
+  useEffect(() => {
+    const opener = document.activeElement;
+    valueRef.current?.focus();
+    return () => { if (opener instanceof HTMLElement) opener.focus(); };
+  }, []);
 
   useEffect(() => {
     const onKeyDown = (e) => { if (e.key === 'Escape' && !saving) onClose(); };
@@ -80,7 +85,7 @@ export default function BulkPriceModal({ products, onClose, onSaved }) {
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
           <div>
             <h2 id={fieldId('title')} className="font-semibold text-slate-800 text-lg">Editar precios en bloque</h2>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-slate-600">
               Se aplica a los {products.length} producto{products.length === 1 ? '' : 's'} que ves en la tabla (filtros incluidos).
             </p>
           </div>
@@ -124,13 +129,13 @@ export default function BulkPriceModal({ products, onClose, onSaved }) {
             </thead>
             <tbody>
               {rows.map(({ product, isSelected, next, manualInvalid, changed }) => (
-                <tr key={product._id} className={`border-b border-slate-50 ${isSelected ? '' : 'opacity-50'}`}>
+                <tr key={product._id} className="border-b border-slate-50">
                   <td className="px-4 py-2">
                     <input type="checkbox" aria-label={`Incluir ${product.name}`} checked={isSelected} onChange={() => toggle(product._id)} />
                   </td>
                   <td className="px-2 py-2">
                     <div className="font-medium text-slate-800">{product.name}</div>
-                    <div className="text-xs text-slate-500">{product.category}</div>
+                    <div className="text-xs text-slate-600">{product.category}{isSelected ? '' : ' · excluido'}</div>
                   </td>
                   <td className="px-4 py-2 text-right text-slate-600">{formatPrice(product.price)}</td>
                   <td className="px-4 py-2 text-right">
@@ -138,6 +143,7 @@ export default function BulkPriceModal({ products, onClose, onSaved }) {
                       aria-label={`Precio nuevo de ${product.name}`}
                       aria-invalid={manualInvalid || undefined}
                       disabled={!isSelected}
+                      title={isSelected ? undefined : 'Excluido del cambio'}
                       inputMode="decimal"
                       className={`input text-right py-1.5 ${manualInvalid ? 'input-error' : ''} ${changed ? 'font-semibold' : ''}`}
                       value={overrides[product._id] ?? (next === null ? '' : String(next))}

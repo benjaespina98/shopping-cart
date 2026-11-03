@@ -82,10 +82,12 @@ export default function Services() {
                   )}
                   <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
                     {/* El servicio viaja en la URL: el formulario de presupuesto lo deja ya elegido. */}
-                    <Button variant="primary" to={`/presupuesto?servicio=${encodeURIComponent(r.title)}`}>
+                    <Button variant="primary" to={`/presupuesto?servicio=${encodeURIComponent(r.title)}`}
+                      aria-label={`${r.cta || 'Pedir presupuesto'}: ${r.title}`}>
                       {r.cta || 'Pedir presupuesto'}
                     </Button>
-                    <WhatsAppButton text={`Hola! Quiero consultar por: ${r.title}.`} location="servicios">
+                    <WhatsAppButton text={`Hola! Quiero consultar por: ${r.title}.`} location="servicios"
+                      aria-label={`Consultar por WhatsApp: ${r.title}`}>
                       Consultar por WhatsApp
                     </WhatsAppButton>
                   </div>

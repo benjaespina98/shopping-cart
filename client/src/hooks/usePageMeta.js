@@ -37,6 +37,7 @@ export default function usePageMeta() {
     setMeta('property', 'og:title', meta.title);
     setMeta('property', 'og:description', meta.description);
     setMeta('name', 'twitter:title', meta.title);
+    setMeta('name', 'twitter:description', meta.description);
 
     const canonical = document.head.querySelector('link[rel="canonical"]');
     if (meta.canonical) {

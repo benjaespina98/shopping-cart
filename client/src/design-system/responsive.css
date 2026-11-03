@@ -69,7 +69,7 @@
 @media (max-width: 767px) {
   .ps-projects-grid                    { grid-template-columns: 1fr 1fr;
                                          grid-template-rows: repeat(3, 170px); }
-  .ps-projects-grid > div:first-child  { grid-row: auto !important; }
+  .ps-projects-grid > :first-child     { grid-row: auto !important; }
 }
 @media (max-width: 480px) {
   .ps-projects-grid { grid-template-columns: 1fr; grid-template-rows: repeat(5, 200px); }
@@ -88,6 +88,8 @@
                     padding: 32px 24px !important; border-radius: 20px !important; }
   .ps-cta-block > div:last-child { width: 100%; flex-direction: column; }
   .ps-cta-block > div:last-child > * { width: 100%; justify-content: center; }
+  /* Con 320–360 px "Escribinos por WhatsApp" no entra en una línea: que el texto baje en vez de salirse del botón. */
+  .ps-cta-actions .ps-btn, .ps-hero-btns .ps-btn { white-space: normal !important; text-align: center; line-height: 1.2 !important; }
 }
 
 /* ── Services page rows ────────────────────────────────── */
